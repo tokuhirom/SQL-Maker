@@ -6,7 +6,7 @@ our $VERSION = '0.01';
 use Class::Accessor::Lite;
 Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep/);
 
-use SQL::Builder::Select;
+use SQL::Builder::Statement;
 
 sub new {
     my $class = shift;
@@ -69,7 +69,7 @@ sub _quote {
 sub delete {
     my ($self, $table, $where) = @_;
 
-    my $stmt = SQL::Builder::Select->new( { from => [$table], } );
+    my $stmt = SQL::Builder::Statement->new( { from => [$table], } );
     $stmt->add_where_ex(%$where);
     my $sql = 'DELETE ' . $stmt->as_sql;
     return ($sql, @{$stmt->bind});
@@ -80,7 +80,7 @@ sub update {
 
     my ($columns, $bind_columns, undef) = $class->_set_columns($args, 0);
 
-    my $stmt = SQL::Builder::Select->new();
+    my $stmt = SQL::Builder::Statement->new();
     $stmt->add_where_ex(%$where);
     push @{$bind_columns}, @{$stmt->bind};
 
@@ -88,7 +88,47 @@ sub update {
     return ($sql, @$bind_columns);
 }
 
-# TODO: select
+# my($stmt, @bind) = $sql−>select($table, \@fields, \%where, \@order);
+sub select {
+    my ($self, $table, $fields, $where, $opt) = @_;
+
+    my $stmt = SQL::Builder::Statement->new(
+        select => $fields,
+        from   => [$table],
+    );
+
+    if ( $where ) {
+        $stmt->add_where_ex(%$where);
+    }
+
+    $stmt->limit(  $opt->{limit}  ) if $opt->{limit};
+    $stmt->offset( $opt->{offset} ) if $opt->{offset};
+
+    if (my $terms = $opt->{order_by}) {
+        $terms = [$terms] unless ref($terms) eq 'ARRAY';
+        my @orders;
+        for my $term (@{$terms}) {
+            my ($col, $case);
+            if (ref($term) eq 'HASH') {
+                ($col, $case) = each %$term;
+            } else {
+                $col  = $term;
+                $case = 'ASC';
+            }
+            push @orders, { column => $col, desc => $case };
+        }
+        $stmt->order(\@orders);
+    }
+
+    if (my $terms = $opt->{having}) {
+        for my $col (keys %$terms) {
+            $stmt->add_having($col => $terms->{$col});
+        }
+    }
+
+    $stmt->for_update(1) if $opt->{for_update};
+    return ($stmt->as_sql,@{$stmt->bind});
+}
 
 1;
 __END__

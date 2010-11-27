@@ -1,5 +1,4 @@
-package SQL::Builder::Select;
-# TODO: rename to ::stmt
+package SQL::Builder::Statement;
 use strict;
 use warnings;
 use utf8;
@@ -315,4 +314,51 @@ sub _add_index_hint {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+SQL::Builder::Statement - dynamic SQL generator
+
+=head1 SYNOPSIS
+
+    my $sql = SQL::Builder::Statement->new;
+    $sql->select(['foo', 'bar', 'baz']);
+    $sql->from(['table_name']);
+    $sql->as_sql;
+        #=> "SELECT foo, bar, baz FROM table_name;"
+
+    $sql->add_where('col' => "value");
+    $sql->as_sql;
+        #=> "SELECT foo, bar, baz FROM table_name WHERE ( col = ? );"
+
+    $sql->add_where(name => { like => "%value" });
+    $sql->as_sql;
+        #=> "SELECT foo, bar, baz FROM table_name WHERE ( col = ? ) AND ( name LIKE ? );"
+
+    $sql->add_where(bar => \"IS NOT NULL");
+    $sql->as_sql;
+        #=> "SELECT foo, bar, baz FROM table_name WHERE ( col = ? ) AND ( name LIKE ? ) AND ( bar IS NOT NULL );"
+
+    # execute SQL and return DBIx::Skinny::Iterator object.
+    my $iter = $sql->retrieve;
+
+    my $sql2 = SQL::Builder::Statement->new;
+    $sql2->from([]);
+    $sql2->add_join(foo => [
+        { table => "bar", type => "inner", condition => "foo.bar_id = bar.id" },
+    ]);
+    $sql2->select(['*']);
+    $sql2->as_sql;
+        #=> "SELECT * FROM foo INNER JOIN bar ON foo.bar_id = bar.id;"
+
+    $sql2->add_complex_where([[ -or => { foo => "bar" }, { foo => "baz" } ]]);
+    $sql2->as_sql;
+        #=> "SELECT * FROM foo INNER JOIN bar ON foo.bar_id = bar.id WHERE ( ( foo = ? ) OR ( foo = ? ) )"
+
+=head1 DESCRIPTION
+
+=head1 SEE ALSO
+
++<Data::ObjectDriver::SQL>
 
