@@ -41,6 +41,32 @@ sub replace {
     return $self->_insert_or_replace($table, $values, 'REPLACE');
 }
 
+# for mysql
+sub insert_multi {
+    my ($self, $table, $args) = @_;
+
+    my (@cols, @bind);
+    for my $arg (@{$args}) {
+        if (scalar(@cols)==0) {
+            for my $col (keys %{$arg}) {
+                push @cols, $col;
+            }
+        }
+
+        for my $col (keys %{$arg}) {
+            push @bind, $arg->{$col};
+        }
+    }
+
+    my $sql = "INSERT INTO $table\n";
+       $sql .= '(' . join(', ', @cols) . ')' . "\nVALUES ";
+
+    my $values = '(' . join(', ', ('?') x @cols) . ')' . "\n";
+    $sql .= join(',', ($values) x (scalar(@bind) / scalar(@cols)));
+
+    return ($sql, @bind);
+}
+
 sub _insert_or_replace {
     my ($self, $table, $args, $prefix) = @_;
 
