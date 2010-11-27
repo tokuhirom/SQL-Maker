@@ -11,9 +11,15 @@ use SQL::Builder::Statement;
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
-    $args{driver} ||= $args{dbh}->{Driver}->{Name};
-    $args{quote_char}  ||= ''; # TODO: detect it by driver name
-    $args{name_sep}    ||= '';
+    my $driver = $args{driver} ||= $args{dbh}->{Driver}->{Name};
+    $args{quote_char}  ||= do{
+        if ($driver eq  'Oracle' || $driver eq 'Pg') {
+            q{"}
+        } else {
+            q{`}
+        }
+    };
+    $args{name_sep}    ||= '.';
     bless {%args}, $class;
 }
 
