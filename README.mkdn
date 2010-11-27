@@ -1,20 +1,85 @@
 # NAME
 
-SQL::Builder -
+SQL::Builder - SQL builder class
 
 # SYNOPSIS
 
-  use SQL::Builder;
+    use SQL::Builder;
+
+    my $builder = SQL::Builder->new();
+
+    # SELECT
+    my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
+
+    # INSERT
+    my ($sql, @binds) = $builder->insert($table, \%values);
+
+    # REPLACE(mysql)
+    my ($sql, @binds) = $builder->replace($table, \%values);
+
+    # DELETE
+    my ($sql, @binds) = $builder->delete($table, \%values);
+
+    # UPDATE
+    my ($sql, @binds) = $builder->update($table, \%set, \%where);
 
 # DESCRIPTION
 
-SQL::Builder is
+SQL::Builder is SQL builder class. It is based on [DBDIx::Skinny](http://search.cpan.org/perldoc?DBDIx::Skinny)'s SQL generator.
+
+# METHODS
+
+- my $builder = SQL::Builder->new(%args);
+
+Create new instance of SQL::Builder.
+
+Attribuetes are following:
+
+    - driver: Str
+
+    - dbh: Object
+
+    Driver or dbh is required. The driver type is needed to create SQL string.
+
+    - quote_char: Str
+
+    This is the character that a table or column name will be quoted with. 
+
+    Default: auto detect from $driver.
+
+    - name_sep: Str
+
+    This is the character that separates a table and column name.
+
+    Default: '.'
+
+- my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
+
+Generates SELECT query.
+
+- my ($sql, @binds) = $builder->insert($table, \%values);
+
+Generate INSERT query.
+
+- my ($sql, @binds) = $builder->replace($table, \%values);
+
+Generate REPLACE query.
+
+- my ($sql, @binds) = $builder->delete($table, \%values);
+
+Generate DELETE query.
+
+- my ($sql, @binds) = $builder->update($table, \%set, \%where);
+
+Generate UPDATE query.
 
 # AUTHOR
 
 Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
 
 # SEE ALSO
+
+[SQL::Abstract](http://search.cpan.org/perldoc?SQL::Abstract)
 
 # LICENSE
 

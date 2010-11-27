@@ -4,14 +4,21 @@ use warnings;
 use 5.008001;
 our $VERSION = '0.01';
 use Class::Accessor::Lite;
-Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep/);
+Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver/);
 
+use Carp ();
 use SQL::Builder::Statement;
 
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
-    my $driver = $args{driver} ||= $args{dbh}->{Driver}->{Name};
+    unless ($args{driver}) {
+        $args{driver} = $args{dbh}->{Driver}->{Name};
+    }
+    unless ($args{driver}) {
+        Carp::croak("'driver' or 'dbh' is required for creating new instance of $class");
+    }
+    my $driver = $args{driver};
     $args{quote_char}  ||= do{
         if ($driver eq  'Oracle' || $driver eq 'Pg') {
             q{"}
@@ -143,21 +150,94 @@ __END__
 
 =head1 NAME
 
-SQL::Builder -
+SQL::Builder - SQL builder class
 
 =head1 SYNOPSIS
 
-  use SQL::Builder;
+    use SQL::Builder;
+
+    my $builder = SQL::Builder->new();
+
+    # SELECT
+    my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
+
+    # INSERT
+    my ($sql, @binds) = $builder->insert($table, \%values);
+
+    # REPLACE(mysql)
+    my ($sql, @binds) = $builder->replace($table, \%values);
+
+    # DELETE
+    my ($sql, @binds) = $builder->delete($table, \%values);
+
+    # UPDATE
+    my ($sql, @binds) = $builder->update($table, \%set, \%where);
 
 =head1 DESCRIPTION
 
-SQL::Builder is
+SQL::Builder is SQL builder class. It is based on L<DBDIx::Skinny>'s SQL generator.
+
+=head1 METHODS
+
+=over 4
+
+=item my $builder = SQL::Builder->new(%args);
+
+Create new instance of SQL::Builder.
+
+Attribuetes are following:
+
+=over 4
+
+=item driver: Str
+
+=item dbh: Object
+
+Driver or dbh is required. The driver type is needed to create SQL string.
+
+=item quote_char: Str
+
+This is the character that a table or column name will be quoted with. 
+
+Default: auto detect from $driver.
+
+=item name_sep: Str
+
+This is the character that separates a table and column name.
+
+Default: '.'
+
+=back
+
+=item my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
+
+Generates SELECT query.
+
+=item my ($sql, @binds) = $builder->insert($table, \%values);
+
+Generate INSERT query.
+
+=item my ($sql, @binds) = $builder->replace($table, \%values);
+
+Generate REPLACE query.
+
+=item my ($sql, @binds) = $builder->delete($table, \%values);
+
+Generate DELETE query.
+
+=item my ($sql, @binds) = $builder->update($table, \%set, \%where);
+
+Generate UPDATE query.
+
+=back
 
 =head1 AUTHOR
 
 Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF GMAIL COME<gt>
 
 =head1 SEE ALSO
+
+L<SQL::Abstract>
 
 =head1 LICENSE
 
