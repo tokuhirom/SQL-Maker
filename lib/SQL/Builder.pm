@@ -8,6 +8,20 @@ Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver/);
 
 use Carp ();
 use SQL::Builder::Statement;
+use Class::Load ();
+
+sub load_plugin {
+    my ($class, $role) = @_;
+    $role = $role =~ s/^\+// ? $role : "SQL::Builder::Plugin::$role";
+    Class::Load::load_class($role);
+
+    no strict 'refs';
+    my @methods = grep !/^_/,
+                  grep { defined &{"${role}::$_"} }
+                       keys %{"${role}::"};
+
+    *{"${class}::$_"} = *{"${role}::$_"} for @methods;
+}
 
 sub new {
     my $class = shift;
@@ -39,32 +53,6 @@ sub insert {
 sub replace {
     my ($self, $table, $values) = @_;
     return $self->_insert_or_replace($table, $values, 'REPLACE');
-}
-
-# for mysql
-sub insert_multi {
-    my ($self, $table, $args) = @_;
-
-    my (@cols, @bind);
-    for my $arg (@{$args}) {
-        if (scalar(@cols)==0) {
-            for my $col (keys %{$arg}) {
-                push @cols, $col;
-            }
-        }
-
-        for my $col (keys %{$arg}) {
-            push @bind, $arg->{$col};
-        }
-    }
-
-    my $sql = "INSERT INTO $table\n";
-       $sql .= '(' . join(', ', @cols) . ')' . "\nVALUES ";
-
-    my $values = '(' . join(', ', ('?') x @cols) . ')' . "\n";
-    $sql .= join(',', ($values) x (scalar(@bind) / scalar(@cols)));
-
-    return ($sql, @bind);
 }
 
 sub _insert_or_replace {
