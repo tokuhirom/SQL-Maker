@@ -16,11 +16,9 @@ sub load_plugin {
     Class::Load::load_class($role);
 
     no strict 'refs';
-    my @methods = grep !/^_/,
-                  grep { defined &{"${role}::$_"} }
-                       keys %{"${role}::"};
-
-    *{"${class}::$_"} = *{"${role}::$_"} for @methods;
+    for (@{"${role}::EXPORT"}) {
+        *{"${class}::$_"} = *{"${role}::$_"};
+    }
 }
 
 sub new {

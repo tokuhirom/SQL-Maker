@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use utf8;
 
+our @EXPORT = qw/insert_multi/;
+
 # for mysql
 sub insert_multi {
     my ($self, $table, $args) = @_;
