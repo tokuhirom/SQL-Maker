@@ -74,6 +74,8 @@ Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
 
 [SQL::Abstract](http://search.cpan.org/perldoc?SQL::Abstract)
 
+Whole code was taken from [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Skinny) by nekokak++.
+
 # LICENSE
 
 Copyright (C) Tokuhiro Matsuno

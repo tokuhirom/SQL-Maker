@@ -8,12 +8,12 @@ Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver/);
 
 use Carp ();
 use SQL::Builder::Statement;
-use Class::Load ();
+use Module::Load ();
 
 sub load_plugin {
     my ($class, $role) = @_;
     $role = $role =~ s/^\+// ? $role : "SQL::Builder::Plugin::$role";
-    Class::Load::load_class($role);
+    Module::Load::load($role);
 
     no strict 'refs';
     for (@{"${role}::EXPORT"}) {
@@ -234,6 +234,8 @@ Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF GMAIL COME<gt>
 =head1 SEE ALSO
 
 L<SQL::Abstract>
+
+Whole code was taken from L<DBIx::Skinny> by nekokak++.
 
 =head1 LICENSE
 
