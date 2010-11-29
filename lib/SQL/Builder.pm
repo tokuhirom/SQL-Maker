@@ -4,10 +4,11 @@ use warnings;
 use 5.008001;
 our $VERSION = '0.01';
 use Class::Accessor::Lite;
-Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver/);
+Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver statement_class/);
 
 use Carp ();
 use SQL::Builder::Statement;
+use SQL::Builder::Statement::Oracle;
 use Module::Load ();
 
 sub load_plugin {
@@ -39,6 +40,7 @@ sub new {
         }
     };
     $args{name_sep}    ||= '.';
+    $args{statement_class} = $driver eq 'Oracle' ? 'SQL::Builder::Statement::Oracle' : 'SQL::Builder::Statement';
     bless {%args}, $class;
 }
 
@@ -85,18 +87,18 @@ sub _quote {
 sub delete {
     my ($self, $table, $where) = @_;
 
-    my $stmt = SQL::Builder::Statement->new( { from => [$table], } );
+    my $stmt = $self->statement_class->new( { from => [$table], } );
     $stmt->add_where_ex(%$where);
     my $sql = 'DELETE ' . $stmt->as_sql;
     return ($sql, @{$stmt->bind});
 }
 
 sub update {
-    my ($class, $table, $args, $where) = @_;
+    my ($self, $table, $args, $where) = @_;
 
-    my ($columns, $bind_columns, undef) = $class->_set_columns($args, 0);
+    my ($columns, $bind_columns, undef) = $self->_set_columns($args, 0);
 
-    my $stmt = SQL::Builder::Statement->new();
+    my $stmt = $self->statement_class->new();
     $stmt->add_where_ex(%$where);
     push @{$bind_columns}, @{$stmt->bind};
 
@@ -108,7 +110,7 @@ sub update {
 sub select {
     my ($self, $table, $fields, $where, $opt) = @_;
 
-    my $stmt = SQL::Builder::Statement->new(
+    my $stmt = $self->statement_class->new(
         select => $fields,
         from   => [$table],
     );

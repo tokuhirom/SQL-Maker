@@ -9,6 +9,7 @@ readme_markdown_from 'lib/SQL/Builder.pm';
 requires 'DBI';
 requires 'Class::Accessor::Lite';
 requires 'Module::Load';
+requires 'parent';
 
 tests 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t';
 test_requires 'Test::More' => 0.96; # done_testing, subtest
