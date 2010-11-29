@@ -177,7 +177,7 @@ SQL::Builder - SQL builder class
 
 =head1 DESCRIPTION
 
-SQL::Builder is SQL builder class. It is based on L<DBDIx::Skinny>'s SQL generator.
+SQL::Builder is SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
 
 =head1 METHODS
 

@@ -22,7 +22,7 @@ SQL::Builder - SQL builder class
 
 # DESCRIPTION
 
-SQL::Builder is SQL builder class. It is based on [DBDIx::Skinny](http://search.cpan.org/perldoc?DBDIx::Skinny)'s SQL generator.
+SQL::Builder is SQL builder class. It is based on [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Skinny)'s SQL generator.
 
 # METHODS
 
