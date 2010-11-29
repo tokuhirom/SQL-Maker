@@ -2,7 +2,7 @@ package SQL::Builder::Statement;
 use strict;
 use warnings;
 use utf8;
-use Class::Accessor::lite;
+use Class::Accessor::Lite;
 
 Class::Accessor::Lite->mk_accessors(
     qw(
