@@ -167,9 +167,6 @@ SQL::Builder - SQL builder class
     # INSERT
     my ($sql, @binds) = $builder->insert($table, \%values);
 
-    # REPLACE(mysql)
-    my ($sql, @binds) = $builder->replace($table, \%values);
-
     # DELETE
     my ($sql, @binds) = $builder->delete($table, \%values);
 
@@ -219,10 +216,6 @@ Generates SELECT query.
 =item my ($sql, @binds) = $builder->insert($table, \%values);
 
 Generate INSERT query.
-
-=item my ($sql, @binds) = $builder->replace($table, \%values);
-
-Generate REPLACE query.
 
 =item my ($sql, @binds) = $builder->delete($table, \%values);
 
