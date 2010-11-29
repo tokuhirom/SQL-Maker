@@ -16,13 +16,6 @@ subtest 'insert' => sub {
     is join(',', @binds), 'baz,man';
 };
 
-subtest 'replace' => sub {
-    my $builder = SQL::Builder->new(driver => 'sqlite');
-    my ($sql, @binds) = $builder->replace('foo' => ordered_hashref(bar => 'baz', john => 'man'));
-    is $sql, "REPLACE INTO foo\n(`bar`, `john`)\nVALUES (?, ?)\n";
-    is join(',', @binds), 'baz,man';
-};
-
 subtest 'delete' => sub {
     my $builder = SQL::Builder->new(driver => 'sqlite');
     my ($sql, @binds) = $builder->delete('foo' => ordered_hashref(bar => 'baz', john => 'man'));

@@ -44,19 +44,10 @@ sub new {
 
 # $builder->insert($table, \%values);
 sub insert {
-    my ($self, $table, $values) = @_;
-    return $self->_insert_or_replace($table, $values, 'INSERT');
-}
+    my ($self, $table, $values, $opt) = @_;
+    my $prefix = $opt->{prefix} || 'INSERT';
 
-sub replace {
-    my ($self, $table, $values) = @_;
-    return $self->_insert_or_replace($table, $values, 'REPLACE');
-}
-
-sub _insert_or_replace {
-    my ($self, $table, $args, $prefix) = @_;
-
-    my ($columns, $bind_columns, $quoted_columns) = $self->_set_columns($args, 1);
+    my ($columns, $bind_columns, $quoted_columns) = $self->_set_columns($values, 1);
 
     my $sql  = "$prefix INTO $table\n";
        $sql .= '(' . join(', ', @$quoted_columns) .')' . "\n" .
