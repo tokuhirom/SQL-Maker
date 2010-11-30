@@ -9,7 +9,7 @@ Class::Accessor::Lite->mk_accessors(
         select distinct select_map select_map_reverse
         from joins where bind bind_col limit offset group order
         having where_values column_mutator index_hint
-        comment for_update
+        for_update
     )
 );
 
@@ -107,10 +107,6 @@ sub as_sql {
     $sql .= $self->as_aggregate('order');
 
     $sql .= $self->as_limit;
-    my $comment = $self->comment;
-    if ($comment && $comment =~ /([ 0-9a-zA-Z.:;()_#&,]+)/) {
-        $sql .= "-- $1" if $1;
-    }
 
     $sql .= $self->as_for_update;
 

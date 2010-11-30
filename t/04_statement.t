@@ -253,14 +253,7 @@ is($stmt->as_sql, "SELECT foo\nFROM baz USE INDEX (index_hint) INNER JOIN baz b1
 $stmt = ns();
 $stmt->add_select(foo => 'foo');
 $stmt->from([ qw(baz) ]);
-$stmt->comment("mycomment");
-is($stmt->as_sql, "SELECT foo\nFROM baz\n-- mycomment");
-
-$stmt->comment("\nbad\n\nmycomment");
-is($stmt->as_sql, "SELECT foo\nFROM baz\n-- bad", "correctly untainted");
-
-$stmt->comment("G\\G");
-is($stmt->as_sql, "SELECT foo\nFROM baz\n-- G", "correctly untainted");
+is($stmt->as_sql, "SELECT foo\nFROM baz\n");
 
 subtest 'add_complex_where' => sub {
     subtest 'OR' => sub {
