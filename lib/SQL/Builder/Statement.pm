@@ -224,14 +224,6 @@ sub _parse_array_terms {
     return (join("", @out), \@bind);
 }
 
-sub has_where {
-    my $self = shift;
-    my($col, $val) = @_;
-
-    # TODO: should check if the value is same with $val?
-    exists $self->where_values->{$col};
-}
-
 sub add_having {
     my $self = shift;
     my($col, $val) = @_;
