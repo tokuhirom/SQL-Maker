@@ -49,31 +49,24 @@ sub insert {
     my ($self, $table, $values, $opt) = @_;
     my $prefix = $opt->{prefix} || 'INSERT';
 
-    my ($columns, $bind_columns, $quoted_columns) = $self->_set_columns($values, 1);
-
-    my $sql  = "$prefix INTO $table\n";
-       $sql .= '(' . join(', ', @$quoted_columns) .')' . "\n" .
-               'VALUES (' . join(', ', @$columns) . ')' . "\n";
-
-    return ($sql, @$bind_columns);
-}
-
-sub _set_columns {
-    my ($self, $args, $insert) = @_;
-
     my (@columns, @bind_columns, @quoted_columns);
-    for my $col (keys %{ $args }) {
-        my $quoted_col = _quote($col, $self->quote_char, $self->name_sep);
-        if (ref($args->{$col}) eq 'SCALAR') {
-            push @columns, ($insert ? ${ $args->{$col} } :"$quoted_col = " . ${ $args->{$col} });
+    while (my ($col, $val) = each %$values) {
+        push @quoted_columns, _quote($col, $self->quote_char, $self->name_sep);
+        if (ref($val) eq 'SCALAR') {
+            # $builder->insert(foo => { created_on => \"NOW()" });
+            push @columns, $$val;
         } else {
-            push @columns, ($insert ? '?' : "$quoted_col = ?");
-            push @bind_columns, $args->{$col};
+            # normal values
+            push @columns, '?';
+            push @bind_columns, $val;
         }
-        push @quoted_columns, $quoted_col;
     }
 
-    return (\@columns, \@bind_columns, \@quoted_columns);
+    my $sql  = "$prefix INTO $table\n";
+       $sql .= '(' . join(', ', @quoted_columns) .')' . "\n" .
+               'VALUES (' . join(', ', @columns) . ')' . "\n";
+
+    return ($sql, @bind_columns);
 }
 
 sub _quote {
@@ -87,23 +80,39 @@ sub _quote {
 sub delete {
     my ($self, $table, $where) = @_;
 
-    my $stmt = $self->statement_class->new( { from => [$table], } );
-    $stmt->add_where_ex(%$where);
-    my $sql = 'DELETE ' . $stmt->as_sql;
+    my $stmt = $self->statement_class->new( );
+    while (my ($col, $val) = each %$where) {
+        $stmt->add_where($col => $val);
+    }
+    my $sql = "DELETE FROM $table\n" . $stmt->as_sql_where;
     return ($sql, @{$stmt->bind});
 }
 
 sub update {
     my ($self, $table, $args, $where) = @_;
 
-    my ($columns, $bind_columns, undef) = $self->_set_columns($args, 0);
+    my (@columns, @bind_columns);
+    # make "SET" clause.
+    while (my ($col, $val) = each %$args) {
+        my $quoted_col = _quote($col, $self->quote_char, $self->name_sep);
+        if (ref($val) eq 'SCALAR') {
+            # $builder->update(foo => { created_on => \"NOW()" });
+            push @columns, "$quoted_col = " . $$val;
+        } else {
+            # normal values
+            push @columns, "$quoted_col = ?";
+            push @bind_columns, $args->{$col};
+        }
+    }
 
     my $stmt = $self->statement_class->new();
-    $stmt->add_where_ex(%$where);
-    push @{$bind_columns}, @{$stmt->bind};
+    while (my ($col, $val) = each %$where) {
+        $stmt->add_where($col => $val);
+    }
+    push @bind_columns, @{$stmt->bind};
 
-    my $sql = "UPDATE $table SET " . join(', ', @$columns) . ' ' . $stmt->as_sql_where;
-    return ($sql, @$bind_columns);
+    my $sql = "UPDATE $table SET " . join(', ', @columns) . ' ' . $stmt->as_sql_where;
+    return ($sql, @bind_columns);
 }
 
 # my($stmt, @bind) = $sql−>select($table, \@fields, \%where, \@order);
@@ -116,7 +125,9 @@ sub select {
     );
 
     if ( $where ) {
-        $stmt->add_where_ex(%$where);
+        while (my ($col, $val) = each %$where) {
+            $stmt->add_where($col => $val);
+        }
     }
 
     $stmt->limit( $opt->{limit} )    if $opt->{limit};
@@ -124,8 +135,8 @@ sub select {
     $stmt->order( $opt->{order_by} ) if $opt->{order_by};
 
     if (my $terms = $opt->{having}) {
-        for my $col (keys %$terms) {
-            $stmt->add_having($col => $terms->{$col});
+        while (my ($col, $val) = each %$terms) {
+            $stmt->add_having($col => $val);
         }
     }
 
