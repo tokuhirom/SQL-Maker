@@ -255,6 +255,14 @@ $stmt->add_select(foo => 'foo');
 $stmt->from([ qw(baz) ]);
 is($stmt->as_sql, "SELECT foo\nFROM baz\n");
 
+subtest 'order_by' => sub {
+    my $stmt = ns();
+    $stmt->add_select('*');
+    $stmt->from([qw/baz/]);
+    $stmt->order('foo DESC');
+    is $stmt->as_sql, "SELECT *\nFROM baz\nORDER BY foo DESC\n";
+};
+
 subtest 'add_complex_where' => sub {
     subtest 'OR' => sub {
         my $sql = ns();

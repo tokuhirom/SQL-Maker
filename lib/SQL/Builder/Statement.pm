@@ -128,6 +128,9 @@ sub as_aggregate {
     return '' unless my $attribute = $self->$set();
 
     my $ref = ref $attribute;
+    if (!$ref) {
+        return uc($set)  . " BY $attribute\n";
+    }
 
     if ($ref eq 'ARRAY' && scalar @$attribute == 0) {
         return '';
