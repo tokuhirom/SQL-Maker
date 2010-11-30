@@ -119,24 +119,9 @@ sub select {
         $stmt->add_where_ex(%$where);
     }
 
-    $stmt->limit(  $opt->{limit}  ) if $opt->{limit};
-    $stmt->offset( $opt->{offset} ) if $opt->{offset};
-
-    if (my $terms = $opt->{order_by}) {
-        $terms = [$terms] unless ref($terms) eq 'ARRAY';
-        my @orders;
-        for my $term (@{$terms}) {
-            my ($col, $case);
-            if (ref($term) eq 'HASH') {
-                ($col, $case) = each %$term;
-            } else {
-                $col  = $term;
-                $case = 'ASC';
-            }
-            push @orders, { column => $col, desc => $case };
-        }
-        $stmt->order(\@orders);
-    }
+    $stmt->limit( $opt->{limit} )    if $opt->{limit};
+    $stmt->offset( $opt->{offset} )  if $opt->{offset};
+    $stmt->order( $opt->{order_by} ) if $opt->{order_by};
 
     if (my $terms = $opt->{having}) {
         for my $col (keys %$terms) {
