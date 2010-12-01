@@ -109,48 +109,48 @@ $stmt->limit("  15g");  ## Non-numerics should cause an error
 }
 
 ## Testing WHERE
-$stmt = ns(); $stmt->add_where(foo => 'bar');
+$stmt = ns(); $stmt->where->add(foo => 'bar');
 is($stmt->as_sql_where, "WHERE (foo = ?)\n");
 is(scalar @{ $stmt->bind }, 1);
 is($stmt->bind->[0], 'bar');
 
-$stmt = ns(); $stmt->add_where(foo => [ 'bar', 'baz' ]);
+$stmt = ns(); $stmt->where->add(foo => [ 'bar', 'baz' ]);
 is($stmt->as_sql_where, "WHERE (foo IN (?,?))\n");
 is(scalar @{ $stmt->bind }, 2);
 is($stmt->bind->[0], 'bar');
 is($stmt->bind->[1], 'baz');
 
-$stmt = ns(); $stmt->add_where(foo => { in => [ 'bar', 'baz' ]});
+$stmt = ns(); $stmt->where->add(foo => { in => [ 'bar', 'baz' ]});
 is($stmt->as_sql_where, "WHERE (foo IN (?,?))\n");
 is(scalar @{ $stmt->bind }, 2);
 is($stmt->bind->[0], 'bar');
 is($stmt->bind->[1], 'baz');
 
-$stmt = ns(); $stmt->add_where(foo => { 'not in' => [ 'bar', 'baz' ]});
+$stmt = ns(); $stmt->where->add(foo => { 'not in' => [ 'bar', 'baz' ]});
 is($stmt->as_sql_where, "WHERE (foo NOT IN (?,?))\n");
 is(scalar @{ $stmt->bind }, 2);
 is($stmt->bind->[0], 'bar');
 is($stmt->bind->[1], 'baz');
 
-$stmt = ns(); $stmt->add_where(foo => { '!=' => 'bar' });
+$stmt = ns(); $stmt->where->add(foo => { '!=' => 'bar' });
 is($stmt->as_sql_where, "WHERE (foo != ?)\n");
 is(scalar @{ $stmt->bind }, 1);
 is($stmt->bind->[0], 'bar');
 
-$stmt = ns(); $stmt->add_where(foo => \'IS NOT NULL');
+$stmt = ns(); $stmt->where->add(foo => \'IS NOT NULL');
 is($stmt->as_sql_where, "WHERE (foo IS NOT NULL)\n");
 is(scalar @{ $stmt->bind }, 0);
 
 $stmt = ns();
-$stmt->add_where(foo => 'bar');
-$stmt->add_where(baz => 'quux');
+$stmt->where->add(foo => 'bar');
+$stmt->where->add(baz => 'quux');
 is($stmt->as_sql_where, "WHERE (foo = ?) AND (baz = ?)\n");
 is(scalar @{ $stmt->bind }, 2);
 is($stmt->bind->[0], 'bar');
 is($stmt->bind->[1], 'quux');
 
 $stmt = ns();
-$stmt->add_where(foo => [ { '>' => 'bar' },
+$stmt->where->add(foo => [ { '>' => 'bar' },
                           { '<' => 'baz' } ]);
 is($stmt->as_sql_where, "WHERE ((foo > ?) OR (foo < ?))\n");
 is(scalar @{ $stmt->bind }, 2);
@@ -158,7 +158,7 @@ is($stmt->bind->[0], 'bar');
 is($stmt->bind->[1], 'baz');
 
 $stmt = ns();
-$stmt->add_where(foo => [ -and => { '>' => 'bar' },
+$stmt->where->add(foo => [ -and => { '>' => 'bar' },
                                   { '<' => 'baz' } ]);
 is($stmt->as_sql_where, "WHERE ((foo > ?) AND (foo < ?))\n");
 is(scalar @{ $stmt->bind }, 2);
@@ -166,7 +166,7 @@ is($stmt->bind->[0], 'bar');
 is($stmt->bind->[1], 'baz');
 
 $stmt = ns();
-$stmt->add_where(foo => [ -and => 'foo', 'bar', 'baz']);
+$stmt->where->add(foo => [ -and => 'foo', 'bar', 'baz']);
 is($stmt->as_sql_where, "WHERE ((foo = ?) AND (foo = ?) AND (foo = ?))\n");
 is(scalar @{ $stmt->bind }, 3);
 is($stmt->bind->[0], 'foo');
@@ -176,9 +176,9 @@ is($stmt->bind->[2], 'baz');
 ## regression bug. modified parameters
 my %terms = ( foo => [-and => 'foo', 'bar', 'baz']);
 $stmt = ns();
-$stmt->add_where(%terms);
+$stmt->where->add(%terms);
 is($stmt->as_sql_where, "WHERE ((foo = ?) AND (foo = ?) AND (foo = ?))\n");
-$stmt->add_where(%terms);
+$stmt->where->add(%terms);
 is($stmt->as_sql_where, "WHERE ((foo = ?) AND (foo = ?) AND (foo = ?)) AND ((foo = ?) AND (foo = ?) AND (foo = ?))\n");
 
 $stmt = ns();
@@ -202,7 +202,7 @@ $stmt = ns();
 $stmt->add_select(foo => 'foo');
 $stmt->add_select('COUNT(*)' => 'count');
 $stmt->from([ qw(baz) ]);
-$stmt->add_where(foo => 1);
+$stmt->where->add(foo => 1);
 $stmt->group({ column => 'baz' });
 $stmt->order({ column => 'foo', desc => 'DESC' });
 $stmt->limit(2);

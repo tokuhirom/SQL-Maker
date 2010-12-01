@@ -126,7 +126,7 @@ sub select {
 
     if ( $where ) {
         while (my ($col, $val) = each %$where) {
-            $stmt->add_where($col => $val);
+            $stmt->where->add($col => $val);
         }
     }
 

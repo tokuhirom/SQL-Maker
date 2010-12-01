@@ -4,11 +4,12 @@ use warnings;
 use utf8;
 use Class::Accessor::Lite;
 use SQL::Builder::Part;
+use SQL::Builder::Where;
 
 Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
-        from joins where bind limit offset group order
+        from joins where limit offset group order
         having column_mutator index_hint
         for_update
     )
@@ -24,7 +25,7 @@ sub new {
         select_map_reverse => +{},
         bind               => +[],
         from               => +[],
-        where              => +[],
+        where              => SQL::Builder::Where->new(),
         having             => +[],
         joins              => +[],
         index_hint         => +{},
@@ -35,6 +36,11 @@ sub new {
     }, $class;
 
     return $self;
+}
+
+sub bind {
+    my $self = shift;
+    return [$self->where->bind, @{$self->{bind}}];
 }
 
 sub add_select {
@@ -105,7 +111,7 @@ sub as_sql {
     }
 
     $sql .= "\n";
-    $sql .= $self->as_sql_where;
+    $sql .= $self->as_sql_where();
 
     $sql .= $self->as_aggregate('group');
     $sql .= $self->as_sql_having;
@@ -150,9 +156,9 @@ sub as_aggregate {
 
 sub as_sql_where {
     my $self = shift;
-    $self->where && @{ $self->where } ?
-        'WHERE ' . join(' AND ', @{ $self->where }) . "\n" :
-        '';
+
+    my $where = $self->where->as_sql();
+    $where ? "WHERE $where\n" : '';
 }
 
 sub as_sql_having {
@@ -160,17 +166,6 @@ sub as_sql_having {
     $self->having && @{ $self->having } ?
         'HAVING ' . join(' AND ', @{ $self->having }) . "\n" :
         '';
-}
-
-sub add_where {
-    my $self = shift;
-    ## xxx Need to support old range and transform behaviors.
-    my($col, $val) = @_;
-    # XXX; DATE_FORMAT(member.created_at,'%Y-%m') 
-#    Carp::croak("Invalid/unsafe column name $col") unless $col =~ /^[\w\.]+$/;
-    my($term, $bind, $tcol) = SQL::Builder::Part->make_term($col, $val);
-    push @{ $self->{where} }, "($term)";
-    push @{ $self->{bind} }, @$bind;
 }
 
 sub add_having {
@@ -219,15 +214,15 @@ SQL::Builder::Statement - dynamic SQL generator
     $sql->as_sql;
         #=> "SELECT foo, bar, baz FROM table_name;"
 
-    $sql->add_where('col' => "value");
+    $sql->where->add('col' => "value");
     $sql->as_sql;
         #=> "SELECT foo, bar, baz FROM table_name WHERE ( col = ? );"
 
-    $sql->add_where(name => { like => "%value" });
+    $sql->where->add(name => { like => "%value" });
     $sql->as_sql;
         #=> "SELECT foo, bar, baz FROM table_name WHERE ( col = ? ) AND ( name LIKE ? );"
 
-    $sql->add_where(bar => \"IS NOT NULL");
+    $sql->where->add(bar => \"IS NOT NULL");
     $sql->as_sql;
         #=> "SELECT foo, bar, baz FROM table_name WHERE ( col = ? ) AND ( name LIKE ? ) AND ( bar IS NOT NULL );"
 
