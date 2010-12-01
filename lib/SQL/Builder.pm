@@ -9,6 +9,7 @@ Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver statement_clas
 use Carp ();
 use SQL::Builder::Statement;
 use SQL::Builder::Statement::Oracle;
+use SQL::Builder::Where;
 use Module::Load ();
 
 sub load_plugin {
@@ -79,12 +80,15 @@ sub _quote {
 sub delete {
     my ($self, $table, $where) = @_;
 
-    my $stmt = $self->statement_class->new( );
+    my $sql = "DELETE FROM $table";
+    my $w = SQL::Builder::Where->new();
     while (my ($col, $val) = each %$where) {
-        $stmt->add_where($col => $val);
+        $w->add($col => $val);
     }
-    my $sql = "DELETE FROM $table\n" . $stmt->as_sql_where;
-    return ($sql, @{$stmt->bind});
+    if (my $where_clause = $w->as_sql) {
+        $sql .= "\nWHERE " . $w->as_sql();
+    }
+    return ($sql, $w->bind);
 }
 
 sub update {
@@ -104,13 +108,17 @@ sub update {
         }
     }
 
-    my $stmt = $self->statement_class->new();
-    while (my ($col, $val) = each %$where) {
-        $stmt->add_where($col => $val);
-    }
-    push @bind_columns, @{$stmt->bind};
+    my $sql = "UPDATE $table SET " . join(', ', @columns);
 
-    my $sql = "UPDATE $table SET " . join(', ', @columns) . ' ' . $stmt->as_sql_where;
+    my $w = SQL::Builder::Where->new();
+    while (my ($col, $val) = each %$where) {
+        $w->add($col => $val);
+    }
+    push @bind_columns, $w->bind;
+    if (my $where_clause = $w->as_sql) {
+        $sql .= " WHERE $where_clause";
+    }
+
     return ($sql, @bind_columns);
 }
 

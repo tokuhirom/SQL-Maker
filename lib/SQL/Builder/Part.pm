@@ -51,7 +51,7 @@ sub make_term {
         $term = "$col = ?";
         push @bind, $val;
     }
-    return ( $term, \@bind, $col );
+    return ( $term, \@bind );
 }
 
 1;
