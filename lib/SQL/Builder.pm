@@ -73,7 +73,6 @@ sub _quote {
     my ($label, $quote_char, $name_sep) = @_;
 
     return $label if $label eq '*';
-    return $quote_char . $label . $quote_char if !defined $name_sep;
     return join $name_sep, map { $quote_char . $_ . $quote_char } split /\Q$name_sep\E/, $label;
 }
 
