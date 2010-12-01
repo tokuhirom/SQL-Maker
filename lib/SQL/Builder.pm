@@ -80,14 +80,11 @@ sub _quote {
 sub delete {
     my ($self, $table, $where) = @_;
 
-    my $sql = "DELETE FROM $table";
     my $w = SQL::Builder::Where->new();
     while (my ($col, $val) = each %$where) {
         $w->add($col => $val);
     }
-    if (my $where_clause = $w->as_sql) {
-        $sql .= "\nWHERE " . $w->as_sql();
-    }
+    my $sql = "DELETE FROM $table" . $w->as_sql(1);
     return ($sql, $w->bind);
 }
 
@@ -108,17 +105,13 @@ sub update {
         }
     }
 
-    my $sql = "UPDATE $table SET " . join(', ', @columns);
-
     my $w = SQL::Builder::Where->new();
     while (my ($col, $val) = each %$where) {
         $w->add($col => $val);
     }
     push @bind_columns, $w->bind;
-    if (my $where_clause = $w->as_sql) {
-        $sql .= " WHERE $where_clause";
-    }
 
+    my $sql = "UPDATE $table SET " . join(', ', @columns) . $w->as_sql(1);
     return ($sql, @bind_columns);
 }
 

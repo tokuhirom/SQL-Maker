@@ -20,7 +20,7 @@ subtest 'delete' => sub {
     subtest 'simple' => sub {
         my $builder = SQL::Builder->new(driver => 'sqlite');
         my ($sql, @binds) = $builder->delete('foo' => ordered_hashref(bar => 'baz', john => 'man'));
-        is $sql, "DELETE FROM foo\nWHERE (bar = ?) AND (john = ?)";
+        is $sql, "DELETE FROM foo WHERE (bar = ?) AND (john = ?)";
         is join(',', @binds), 'baz,man';
     };
     subtest 'delete all' => sub {

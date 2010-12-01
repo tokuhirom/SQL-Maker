@@ -21,8 +21,10 @@ sub add {
 }
 
 sub as_sql {
-    my $self = shift;
-    join(' AND ', map { "($_)" } @{$self->{where}});
+    my ($self, $need_prefix) = @_;
+    my $sql = join(' AND ', map { "($_)" } @{$self->{where}});
+    $sql = " WHERE $sql" if $need_prefix && length($sql)>0;
+    return $sql;
 }
 
 sub bind {
