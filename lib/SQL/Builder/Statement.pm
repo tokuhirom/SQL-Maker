@@ -23,7 +23,7 @@ sub new {
         distinct           => 0,
         select_map         => +{},
         select_map_reverse => +{},
-        bind               => +[],
+        having_bind        => +[],
         from               => +[],
         where              => SQL::Builder::Where->new(),
         having             => +[],
@@ -40,7 +40,7 @@ sub new {
 
 sub bind {
     my $self = shift;
-    return [$self->where->bind, @{$self->{bind}}];
+    return [$self->where->bind, @{$self->{having_bind}}];
 }
 
 sub add_select {
@@ -178,7 +178,7 @@ sub add_having {
 
     my($term, $bind) = SQL::Builder::Part->make_term($col, $val);
     push @{ $self->{having} }, "($term)";
-    push @{ $self->{bind} }, @$bind;
+    push @{ $self->{having_bind} }, @$bind;
 }
 
 sub as_for_update {
