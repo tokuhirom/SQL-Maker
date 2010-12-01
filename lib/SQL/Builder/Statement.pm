@@ -16,18 +16,24 @@ Class::Accessor::Lite->mk_accessors(
 sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
-    my $self = bless {%args}, $class;
-
-    for my $name (qw/ select from joins bind bind_col group order where having /) {
-        unless ($self->$name && ref $self->$name eq 'ARRAY') {
-            $self->$name ? $self->$name([ $self->$name ]) : $self->$name([]);
-        }
-    }
-    for my $name (qw/ select_map select_map_reverse where_values index_hint/) {
-        $self->$name( {} ) unless $self->$name && ref $self->$name eq 'HASH';
-    }
-
-    $self->distinct(0) unless $self->distinct;
+    my $self = bless {
+        select             => +[],
+        distinct           => 0,
+        select_map         => +{},
+        select_map_reverse => +{},
+        bind               => +[],
+        from               => +[],
+        where              => +[],
+        where_values       => +{},
+        having             => +[],
+        joins              => +[],
+        index_hint         => +{},
+        group              => +[],
+        bind_col           => +[],
+        order              => +[],
+        having             => +[],
+        %args
+    }, $class;
 
     return $self;
 }
@@ -155,14 +161,6 @@ sub as_sql_having {
     $self->having && @{ $self->having } ?
         'HAVING ' . join(' AND ', @{ $self->having }) . "\n" :
         '';
-}
-
-# TODO: fixme
-sub add_where_ex {
-    my ($self, @where) = @_;
-    while (my ($k, $v) = splice @where, 0, 2) {
-        $self->add_where($k, $v);
-    }
 }
 
 sub add_where {
