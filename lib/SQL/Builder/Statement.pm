@@ -7,8 +7,8 @@ use Class::Accessor::Lite;
 Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
-        from joins where bind bind_col limit offset group order
-        having where_values column_mutator index_hint
+        from joins where bind limit offset group order
+        having column_mutator index_hint
         for_update
     )
 );
@@ -24,12 +24,10 @@ sub new {
         bind               => +[],
         from               => +[],
         where              => +[],
-        where_values       => +{},
         having             => +[],
         joins              => +[],
         index_hint         => +{},
         group              => +[],
-        bind_col           => +[],
         order              => +[],
         having             => +[],
         %args
@@ -172,8 +170,6 @@ sub add_where {
     my($term, $bind, $tcol) = $self->_mk_term($col, $val);
     push @{ $self->{where} }, "($term)";
     push @{ $self->{bind} }, @$bind;
-    push @{ $self->{bind_col} }, $tcol;
-    $self->where_values->{$tcol} = $bind;
 }
 
 sub add_complex_where {
@@ -203,8 +199,6 @@ sub _parse_array_terms {
             my @out;
             foreach my $t2 ( keys %$t ) {
                 my ($term, $bind, $col) = $self->_mk_term($t2, $t->{$t2});
-                push @{ $self->{bind_col} }, $col;
-                $self->where_values->{$col} = $t->{$t2};
                 push @out, $term;
                 push @bind, @$bind;
             }
