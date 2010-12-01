@@ -173,49 +173,6 @@ sub add_where {
     push @{ $self->{bind} }, @$bind;
 }
 
-sub add_complex_where {
-    my $self = shift;
-    my ($terms) = @_;
-    my ($where, $bind) = $self->_parse_array_terms($terms);
-    push @{ $self->{where} }, $where;
-    push @{ $self->{bind} }, @$bind;
-}
-
-sub _parse_array_terms {
-    my $self = shift;
-    my ($term_list) = @_;
-
-    my @out;
-    my $logic = 'AND';
-    my @bind;
-    foreach my $t ( @$term_list ) {
-        if (! ref $t ) {
-            $logic = $1 if uc($t) =~ m/^-?(OR|AND|OR_NOT|AND_NOT)$/;
-            $logic =~ s/_/ /;
-            next;
-        }
-        my $out;
-        if (ref $t eq 'HASH') {
-            # bag of terms to apply $logic with
-            my @out;
-            foreach my $t2 ( keys %$t ) {
-                my ($term, $bind, $col) = SQL::Builder::Part->make_term($t2, $t->{$t2});
-                push @out, $term;
-                push @bind, @$bind;
-            }
-            $out .= '(' . join(" AND ", @out) . ")";
-        }
-        elsif (ref $t eq 'ARRAY') {
-            # another array of terms to process!
-            my ($where, $bind) = $self->_parse_array_terms( $t );
-            push @bind, @$bind;
-            $out = '(' . $where . ')';
-        }
-        push @out, (@out ? ' ' . $logic . ' ' : '') . $out;
-    }
-    return (join("", @out), \@bind);
-}
-
 sub add_having {
     my $self = shift;
     my($col, $val) = @_;
@@ -286,11 +243,13 @@ SQL::Builder::Statement - dynamic SQL generator
     $sql2->as_sql;
         #=> "SELECT * FROM foo INNER JOIN bar ON foo.bar_id = bar.id;"
 
-    $sql2->add_complex_where([[ -or => { foo => "bar" }, { foo => "baz" } ]]);
-    $sql2->as_sql;
-        #=> "SELECT * FROM foo INNER JOIN bar ON foo.bar_id = bar.id WHERE ( ( foo = ? ) OR ( foo = ? ) )"
 
 =head1 DESCRIPTION
+
+=head1 TODO
+
+    AND/OR support for add_complex_where.
+    call() for stored procedure
 
 =head1 SEE ALSO
 
