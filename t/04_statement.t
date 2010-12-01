@@ -4,10 +4,9 @@ use warnings;
 use SQL::Builder::Statement;
 use Test::More;
 
-my $stmt = ns();
-ok($stmt, 'Created SQL object');
-
 subtest 'FROM' => sub {
+    my $stmt = ns();
+
     $stmt->from([ 'foo' ]);
     is($stmt->as_sql, "FROM foo\n");
 
@@ -16,6 +15,8 @@ subtest 'FROM' => sub {
 };
 
 subtest 'JOIN' => sub {
+    my $stmt = ns();
+
     $stmt->from([]);
     $stmt->joins([]);
     $stmt->add_join(foo => { type => 'inner', table => 'baz',
@@ -58,7 +59,7 @@ subtest 'JOIN' => sub {
 
 
 subtest 'GROUP BY' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->from([ 'foo' ]);
     $stmt->group({ column => 'baz' });
     is($stmt->as_sql, "FROM foo\nGROUP BY baz\n", 'single bare group by');
@@ -81,7 +82,7 @@ subtest 'GROUP BY' => sub {
 };
 
 subtest 'ORDER BY' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->from([ 'foo' ]);
     $stmt->order({ column => 'baz', desc => 'DESC' });
     is($stmt->as_sql, "FROM foo\nORDER BY baz DESC\n", 'single order by');
@@ -94,7 +95,7 @@ subtest 'ORDER BY' => sub {
 };
 
 subtest 'GROUP BY + ORDER BY' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->from([ 'foo' ]);
     $stmt->group({ column => 'quux' });
     $stmt->order({ column => 'baz', desc => 'DESC' });
@@ -102,7 +103,7 @@ subtest 'GROUP BY + ORDER BY' => sub {
 };
 
 subtest 'LIMIT OFFSET' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->from([ 'foo' ]);
     $stmt->limit(5);
     is($stmt->as_sql, "FROM foo\nLIMIT 5\n");
@@ -116,7 +117,8 @@ subtest 'LIMIT OFFSET' => sub {
 };
 
 subtest 'WHERE' => sub {
-    $stmt = ns(); $stmt->where->add(foo => 'bar');
+    my $stmt = ns();
+    $stmt->where->add(foo => 'bar');
     is($stmt->as_sql_where, "WHERE (foo = ?)\n");
     is(scalar @{ $stmt->bind }, 1);
     is($stmt->bind->[0], 'bar');
@@ -189,25 +191,27 @@ subtest 'WHERE' => sub {
     is($stmt->as_sql_where, "WHERE ((foo = ?) AND (foo = ?) AND (foo = ?)) AND ((foo = ?) AND (foo = ?) AND (foo = ?))\n");
 };
 
-$stmt = ns();
-$stmt->add_select(foo => 'foo');
-$stmt->add_select('bar');
-$stmt->from([ qw( baz ) ]);
-is($stmt->as_sql, "SELECT foo, bar\nFROM baz\n");
+subtest 'add_select' => sub {
+    my $stmt = ns();
+    $stmt->add_select(foo => 'foo');
+    $stmt->add_select('bar');
+    $stmt->from([ qw( baz ) ]);
+    is($stmt->as_sql, "SELECT foo, bar\nFROM baz\n");
 
-$stmt = ns();
-$stmt->add_select('f.foo' => 'foo');
-$stmt->add_select('COUNT(*)' => 'count');
-$stmt->from([ qw( baz ) ]);
-is($stmt->as_sql, "SELECT f.foo, COUNT(*) AS count\nFROM baz\n");
-my $map = $stmt->select_map;
-is(scalar(keys %$map), 2);
-is($map->{'f.foo'}, 'foo');
-is($map->{'COUNT(*)'}, 'count');
+    $stmt = ns();
+    $stmt->add_select('f.foo' => 'foo');
+    $stmt->add_select('COUNT(*)' => 'count');
+    $stmt->from([ qw( baz ) ]);
+    is($stmt->as_sql, "SELECT f.foo, COUNT(*) AS count\nFROM baz\n");
+    my $map = $stmt->select_map;
+    is(scalar(keys %$map), 2);
+    is($map->{'f.foo'}, 'foo');
+    is($map->{'COUNT(*)'}, 'count');
+};
 
 # HAVING
 subtest 'HAVING' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_select('COUNT(*)' => 'count');
     $stmt->from([ qw(baz) ]);
@@ -229,7 +233,7 @@ SQL
 };
 
 subtest 'DISTINCT' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->from([ qw(baz) ]);
     is($stmt->as_sql, "SELECT foo\nFROM baz\n", "DISTINCT is absent by default");
@@ -238,7 +242,7 @@ subtest 'DISTINCT' => sub {
 };
 
 subtest 'index hint' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->from([ qw(baz) ]);
     is($stmt->as_sql, "SELECT foo\nFROM baz\n", "index hint is absent by default");
@@ -247,6 +251,9 @@ subtest 'index hint' => sub {
 };
 
 subtest 'index hint with joins' => sub {
+    my $stmt = ns();
+    $stmt->add_select(foo => 'foo');
+    $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
     $stmt->joins([]);
     $stmt->from([]);
     $stmt->add_join(baz => { type => 'inner', table => 'baz',
@@ -264,7 +271,7 @@ subtest 'index hint with joins' => sub {
 };
 
 subtest 'select + from' => sub {
-    $stmt = ns();
+    my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->from([ qw(baz) ]);
     is($stmt->as_sql, "SELECT foo\nFROM baz\n");
