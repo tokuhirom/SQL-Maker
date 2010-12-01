@@ -10,7 +10,7 @@ Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
         from joins where limit offset group order
-        having column_mutator index_hint
+        having index_hint
         for_update
     )
 );
