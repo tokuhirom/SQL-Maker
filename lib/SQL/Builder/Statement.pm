@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use Class::Accessor::Lite;
+use SQL::Builder::Part;
 
 Class::Accessor::Lite->mk_accessors(
     qw(
@@ -167,7 +168,7 @@ sub add_where {
     my($col, $val) = @_;
     # XXX; DATE_FORMAT(member.created_at,'%Y-%m') 
 #    Carp::croak("Invalid/unsafe column name $col") unless $col =~ /^[\w\.]+$/;
-    my($term, $bind, $tcol) = $self->_mk_term($col, $val);
+    my($term, $bind, $tcol) = SQL::Builder::Part->make_term($col, $val);
     push @{ $self->{where} }, "($term)";
     push @{ $self->{bind} }, @$bind;
 }
@@ -198,7 +199,7 @@ sub _parse_array_terms {
             # bag of terms to apply $logic with
             my @out;
             foreach my $t2 ( keys %$t ) {
-                my ($term, $bind, $col) = $self->_mk_term($t2, $t->{$t2});
+                my ($term, $bind, $col) = SQL::Builder::Part->make_term($t2, $t->{$t2});
                 push @out, $term;
                 push @bind, @$bind;
             }
@@ -223,7 +224,7 @@ sub add_having {
         $col = $orig;
     }
 
-    my($term, $bind) = $self->_mk_term($col, $val);
+    my($term, $bind) = SQL::Builder::Part->make_term($col, $val);
     push @{ $self->{having} }, "($term)";
     push @{ $self->{bind} }, @$bind;
 }
@@ -231,56 +232,6 @@ sub add_having {
 sub as_for_update {
     my $self = shift;
     $self->for_update ? ' FOR UPDATE' : '';
-}
-
-sub _mk_term {
-    my $self = shift;
-    my($col, $val) = @_;
-    my $term = '';
-    my (@bind, $m);
-    if (ref($val) eq 'ARRAY') {
-        if (ref $val->[0] or (($val->[0] || '') eq '-and')) {
-            my $logic = 'OR';
-            my @values = @$val;
-            if ($val->[0] eq '-and') {
-                $logic = 'AND';
-                shift @values;
-            }
-
-            my @terms;
-            for my $v (@values) {
-                my($term, $bind) = $self->_mk_term($col, $v);
-                push @terms, "($term)";
-                push @bind, @$bind;
-            }
-            $term = join " $logic ", @terms;
-        } else {
-            $col = $m->($col) if $m = $self->column_mutator;
-            $term = "$col IN (".join(',', ('?') x scalar @$val).')';
-            @bind = @$val;
-        }
-    } elsif (ref($val) eq 'HASH') {
-        my $c = $val->{column} || $col;
-        $c = $m->($c) if $m = $self->column_mutator;
-
-        my($op, $v) = (%{ $val });
-        $op = uc($op);
-        if (($op eq 'IN' || $op eq 'NOT IN') && ref($v) eq 'ARRAY') {
-            $term = "$c $op (".join(',', ('?') x scalar @$v).')';
-            @bind = @$v;
-        } else {
-            $term = "$c $op ?";
-            push @bind, $v;
-        }
-    } elsif (ref($val) eq 'SCALAR') {
-        $col = $m->($col) if $m = $self->column_mutator;
-        $term = "$col $$val";
-    } else {
-        $col = $m->($col) if $m = $self->column_mutator;
-        $term = "$col = ?";
-        push @bind, $val;
-    }
-    ($term, \@bind, $col);
 }
 
 sub _add_index_hint {
