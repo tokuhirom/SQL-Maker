@@ -1,4 +1,4 @@
-package SQL::Builder::Statement;
+package SQL::Builder::Select;
 use strict;
 use warnings;
 use utf8;
@@ -204,11 +204,11 @@ __END__
 
 =head1 NAME
 
-SQL::Builder::Statement - dynamic SQL generator
+SQL::Builder::Select - dynamic SQL generator
 
 =head1 SYNOPSIS
 
-    my $sql = SQL::Builder::Statement->new;
+    my $sql = SQL::Builder::Select->new;
     $sql->select(['foo', 'bar', 'baz']);
     $sql->from(['table_name']);
     $sql->as_sql;
@@ -229,7 +229,7 @@ SQL::Builder::Statement - dynamic SQL generator
     # execute SQL and return DBIx::Skinny::Iterator object.
     my $iter = $sql->retrieve;
 
-    my $sql2 = SQL::Builder::Statement->new;
+    my $sql2 = SQL::Builder::Select->new;
     $sql2->from([]);
     $sql2->add_join(foo => [
         { table => "bar", type => "inner", condition => "foo.bar_id = bar.id" },

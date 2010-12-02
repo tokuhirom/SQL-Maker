@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use SQL::Builder::Statement;
+use SQL::Builder::Select;
 use Test::More;
 
 subtest 'FROM' => sub {
@@ -300,6 +300,6 @@ subtest join_with_using => sub {
     done_testing;
 };
 
-sub ns { SQL::Builder::Statement->new }
+sub ns { SQL::Builder::Select->new }
 
 done_testing;

@@ -7,8 +7,8 @@ use Class::Accessor::Lite;
 Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver statement_class/);
 
 use Carp ();
-use SQL::Builder::Statement;
-use SQL::Builder::Statement::Oracle;
+use SQL::Builder::Select;
+use SQL::Builder::Select::Oracle;
 use SQL::Builder::Where;
 use Module::Load ();
 
@@ -41,7 +41,7 @@ sub new {
         }
     };
     $args{name_sep}    ||= '.';
-    $args{statement_class} = $driver eq 'Oracle' ? 'SQL::Builder::Statement::Oracle' : 'SQL::Builder::Statement';
+    $args{statement_class} = $driver eq 'Oracle' ? 'SQL::Builder::Select::Oracle' : 'SQL::Builder::Select';
     bless {%args}, $class;
 }
 
