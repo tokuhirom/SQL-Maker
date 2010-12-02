@@ -12,7 +12,7 @@ sub ordered_hashref {
 subtest 'insert' => sub {
     my $builder = SQL::Builder->new(driver => 'sqlite');
     my ($sql, @binds) = $builder->insert('foo' => ordered_hashref(bar => 'baz', john => 'man'));
-    is $sql, "INSERT INTO foo\n(`bar`, `john`)\nVALUES (?, ?)\n";
+    is $sql, "INSERT INTO `foo`\n(`bar`, `john`)\nVALUES (?, ?)\n";
     is join(',', @binds), 'baz,man';
 };
 

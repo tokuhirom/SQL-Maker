@@ -50,6 +50,8 @@ sub insert {
     my ($self, $table, $values, $opt) = @_;
     my $prefix = $opt->{prefix} || 'INSERT';
 
+    my $quoted_table = $self->_quote($table);
+
     my (@columns, @bind_columns, @quoted_columns);
     while (my ($col, $val) = each %$values) {
         push @quoted_columns, $self->_quote($col);
@@ -63,7 +65,7 @@ sub insert {
         }
     }
 
-    my $sql  = "$prefix INTO $table\n";
+    my $sql  = "$prefix INTO $quoted_table\n";
        $sql .= '(' . join(', ', @quoted_columns) .')' . "\n" .
                'VALUES (' . join(', ', @columns) . ')' . "\n";
 
