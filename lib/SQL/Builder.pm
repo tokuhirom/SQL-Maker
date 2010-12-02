@@ -52,7 +52,7 @@ sub insert {
 
     my (@columns, @bind_columns, @quoted_columns);
     while (my ($col, $val) = each %$values) {
-        push @quoted_columns, _quote($col, $self->quote_char, $self->name_sep);
+        push @quoted_columns, $self->_quote($col);
         if (ref($val) eq 'SCALAR') {
             # $builder->insert(foo => { created_on => \"NOW()" });
             push @columns, $$val;
@@ -71,9 +71,12 @@ sub insert {
 }
 
 sub _quote {
-    my ($label, $quote_char, $name_sep) = @_;
+    my ($self, $label) = @_;
 
     return $label if $label eq '*';
+
+    my $quote_char = $self->quote_char();
+    my $name_sep = $self->name_sep();
     return join $name_sep, map { $quote_char . $_ . $quote_char } split /\Q$name_sep\E/, $label;
 }
 
@@ -94,7 +97,7 @@ sub update {
     my (@columns, @bind_columns);
     # make "SET" clause.
     while (my ($col, $val) = each %$args) {
-        my $quoted_col = _quote($col, $self->quote_char, $self->name_sep);
+        my $quoted_col = $self->_quote($col);
         if (ref($val) eq 'SCALAR') {
             # $builder->update(foo => { created_on => \"NOW()" });
             push @columns, "$quoted_col = " . $$val;
