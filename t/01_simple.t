@@ -20,13 +20,13 @@ subtest 'delete' => sub {
     subtest 'simple' => sub {
         my $builder = SQL::Builder->new(driver => 'sqlite');
         my ($sql, @binds) = $builder->delete('foo' => ordered_hashref(bar => 'baz', john => 'man'));
-        is $sql, "DELETE FROM foo WHERE (bar = ?) AND (john = ?)";
+        is $sql, "DELETE FROM `foo` WHERE (bar = ?) AND (john = ?)";
         is join(',', @binds), 'baz,man';
     };
     subtest 'delete all' => sub {
         my $builder = SQL::Builder->new(driver => 'sqlite');
         my ($sql, @binds) = $builder->delete('foo');
-        is $sql, "DELETE FROM foo";
+        is $sql, "DELETE FROM `foo`";
         is join(',', @binds), '';
     };
 };
@@ -35,13 +35,13 @@ subtest 'update' => sub {
     my $builder = SQL::Builder->new(driver => 'sqlite');
     {
         my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
-        is $sql, "UPDATE foo SET `bar` = ?, `john` = ? WHERE (yo = ?)";
+        is $sql, "UPDATE `foo` SET `bar` = ?, `john` = ? WHERE (yo = ?)";
         is join(',', @binds), 'baz,man,king';
     }
     {
         # no where
         my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'));
-        is $sql, "UPDATE foo SET `bar` = ?, `john` = ?";
+        is $sql, "UPDATE `foo` SET `bar` = ?, `john` = ?";
         is join(',', @binds), 'baz,man';
     }
 };

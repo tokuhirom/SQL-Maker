@@ -89,7 +89,8 @@ sub delete {
     while (my ($col, $val) = each %$where) {
         $w->add($col => $val);
     }
-    my $sql = "DELETE FROM $table" . $w->as_sql(1);
+    my $quoted_table = $self->_quote($table);
+    my $sql = "DELETE FROM $quoted_table" . $w->as_sql(1);
     return ($sql, $w->bind);
 }
 
@@ -116,7 +117,8 @@ sub update {
     }
     push @bind_columns, $w->bind;
 
-    my $sql = "UPDATE $table SET " . join(', ', @columns) . $w->as_sql(1);
+    my $quoted_table = $self->_quote($table);
+    my $sql = "UPDATE $quoted_table SET " . join(', ', @columns) . $w->as_sql(1);
     return ($sql, @bind_columns);
 }
 
