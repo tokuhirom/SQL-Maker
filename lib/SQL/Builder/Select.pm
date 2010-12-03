@@ -118,9 +118,9 @@ sub as_sql {
     $sql .= "\n";
     $sql .= $self->as_sql_where();
 
-    $sql .= $self->as_aggregate('group');
+    $sql .= $self->as_sql_group_by;
     $sql .= $self->as_sql_having;
-    $sql .= $self->as_aggregate('order');
+    $sql .= $self->as_sql_order_by;
 
     $sql .= $self->as_limit;
 
@@ -138,14 +138,15 @@ sub as_limit {
            ($self->offset ? " OFFSET " . int($self->offset) : "");
 }
 
-sub as_aggregate {
-    my ($self, $set) = @_;
+sub as_sql_order_by {
+    my ($self) = @_;
+    my $set = 'order';
 
-    return '' unless my $attribute = $self->$set();
+    return '' unless my $attribute = $self->order();
 
     my $ref = ref $attribute;
     if (!$ref) {
-        return uc($set)  . " BY $attribute\n";
+        return "ORDER BY $attribute\n";
     }
 
     if ($ref eq 'ARRAY' && scalar @$attribute == 0) {
@@ -153,8 +154,27 @@ sub as_aggregate {
     }
 
     my $elements = ($ref eq 'ARRAY') ? $attribute : [ $attribute ];
-    return uc($set)
-           . ' BY '
+    return 'ORDER BY '
+           . join(', ', map { $_->{column} . ($_->{desc} ? (' ' . $_->{desc}) : '') } @$elements)
+           . "\n";
+}
+
+sub as_sql_group_by {
+    my ($self,) = @_;
+
+    return '' unless my $attribute = $self->group();
+
+    my $ref = ref $attribute;
+    if (!$ref) {
+        return "GROUP BY $attribute\n";
+    }
+
+    if ($ref eq 'ARRAY' && scalar @$attribute == 0) {
+        return '';
+    }
+
+    my $elements = ($ref eq 'ARRAY') ? $attribute : [ $attribute ];
+    return 'GROUP BY '
            . join(', ', map { $_->{column} . ($_->{desc} ? (' ' . $_->{desc}) : '') } @$elements)
            . "\n";
 }
