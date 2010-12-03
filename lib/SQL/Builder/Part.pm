@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use utf8;
 
-# TODO: support sub query?
 sub make_term {
     my ($class, $col, $val) = @_;
 
