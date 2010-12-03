@@ -9,7 +9,7 @@ use SQL::Builder::Where;
 Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
-        from joins where limit offset group order
+        _from joins where limit offset group order
         having index_hint
         for_update
     )
@@ -24,7 +24,7 @@ sub new {
         select_map         => +{},
         select_map_reverse => +{},
         having_bind        => +[],
-        from               => +[],
+        _from               => +[],
         where              => SQL::Builder::Where->new(),
         having             => +[],
         joins              => +[],
@@ -50,6 +50,11 @@ sub add_select {
     push @{ $self->select }, $term;
     $self->select_map->{$term} = $col;
     $self->select_map_reverse->{$col} = $term;
+}
+
+sub add_from {
+    my ($self, $table, $alias) = @_;
+    push @{$self->_from}, [$table, $alias];
 }
 
 sub add_join {
@@ -103,11 +108,11 @@ sub as_sql {
                 }
             }
         }
-        $sql .= ', ' if @{ $self->from };
+        $sql .= ', ' if @{ $self->_from };
     }
 
-    if ($self->from && @{ $self->from }) {
-        $sql .= join ', ', map { $self->_add_index_hint($_) } @{ $self->from };
+    if ($self->_from && @{ $self->_from }) {
+        $sql .= join ', ', map { $self->_add_index_hint($_) } map { $_->[1] ? "$_->[0] $_->[1]" : $_->[0] } @{ $self->_from };
     }
 
     $sql .= "\n";
@@ -210,7 +215,7 @@ SQL::Builder::Select - dynamic SQL generator
 
     my $sql = SQL::Builder::Select->new;
     $sql->select(['foo', 'bar', 'baz']);
-    $sql->from(['table_name']);
+    $sql->add_from('table_name');
     $sql->as_sql;
         #=> "SELECT foo, bar, baz FROM table_name;"
 
@@ -230,7 +235,6 @@ SQL::Builder::Select - dynamic SQL generator
     my $iter = $sql->retrieve;
 
     my $sql2 = SQL::Builder::Select->new;
-    $sql2->from([]);
     $sql2->add_join(foo => [
         { table => "bar", type => "inner", condition => "foo.bar_id = bar.id" },
     ]);

@@ -128,8 +128,8 @@ sub select {
 
     my $stmt = $self->statement_class->new(
         select => $fields,
-        from   => [$table],
     );
+    $stmt->add_from($table);
 
     if ( $where ) {
         while (my ($col, $val) = each %$where) {
