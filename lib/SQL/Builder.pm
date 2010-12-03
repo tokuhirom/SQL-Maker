@@ -131,7 +131,8 @@ sub select {
     $stmt->add_from($table);
 
     if ( $where ) {
-        while (my ($col, $val) = each %$where) {
+        my @w = ref $where eq 'ARRAY' ? @$where : %$where;
+        while (my ($col, $val) = splice @w, 0, 2) {
             $stmt->where->add($col => $val);
         }
     }

@@ -48,9 +48,16 @@ subtest 'update' => sub {
 
 subtest 'select' => sub {
     my $builder = SQL::Builder->new(driver => 'sqlite');
-    my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
-    is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
-    is join(',', @binds), 'baz,man';
+    do {
+        my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
+        is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
+        is join(',', @binds), 'baz,man';
+    };
+    do {
+        my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [bar => 'baz', john => 'man'], {order_by => 'yo'});
+        is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
+        is join(',', @binds), 'baz,man';
+    };
     subtest 'order_by' => sub {
         do {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
