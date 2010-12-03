@@ -44,7 +44,6 @@ subtest 'JOIN' => sub {
 
     do {
         my $stmt = ns();
-        $stmt->joins([]);
         $stmt->add_join(foo => [
                 { type => 'inner', table => 'baz b1',
                 condition => 'foo.baz_id = b1.baz_id AND b1.quux_id = 1' },
@@ -56,7 +55,6 @@ subtest 'JOIN' => sub {
 
     subtest 'test case for bug found where add_join is called twice' => sub {
         my $stmt = ns();
-        $stmt->joins([]);
         $stmt->add_join(foo => [
                 { type => 'inner', table => 'baz b1',
                 condition => 'foo.baz_id = b1.baz_id AND b1.quux_id = 1' },
@@ -331,7 +329,6 @@ subtest 'index hint with joins' => sub {
         my $stmt = ns();
         $stmt->add_select(foo => 'foo');
         $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
-        $stmt->joins([]);
         $stmt->add_join(baz => { type => 'inner', table => 'baz',
                                 condition => 'baz.baz_id = foo.baz_id' });
         is($stmt->as_sql, "SELECT foo\nFROM baz USE INDEX (index_hint) INNER JOIN baz ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
@@ -340,9 +337,6 @@ subtest 'index hint with joins' => sub {
         my $stmt = ns();
         $stmt->add_select(foo => 'foo');
         $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
-        $stmt->add_join(baz => { type => 'inner', table => 'baz',
-                                condition => 'baz.baz_id = foo.baz_id' });
-        $stmt->joins([]);
         $stmt->add_join(baz => [
                 { type => 'inner', table => 'baz b1',
                 condition => 'baz.baz_id = b1.baz_id AND b1.quux_id = 1' },

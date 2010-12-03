@@ -8,8 +8,8 @@ use SQL::Builder::Where;
 
 Class::Accessor::Lite->mk_accessors(
     qw(
-        select distinct select_map select_map_reverse
-        _from joins where limit offset
+        distinct select_map select_map_reverse
+        _from where limit offset
         for_update
     )
 );
@@ -46,7 +46,7 @@ sub add_select {
     my $self = shift;
     my($term, $col) = @_;
     $col ||= $term;
-    push @{ $self->select }, $term;
+    push @{ $self->{select} }, $term;
     $self->select_map->{$term} = $col;
     $self->select_map_reverse->{$col} = $term;
 }
@@ -59,7 +59,7 @@ sub add_from {
 sub add_join {
     my $self = shift;
     my($table, $joins) = @_;
-    push @{ $self->joins }, {
+    push @{ $self->{joins} }, {
         table => $table,
         joins => ref($joins) eq 'ARRAY' ? $joins : [ $joins ],
     };
@@ -77,22 +77,22 @@ sub add_index_hint {
 sub as_sql {
     my $self = shift;
     my $sql = '';
-    if (@{ $self->select }) {
+    if (@{ $self->{select} }) {
         $sql .= 'SELECT ';
         $sql .= 'DISTINCT ' if $self->distinct;
         $sql .= join(', ',  map {
             my $alias = $self->select_map->{$_};
             !$alias                         ? $_ :
             $alias && /(?:^|\.)\Q$alias\E$/ ? $_ : "$_ AS $alias";
-        } @{ $self->select }) . "\n";
+        } @{ $self->{select} }) . "\n";
     }
 
     $sql .= 'FROM ';
 
     ## Add any explicit JOIN statements before the non-joined tables.
-    if ($self->joins && @{ $self->joins }) {
+    if ($self->{joins} && @{ $self->{joins} }) {
         my $initial_table_written = 0;
-        for my $j (@{ $self->joins }) {
+        for my $j (@{ $self->{joins} }) {
             my($table, $joins) = map { $j->{$_} } qw( table joins );
             $table = $self->_add_index_hint($table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
