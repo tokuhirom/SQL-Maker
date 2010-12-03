@@ -9,7 +9,7 @@ use SQL::Builder::Where;
 Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
-        _from joins where limit offset order
+        _from joins where limit offset
         for_update
     )
 );
@@ -29,7 +29,7 @@ sub new {
         joins              => +[],
         index_hint         => +{},
         group_by           => +[],
-        order              => +[],
+        order_by           => +[],
         having             => +[],
         %args
     }, $class;
@@ -137,24 +137,25 @@ sub as_limit {
            ($self->offset ? " OFFSET " . int($self->offset) : "");
 }
 
+sub add_order_by {
+    my ($self, $col, $type) = @_;
+    push @{$self->{order_by}}, do {
+        if (ref $col) {
+            $$col;
+        } else {
+            $type ? "$col $type" : $col
+        }
+    };
+}
+
 sub as_sql_order_by {
     my ($self) = @_;
-    my $set = 'order';
 
-    return '' unless my $attribute = $self->order();
+    my @attrs = @{$self->{order_by}};
+    return '' unless @attrs;
 
-    my $ref = ref $attribute;
-    if (!$ref) {
-        return "ORDER BY $attribute\n";
-    }
-
-    if ($ref eq 'ARRAY' && scalar @$attribute == 0) {
-        return '';
-    }
-
-    my $elements = ($ref eq 'ARRAY') ? $attribute : [ $attribute ];
     return 'ORDER BY '
-           . join(', ', map { $_->{column} . ($_->{desc} ? (' ' . $_->{desc}) : '') } @$elements)
+           . join(', ', @attrs)
            . "\n";
 }
 
@@ -271,9 +272,18 @@ SQL::Builder::Select - dynamic SQL generator
 
 =head1 DESCRIPTION
 
+=head1 METHODS
+
+=over 4
+
+=item $stmt->add_order_by('foo');
+
+=item $stmt->add_order_by({'foo' => 'DESC'});
+
+=back
+
 =head1 TODO
 
-    AND/OR support for add_complex_where.
     call() for stored procedure
 
 =head1 SEE ALSO

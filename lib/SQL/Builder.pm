@@ -139,7 +139,20 @@ sub select {
 
     $stmt->limit( $opt->{limit} )    if $opt->{limit};
     $stmt->offset( $opt->{offset} )  if $opt->{offset};
-    $stmt->order( $opt->{order_by} ) if $opt->{order_by};
+    if (my $o = $opt->{order_by}) {
+        if (ref $o) {
+            for my $order (@$o) {
+                if (ref $order) {
+                    # Skinny-ish {foo => 'DESC'}
+                    $stmt->add_order_by(%$order);
+                } else {
+                    $stmt->add_order_by(\$order);
+                }
+            }
+        } else {
+            $stmt->add_order_by(\$o);
+        }
+    }
 
     if (my $terms = $opt->{having}) {
         while (my ($col, $val) = each %$terms) {

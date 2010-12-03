@@ -124,24 +124,23 @@ subtest 'ORDER BY' => sub {
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
-        $stmt->order({ column => 'baz', desc => 'DESC' });
+        $stmt->add_order_by('baz' => 'DESC');
         is($stmt->as_sql, "FROM foo\nORDER BY baz DESC\n", 'single order by');
     };
 
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
-        $stmt->order([ { column => 'baz',  desc => 'DESC' },
-                    { column => 'quux', desc => 'ASC'  }, ]);
+        $stmt->add_order_by( 'baz' => 'DESC' );
+        $stmt->add_order_by( 'quux' => 'ASC' );
         is($stmt->as_sql, "FROM foo\nORDER BY baz DESC, quux ASC\n", 'multiple order by');
     };
 
-    do {
+    subtest 'scalarref' => sub {
         my $stmt = ns();
-        $stmt->add_select('*');
-        $stmt->add_from(qw/baz/);
-        $stmt->order('foo DESC');
-        is $stmt->as_sql, "SELECT *\nFROM baz\nORDER BY foo DESC\n";
+        $stmt->add_from( 'foo' );
+        $stmt->add_order_by( \'baz DESC' );
+        is($stmt->as_sql, "FROM foo\nORDER BY baz DESC\n");
     };
 };
 
@@ -149,7 +148,7 @@ subtest 'GROUP BY + ORDER BY' => sub {
     my $stmt = ns();
     $stmt->add_from( 'foo' );
     $stmt->add_group_by({ column => 'quux' });
-    $stmt->order({ column => 'baz', desc => 'DESC' });
+    $stmt->add_order_by('baz' => 'DESC');
     is($stmt->as_sql, "FROM foo\nGROUP BY quux\nORDER BY baz DESC\n", 'group by with order by');
 };
 
@@ -294,7 +293,7 @@ subtest 'HAVING' => sub {
     $stmt->add_from( qw(baz) );
     $stmt->where->add(foo => 1);
     $stmt->add_group_by({ column => 'baz' });
-    $stmt->order({ column => 'foo', desc => 'DESC' });
+    $stmt->add_order_by('foo' => 'DESC');
     $stmt->limit(2);
     $stmt->add_having(count => 2);
 

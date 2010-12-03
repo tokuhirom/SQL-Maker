@@ -51,6 +51,23 @@ subtest 'select' => sub {
     my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
     is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
     is join(',', @binds), 'baz,man';
+    subtest 'order_by' => sub {
+        do {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
+            is $sql, "SELECT *\nFROM foo\nORDER BY yo\n";
+            is join(',', @binds), '';
+        };
+        do {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => ['yo', 'ya']});
+            is $sql, "SELECT *\nFROM foo\nORDER BY yo, ya\n";
+            is join(',', @binds), '';
+        };
+        do {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => [{'yo' => 'DESC'}, 'ya']});
+            is $sql, "SELECT *\nFROM foo\nORDER BY yo DESC, ya\n";
+            is join(',', @binds), '';
+        };
+    };
 };
 
 done_testing;
