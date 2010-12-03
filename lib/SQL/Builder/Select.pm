@@ -9,8 +9,8 @@ use SQL::Builder::Where;
 Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
-        _from joins where limit offset group order
-        having index_hint
+        _from joins where limit offset order
+        having
         for_update
     )
 );
@@ -29,7 +29,7 @@ sub new {
         having             => +[],
         joins              => +[],
         index_hint         => +{},
-        group              => +[],
+        group_by           => +[],
         order              => +[],
         having             => +[],
         %args
@@ -69,7 +69,7 @@ sub add_join {
 sub add_index_hint {
     my $self = shift;
     my($table, $hint) = @_;
-    $self->index_hint->{$table} = {
+    $self->{index_hint}->{$table} = {
         type => $hint->{type} || 'USE',
         list => ref($hint->{list}) eq 'ARRAY' ? $hint->{list} : [ $hint->{list} ],
     };
@@ -159,10 +159,15 @@ sub as_sql_order_by {
            . "\n";
 }
 
+sub add_group_by {
+    my ($self, $group) = @_;
+    push @{$self->{group_by}}, $group;
+}
+
 sub as_sql_group_by {
     my ($self,) = @_;
 
-    return '' unless my $attribute = $self->group();
+    return '' unless my $attribute = $self->{group_by};
 
     my $ref = ref $attribute;
     if (!$ref) {
@@ -214,7 +219,7 @@ sub as_for_update {
 sub _add_index_hint {
     my $self = shift;
     my ($tbl_name) = @_;
-    my $hint = $self->index_hint->{$tbl_name};
+    my $hint = $self->{index_hint}->{$tbl_name};
     return $tbl_name unless $hint && ref($hint) eq 'HASH';
     if ($hint->{list} && @{ $hint->{list} }) {
         return $tbl_name . ' ' . uc($hint->{type} || 'USE') . ' INDEX (' . 

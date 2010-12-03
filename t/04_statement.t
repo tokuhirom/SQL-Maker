@@ -92,29 +92,30 @@ subtest 'GROUP BY' => sub {
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
-        $stmt->group({ column => 'baz' });
+        $stmt->add_group_by({ column => 'baz' });
         is($stmt->as_sql, "FROM foo\nGROUP BY baz\n", 'single bare group by');
     };
 
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
-        $stmt->group({ column => 'baz', desc => 'DESC' });
+        $stmt->add_group_by({ column => 'baz', desc => 'DESC' });
         is($stmt->as_sql, "FROM foo\nGROUP BY baz DESC\n", 'single group by with desc');
     };
 
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
-        $stmt->group([ { column => 'baz' }, { column => 'quux' }, ]);
+        $stmt->add_group_by({ column => 'baz' });
+        $stmt->add_group_by({ column => 'quux' });
         is($stmt->as_sql, "FROM foo\nGROUP BY baz, quux\n", 'multiple group by');
     };
 
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
-        $stmt->group([ { column => 'baz',  desc => 'DESC' },
-                    { column => 'quux', desc => 'DESC' }, ]);
+        $stmt->add_group_by({ column => 'baz',  desc => 'DESC' });
+        $stmt->add_group_by({ column => 'quux', desc => 'DESC' });
         is($stmt->as_sql, "FROM foo\nGROUP BY baz DESC, quux DESC\n", 'multiple group by with desc');
     };
 };
@@ -139,7 +140,7 @@ subtest 'ORDER BY' => sub {
 subtest 'GROUP BY + ORDER BY' => sub {
     my $stmt = ns();
     $stmt->add_from( 'foo' );
-    $stmt->group({ column => 'quux' });
+    $stmt->add_group_by({ column => 'quux' });
     $stmt->order({ column => 'baz', desc => 'DESC' });
     is($stmt->as_sql, "FROM foo\nGROUP BY quux\nORDER BY baz DESC\n", 'group by with order by');
 };
@@ -284,7 +285,7 @@ subtest 'HAVING' => sub {
     $stmt->add_select('COUNT(*)' => 'count');
     $stmt->add_from( qw(baz) );
     $stmt->where->add(foo => 1);
-    $stmt->group({ column => 'baz' });
+    $stmt->add_group_by({ column => 'baz' });
     $stmt->order({ column => 'foo', desc => 'DESC' });
     $stmt->limit(2);
     $stmt->add_having(count => 2);
