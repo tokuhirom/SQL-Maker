@@ -311,7 +311,8 @@ subtest 'DISTINCT' => sub {
     $stmt->add_select(foo => 'foo');
     $stmt->add_from( qw(baz) );
     is($stmt->as_sql, "SELECT foo\nFROM baz\n", "DISTINCT is absent by default");
-    $stmt->distinct(1);
+
+    $stmt->set_distinct(1);
     is($stmt->as_sql, "SELECT DISTINCT foo\nFROM baz\n", "we can turn on DISTINCT");
 };
 

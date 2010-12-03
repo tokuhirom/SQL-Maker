@@ -8,7 +8,7 @@ use SQL::Builder::Where;
 
 Class::Accessor::Lite->mk_accessors(
     qw(
-        distinct select_map select_map_reverse
+        select_map select_map_reverse
         _from where limit offset
         for_update
     )
@@ -35,6 +35,11 @@ sub new {
     }, $class;
 
     return $self;
+}
+
+sub set_distinct {
+    my ($self, $val) = @_;
+    $self->{distinct} = $val;
 }
 
 sub bind {
@@ -79,7 +84,7 @@ sub as_sql {
     my $sql = '';
     if (@{ $self->{select} }) {
         $sql .= 'SELECT ';
-        $sql .= 'DISTINCT ' if $self->distinct;
+        $sql .= 'DISTINCT ' if $self->{distinct};
         $sql .= join(', ',  map {
             my $alias = $self->select_map->{$_};
             !$alias                         ? $_ :
