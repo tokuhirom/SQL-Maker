@@ -7,13 +7,7 @@ use SQL::Builder::Part;
 use SQL::Builder::Where;
 
 Class::Accessor::Lite->mk_wo_accessors(qw/limit offset distinct for_update/);
-
-Class::Accessor::Lite->mk_accessors(
-    qw(
-        select_map select_map_reverse
-        _from where
-    )
-);
+Class::Accessor::Lite->mk_accessors( qw(where) );
 
 sub new {
     my $class = shift;
@@ -24,7 +18,7 @@ sub new {
         select_map         => +{},
         select_map_reverse => +{},
         having_bind        => +[],
-        _from               => +[],
+        from               => +[],
         where              => SQL::Builder::Where->new(),
         having             => +[],
         joins              => +[],
@@ -48,13 +42,13 @@ sub add_select {
     my($term, $col) = @_;
     $col ||= $term;
     push @{ $self->{select} }, $term;
-    $self->select_map->{$term} = $col;
-    $self->select_map_reverse->{$col} = $term;
+    $self->{select_map}->{$term} = $col;
+    $self->{select_map_reverse}->{$col} = $term;
 }
 
 sub add_from {
     my ($self, $table, $alias) = @_;
-    push @{$self->_from}, [$table, $alias];
+    push @{$self->{from}}, [$table, $alias];
 }
 
 sub add_join {
@@ -82,7 +76,7 @@ sub as_sql {
         $sql .= 'SELECT ';
         $sql .= 'DISTINCT ' if $self->{distinct};
         $sql .= join(', ',  map {
-            my $alias = $self->select_map->{$_};
+            my $alias = $self->{select_map}->{$_};
             !$alias                         ? $_ :
             $alias && /(?:^|\.)\Q$alias\E$/ ? $_ : "$_ AS $alias";
         } @{ $self->{select} }) . "\n";
@@ -108,11 +102,11 @@ sub as_sql {
                 }
             }
         }
-        $sql .= ', ' if @{ $self->_from };
+        $sql .= ', ' if @{ $self->{from} };
     }
 
-    if ($self->_from && @{ $self->_from }) {
-        $sql .= join ', ', map { $self->_add_index_hint($_) } map { $_->[1] ? "$_->[0] $_->[1]" : $_->[0] } @{ $self->_from };
+    if ($self->{from} && @{ $self->{from} }) {
+        $sql .= join ', ', map { $self->_add_index_hint($_) } map { $_->[1] ? "$_->[0] $_->[1]" : $_->[0] } @{ $self->{from} };
     }
 
     $sql .= "\n";
@@ -205,7 +199,7 @@ sub add_having {
     my $self = shift;
     my($col, $val) = @_;
 
-    if (my $orig = $self->select_map_reverse->{$col}) {
+    if (my $orig = $self->{select_map_reverse}->{$col}) {
         $col = $orig;
     }
 

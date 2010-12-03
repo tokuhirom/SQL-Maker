@@ -276,10 +276,6 @@ subtest 'add_select' => sub {
         $stmt->add_select('COUNT(*)' => 'count');
         $stmt->add_from( qw( baz ) );
         is($stmt->as_sql, "SELECT f.foo, COUNT(*) AS count\nFROM baz\n");
-        my $map = $stmt->select_map;
-        is(scalar(keys %$map), 2);
-        is($map->{'f.foo'}, 'foo');
-        is($map->{'COUNT(*)'}, 'count');
     };
 };
 

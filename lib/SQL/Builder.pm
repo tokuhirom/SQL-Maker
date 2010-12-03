@@ -126,9 +126,8 @@ sub update {
 sub select {
     my ($self, $table, $fields, $where, $opt) = @_;
 
-    my $stmt = $self->statement_class->new(
-        select => $fields,
-    );
+    my $stmt = $self->statement_class->new();
+    $stmt->add_select($_) for @$fields;
     $stmt->add_from($table);
 
     if ( $where ) {
