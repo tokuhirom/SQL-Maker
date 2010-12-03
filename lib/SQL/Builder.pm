@@ -4,7 +4,8 @@ use warnings;
 use 5.008001;
 our $VERSION = '0.01';
 use Class::Accessor::Lite;
-Class::Accessor::Lite->mk_accessors(qw/quote_char name_sep driver statement_class/);
+
+Class::Accessor::Lite->mk_ro_accessors(qw/quote_char name_sep driver statement_class/);
 
 use Carp ();
 use SQL::Builder::Select;
