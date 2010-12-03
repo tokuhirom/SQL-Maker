@@ -155,27 +155,19 @@ sub as_sql_order_by {
 }
 
 sub add_group_by {
-    my ($self, $group) = @_;
-    push @{$self->{group_by}}, $group;
+    my ($self, $group, $order) = @_;
+    push @{$self->{group_by}}, $order ? "$group $order" : $group;
 }
 
 sub as_sql_group_by {
     my ($self,) = @_;
 
-    return '' unless my $attribute = $self->{group_by};
+    my $elems = $self->{group_by};
 
-    my $ref = ref $attribute;
-    if (!$ref) {
-        return "GROUP BY $attribute\n";
-    }
+    return '' if @$elems == 0;
 
-    if ($ref eq 'ARRAY' && scalar @$attribute == 0) {
-        return '';
-    }
-
-    my $elements = ($ref eq 'ARRAY') ? $attribute : [ $attribute ];
     return 'GROUP BY '
-           . join(', ', map { $_->{column} . ($_->{desc} ? (' ' . $_->{desc}) : '') } @$elements)
+           . join(', ', @$elems)
            . "\n";
 }
 
