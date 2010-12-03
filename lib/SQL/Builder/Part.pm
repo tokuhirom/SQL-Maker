@@ -54,6 +54,10 @@ sub make_term {
         # make_term(foo => \"> 3") => foo > 3
         return ("$col $$val", []);
     }
+    elsif ( ref($val) eq 'REF') {
+        my ($query, @v) = @{${$val}};
+        return ("$col $query", \@v);
+    }
     else {
         # make_term(foo => "3") => foo = 3
         return ("$col = ?", [$val]);

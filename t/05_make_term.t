@@ -2,12 +2,17 @@ use strict;
 use warnings;
 use Test::More;
 use SQL::Builder::Part;
+use Data::Dumper;
 
 sub test {
     my ($source, $expected_term, $expected_bind) = @_;
-    my ($term, $bind) = SQL::Builder::Part->make_term(@$source);
-    is $term, $expected_term;
-    is_deeply $bind, $expected_bind;
+    local $Data::Dumper::Terse=1;
+    local $Data::Dumper::Indent=0;
+    subtest Dumper($source) => sub {
+        my ($term, $bind) = SQL::Builder::Part->make_term(@$source);
+        is $term, $expected_term;
+        is_deeply $bind, $expected_bind;
+    };
 }
 
 test(@{$_}) for (
@@ -65,6 +70,16 @@ test(@{$_}) for (
         ['foo' => [-and => 'foo', 'bar', 'baz']],
         "(foo = ?) AND (foo = ?) AND (foo = ?)",
         [qw/foo bar baz/]
+    ],
+    [
+        ['foo_id' => \['IN (SELECT foo_id FROM bar WHERE t=?)', 44]],
+        "foo_id IN (SELECT foo_id FROM bar WHERE t=?)",
+        [qw/44/]
+    ],
+    [
+        ['foo_id' => \['MATCH (col1, col2) AGAINST (?)', 'apples']],
+        "foo_id MATCH (col1, col2) AGAINST (?)",
+        [qw/apples/]
     ],
 );
 done_testing;
