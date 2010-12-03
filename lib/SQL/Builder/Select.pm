@@ -6,11 +6,12 @@ use Class::Accessor::Lite;
 use SQL::Builder::Part;
 use SQL::Builder::Where;
 
+Class::Accessor::Lite->mk_wo_accessors(qw/limit offset distinct for_update/);
+
 Class::Accessor::Lite->mk_accessors(
     qw(
         select_map select_map_reverse
         _from where
-        for_update
     )
 );
 
@@ -35,21 +36,6 @@ sub new {
     }, $class;
 
     return $self;
-}
-
-sub set_limit {
-    my ($self, $val) = @_;
-    $self->{limit} = $val;
-}
-
-sub set_offset {
-    my ($self, $val) = @_;
-    $self->{offset} = $val;
-}
-
-sub set_distinct {
-    my ($self, $val) = @_;
-    $self->{distinct} = $val;
 }
 
 sub bind {
@@ -230,7 +216,7 @@ sub add_having {
 
 sub as_for_update {
     my $self = shift;
-    $self->for_update ? ' FOR UPDATE' : '';
+    $self->{for_update} ? ' FOR UPDATE' : '';
 }
 
 sub _add_index_hint {

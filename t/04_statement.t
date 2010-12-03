@@ -153,13 +153,11 @@ subtest 'GROUP BY + ORDER BY' => sub {
 subtest 'LIMIT OFFSET' => sub {
     my $stmt = ns();
     $stmt->add_from( 'foo' );
-    $stmt->set_limit(5);
+    $stmt->limit(5);
     is($stmt->as_sql, "FROM foo\nLIMIT 5\n");
-
-    $stmt->set_offset(10);
+    $stmt->offset(10);
     is($stmt->as_sql, "FROM foo\nLIMIT 5 OFFSET 10\n");
-
-    $stmt->set_limit("  15g");  ## Non-numerics should cause an error
+    $stmt->limit("  15g");  ## Non-numerics should cause an error
     {
         my $sql = eval { $stmt->as_sql };
         like($@, qr/Non-numerics/, "bogus limit causes as_sql assertion");
@@ -294,7 +292,7 @@ subtest 'HAVING' => sub {
     $stmt->where->add(foo => 1);
     $stmt->add_group_by({ column => 'baz' });
     $stmt->add_order_by('foo' => 'DESC');
-    $stmt->set_limit(2);
+    $stmt->limit(2);
     $stmt->add_having(count => 2);
 
     is($stmt->as_sql, <<SQL);
@@ -313,8 +311,7 @@ subtest 'DISTINCT' => sub {
     $stmt->add_select(foo => 'foo');
     $stmt->add_from( qw(baz) );
     is($stmt->as_sql, "SELECT foo\nFROM baz\n", "DISTINCT is absent by default");
-
-    $stmt->set_distinct(1);
+    $stmt->distinct(1);
     is($stmt->as_sql, "SELECT DISTINCT foo\nFROM baz\n", "we can turn on DISTINCT");
 };
 
