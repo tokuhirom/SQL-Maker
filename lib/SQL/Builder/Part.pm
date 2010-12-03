@@ -7,6 +7,7 @@ sub make_term {
     my ($class, $col, $val) = @_;
 
     if ( ref($val) eq 'ARRAY' ) {
+        # make_term(foo => {-and => [1,2,3]}) => (foo = 1) AND (foo = 2) AND (foo = 3)
         if ( ref $val->[0] or ( ( $val->[0] || '' ) eq '-and' ) ) {
             my $logic  = 'OR';
             my @values = @$val;
