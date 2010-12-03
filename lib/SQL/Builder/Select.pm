@@ -10,7 +10,6 @@ Class::Accessor::Lite->mk_accessors(
     qw(
         select distinct select_map select_map_reverse
         _from joins where limit offset order
-        having
         for_update
     )
 );
@@ -193,9 +192,11 @@ sub as_sql_where {
 
 sub as_sql_having {
     my $self = shift;
-    $self->having && @{ $self->having } ?
-        'HAVING ' . join(' AND ', @{ $self->having }) . "\n" :
-        '';
+    if ($self->{having} && @{$self->{having}}) {
+        'HAVING ' . join(' AND ', @{ $self->{having} }) . "\n";
+    } else {
+        ''
+    }
 }
 
 sub add_having {
