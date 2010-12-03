@@ -135,6 +135,14 @@ subtest 'ORDER BY' => sub {
                     { column => 'quux', desc => 'ASC'  }, ]);
         is($stmt->as_sql, "FROM foo\nORDER BY baz DESC, quux ASC\n", 'multiple order by');
     };
+
+    do {
+        my $stmt = ns();
+        $stmt->add_select('*');
+        $stmt->add_from(qw/baz/);
+        $stmt->order('foo DESC');
+        is $stmt->as_sql, "SELECT *\nFROM baz\nORDER BY foo DESC\n";
+    };
 };
 
 subtest 'GROUP BY + ORDER BY' => sub {
@@ -353,13 +361,6 @@ subtest 'select + from' => sub {
     is($stmt->as_sql, "SELECT foo\nFROM baz\n");
 };
 
-subtest 'order_by' => sub {
-    my $stmt = ns();
-    $stmt->add_select('*');
-    $stmt->add_from(qw/baz/);
-    $stmt->order('foo DESC');
-    is $stmt->as_sql, "SELECT *\nFROM baz\nORDER BY foo DESC\n";
-};
 
 subtest join_with_using => sub {
     my $sql = ns();
