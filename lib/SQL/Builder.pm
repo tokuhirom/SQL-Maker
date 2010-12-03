@@ -137,8 +137,8 @@ sub select {
         }
     }
 
-    $stmt->limit( $opt->{limit} )    if $opt->{limit};
-    $stmt->offset( $opt->{offset} )  if $opt->{offset};
+    $stmt->set_limit( $opt->{limit} )    if $opt->{limit};
+    $stmt->set_offset( $opt->{offset} )  if $opt->{offset};
     if (my $o = $opt->{order_by}) {
         if (ref $o) {
             for my $order (@$o) {

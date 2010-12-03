@@ -9,7 +9,7 @@ use SQL::Builder::Where;
 Class::Accessor::Lite->mk_accessors(
     qw(
         select_map select_map_reverse
-        _from where limit offset
+        _from where
         for_update
     )
 );
@@ -35,6 +35,16 @@ sub new {
     }, $class;
 
     return $self;
+}
+
+sub set_limit {
+    my ($self, $val) = @_;
+    $self->{limit} = $val;
+}
+
+sub set_offset {
+    my ($self, $val) = @_;
+    $self->{offset} = $val;
 }
 
 sub set_distinct {
@@ -135,11 +145,11 @@ sub as_sql {
 
 sub as_limit {
     my $self = shift;
-    my $n = $self->limit or
+    my $n = $self->{limit} or
         return '';
     die "Non-numerics in limit clause ($n)" if $n =~ /\D/;
     return sprintf "LIMIT %d%s\n", $n,
-           ($self->offset ? " OFFSET " . int($self->offset) : "");
+           ($self->{offset} ? " OFFSET " . int($self->{offset}) : "");
 }
 
 sub add_order_by {

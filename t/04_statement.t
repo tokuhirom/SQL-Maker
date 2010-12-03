@@ -153,11 +153,13 @@ subtest 'GROUP BY + ORDER BY' => sub {
 subtest 'LIMIT OFFSET' => sub {
     my $stmt = ns();
     $stmt->add_from( 'foo' );
-    $stmt->limit(5);
+    $stmt->set_limit(5);
     is($stmt->as_sql, "FROM foo\nLIMIT 5\n");
-    $stmt->offset(10);
+
+    $stmt->set_offset(10);
     is($stmt->as_sql, "FROM foo\nLIMIT 5 OFFSET 10\n");
-    $stmt->limit("  15g");  ## Non-numerics should cause an error
+
+    $stmt->set_limit("  15g");  ## Non-numerics should cause an error
     {
         my $sql = eval { $stmt->as_sql };
         like($@, qr/Non-numerics/, "bogus limit causes as_sql assertion");
@@ -292,7 +294,7 @@ subtest 'HAVING' => sub {
     $stmt->where->add(foo => 1);
     $stmt->add_group_by({ column => 'baz' });
     $stmt->add_order_by('foo' => 'DESC');
-    $stmt->limit(2);
+    $stmt->set_limit(2);
     $stmt->add_having(count => 2);
 
     is($stmt->as_sql, <<SQL);
