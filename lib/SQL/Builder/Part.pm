@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
+# TODO: support sub query?
 sub make_term {
     my ($class, $col, $val) = @_;
 
@@ -39,6 +40,10 @@ sub make_term {
             # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
             my $term = "$col $op (" . join( ',', ('?') x scalar @$v ) . ')';
             return ($term, $v);
+        }
+        elsif ( ( $op eq 'BETWEEN' ) && ref($v) eq 'ARRAY' ) {
+            Carp::croak("USAGE: make_term(foo => {BETWEEN => [\$a, \$b]})") if @$v != 2;
+            return ("$col BETWEEN ? AND ?", $v);
         }
         else {
             # make_term(foo => +{ '<', 3 }) => foo < 3

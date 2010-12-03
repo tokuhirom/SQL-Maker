@@ -211,6 +211,12 @@ subtest 'WHERE' => sub {
     };
 
     do {
+        my $stmt = ns(); $stmt->where->add(foo => {between => [1, 2]});
+        is($stmt->as_sql_where, "WHERE (foo BETWEEN ? AND ?)\n");
+        is(join(',', @{ $stmt->bind }), '1,2');
+    };
+
+    do {
         my $stmt = ns();
         $stmt->where->add(foo => 'bar');
         $stmt->where->add(baz => 'quux');
