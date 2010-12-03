@@ -217,6 +217,12 @@ subtest 'WHERE' => sub {
     };
 
     do {
+        my $stmt = ns(); $stmt->where->add(foo => {like => 'xaic%'});
+        is($stmt->as_sql_where, "WHERE (foo LIKE ?)\n");
+        is(join(',', @{ $stmt->bind }), 'xaic%');
+    };
+
+    do {
         my $stmt = ns();
         $stmt->where->add(foo => 'bar');
         $stmt->where->add(baz => 'quux');
