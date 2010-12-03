@@ -26,28 +26,31 @@ sub make_term {
             $term = join " $logic ", @terms;
         }
         else {
+            # make_term(foo => [1,2,3]) => foo IN (1,2,3)
             $term = "$col IN (" . join( ',', ('?') x scalar @$val ) . ')';
             @bind = @$val;
         }
     }
     elsif ( ref($val) eq 'HASH' ) {
-        my $c = $val->{column} || $col;
-
         my ( $op, $v ) = ( %{$val} );
         $op = uc($op);
         if ( ( $op eq 'IN' || $op eq 'NOT IN' ) && ref($v) eq 'ARRAY' ) {
-            $term = "$c $op (" . join( ',', ('?') x scalar @$v ) . ')';
+            # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
+            $term = "$col $op (" . join( ',', ('?') x scalar @$v ) . ')';
             @bind = @$v;
         }
         else {
-            $term = "$c $op ?";
+            # make_term(foo => +{ '<', 3 }) => foo < 3
+            $term = "$col $op ?";
             push @bind, $v;
         }
     }
     elsif ( ref($val) eq 'SCALAR' ) {
+        # make_term(foo => \"> 3") => foo > 3
         $term = "$col $$val";
     }
     else {
+        # make_term(foo => "3") => foo = 3
         $term = "$col = ?";
         push @bind, $val;
     }

@@ -142,13 +142,15 @@ sub select {
         if (ref $o) {
             for my $order (@$o) {
                 if (ref $order) {
-                    # Skinny-ish {foo => 'DESC'}
+                    # Skinny-ish [{foo => 'DESC'}, {bar => 'ASC'}]
                     $stmt->add_order_by(%$order);
                 } else {
+                    # just ['foo DESC', 'bar ASC']
                     $stmt->add_order_by(\$order);
                 }
             }
         } else {
+            # just 'foo DESC, bar ASC'
             $stmt->add_order_by(\$o);
         }
     }
