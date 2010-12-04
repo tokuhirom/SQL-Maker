@@ -1,10 +1,8 @@
 use inc::Module::Install;
 use Module::Install::AuthorTests;
-use Module::Install::ReadmeMarkdownFromPod;
 
 name 'SQL-Builder';
 all_from 'lib/SQL/Builder.pm';
-readme_markdown_from 'lib/SQL/Builder.pm';
 
 requires 'DBI';
 requires 'Class::Accessor::Lite';
