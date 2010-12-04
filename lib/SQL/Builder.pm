@@ -122,7 +122,9 @@ sub select {
     my ($self, $table, $fields, $where, $opt) = @_;
 
     my $stmt = $self->statement_class->new(
-        select => $fields,
+        name_sep   => $self->name_sep,
+        quote_char => $self->quote_char,
+        select     => $fields,
     );
     $stmt->add_from($table);
     $stmt->prefix($opt->{prefix}) if $opt->{prefix};

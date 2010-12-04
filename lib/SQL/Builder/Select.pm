@@ -156,7 +156,7 @@ sub as_sql_order_by {
     return '' unless @attrs;
 
     return 'ORDER BY '
-           . join(', ', map { 
+           . join(', ', map {
                 my ($col, $type) = @$_;
                 if (ref $col) {
                     $$col
