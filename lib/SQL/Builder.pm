@@ -127,8 +127,9 @@ sub update {
 sub select {
     my ($self, $table, $fields, $where, $opt) = @_;
 
-    my $stmt = $self->statement_class->new();
-    $stmt->add_select($_) for @$fields;
+    my $stmt = $self->statement_class->new(
+        select => $fields,
+    );
     $stmt->add_from($table);
 
     if ( $where ) {
@@ -138,8 +139,6 @@ sub select {
         }
     }
 
-    $stmt->limit( $opt->{limit} )    if $opt->{limit};
-    $stmt->offset( $opt->{offset} )  if $opt->{offset};
     if (my $o = $opt->{order_by}) {
         if (ref $o) {
             for my $order (@$o) {
@@ -156,6 +155,9 @@ sub select {
             $stmt->add_order_by(\$o);
         }
     }
+
+    $stmt->limit( $opt->{limit} )    if $opt->{limit};
+    $stmt->offset( $opt->{offset} )  if $opt->{offset};
 
     if (my $terms = $opt->{having}) {
         while (my ($col, $val) = each %$terms) {

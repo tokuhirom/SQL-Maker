@@ -45,7 +45,7 @@ sub compose_or {
 sub as_sql {
     my ($self, $need_prefix) = @_;
     my $sql = join(' AND ', @{$self->{sql}});
-    $sql = " WHERE $sql" if $need_prefix && length($sql)>0;
+    return " WHERE $sql" if $need_prefix && length($sql)>0;
     return $sql;
 }
 

@@ -20,12 +20,10 @@ sub new {
         having_bind        => +[],
         from               => +[],
         where              => SQL::Builder::Where->new(),
-        having             => +[],
         joins              => +[],
         index_hint         => +{},
         group_by           => +[],
         order_by           => +[],
-        having             => +[],
         %args
     }, $class;
 
@@ -77,8 +75,13 @@ sub as_sql {
         $sql .= 'DISTINCT ' if $self->{distinct};
         $sql .= join(', ',  map {
             my $alias = $self->{select_map}->{$_};
-            !$alias                         ? $_ :
-            $alias && /(?:^|\.)\Q$alias\E$/ ? $_ : "$_ AS $alias";
+            if (!$alias) {
+                $_
+            } elsif ($alias && $_ =~ /(?:^|\.)\Q$alias\E$/) {
+                $_
+            } else {
+                "$_ AS $alias";
+            }
         } @{ $self->{select} }) . "\n";
     }
 
@@ -112,11 +115,11 @@ sub as_sql {
     $sql .= "\n";
     $sql .= $self->as_sql_where();
 
-    $sql .= $self->as_sql_group_by;
-    $sql .= $self->as_sql_having;
-    $sql .= $self->as_sql_order_by;
+    $sql .= $self->as_sql_group_by  if $self->{group_by};
+    $sql .= $self->as_sql_having    if $self->{having};
+    $sql .= $self->as_sql_order_by  if $self->{order_by};
 
-    $sql .= $self->as_limit;
+    $sql .= $self->as_limit         if $self->{limit};
 
     $sql .= $self->as_for_update;
 
@@ -174,7 +177,7 @@ sub as_sql_group_by {
 sub as_sql_where {
     my $self = shift;
 
-    my $where = $self->where->as_sql();
+    my $where = $self->{where}->as_sql();
     $where ? "WHERE $where\n" : '';
 }
 
