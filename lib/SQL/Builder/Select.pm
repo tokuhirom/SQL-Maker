@@ -52,11 +52,11 @@ sub add_from {
 }
 
 sub add_join {
-    my $self = shift;
-    my($table, $joins) = @_;
+    my ($self, $table, $joins) = @_;
+
     push @{ $self->{joins} }, {
         table => $table,
-        joins => ref($joins) eq 'ARRAY' ? $joins : [ $joins ],
+        joins => $joins,
     };
 }
 
@@ -99,18 +99,16 @@ sub as_sql {
     if ($self->{joins} && @{ $self->{joins} }) {
         my $initial_table_written = 0;
         for my $j (@{ $self->{joins} }) {
-            my($table, $joins) = map { $j->{$_} } qw( table joins );
+            my ($table, $join) = map { $j->{$_} } qw( table joins );
             $table = $self->_add_index_hint($table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
-            for my $join (@{ $j->{joins} }) {
-                $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $join->{table};
-                
-                if (ref $join->{condition}) {
-                    $sql .= ' USING ('. join(', ', @{ $join->{condition} }) . ')';
-                }
-                else {
-                    $sql .= ' ON ' . $join->{condition};
-                }
+            $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $join->{table};
+
+            if (ref $join->{condition}) {
+                $sql .= ' USING ('. join(', ', @{ $join->{condition} }) . ')';
+            }
+            else {
+                $sql .= ' ON ' . $join->{condition};
             }
         }
         $sql .= ', ' if @{ $self->{from} };
