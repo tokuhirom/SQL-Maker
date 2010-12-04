@@ -74,14 +74,16 @@ subtest 'JOIN' => sub {
         $stmt->add_join(
             foo => {
                 type      => 'inner',
-                table     => 'baz b1',
+                table     => 'baz',
+                alias     => 'b1',
                 condition => 'foo.baz_id = b1.baz_id AND b1.quux_id = 1'
             },
         );
         $stmt->add_join(
             foo => {
                 type      => 'left',
-                table     => 'baz b2',
+                table     => 'baz',
+                alias     => 'b2',
                 condition => 'foo.baz_id = b2.baz_id AND b2.quux_id = 2'
             },
         );
@@ -93,21 +95,24 @@ subtest 'JOIN' => sub {
         $stmt->add_join(
             foo => {
                 type      => 'inner',
-                table     => 'baz b1',
+                table     => 'baz',
+                alias     => 'b1',
                 condition => 'foo.baz_id = b1.baz_id AND b1.quux_id = 1'
             },
         );
         $stmt->add_join(
             foo => {
                 type      => 'left',
-                table     => 'baz b2',
+                table     => 'baz',
+                alias     => 'b2',
                 condition => 'foo.baz_id = b2.baz_id AND b2.quux_id = 2'
             },
         );
         $stmt->add_join(
             quux => {
                 type      => 'inner',
-                table     => 'foo f1',
+                table     => 'foo',
+                alias     => 'f1',
                 condition => 'f1.quux_id = quux.q_id'
             }
         );
@@ -384,14 +389,16 @@ subtest 'index hint with joins' => sub {
         $stmt->add_join(
             baz => {
                 type      => 'inner',
-                table     => 'baz b1',
+                table     => 'baz',
+                alias     => 'b1',
                 condition => 'baz.baz_id = b1.baz_id AND b1.quux_id = 1'
             },
         );
         $stmt->add_join(
             baz => {
                 type      => 'left',
-                table     => 'baz b2',
+                table     => 'baz',
+                alias     => 'b2',
                 condition => 'baz.baz_id = b2.baz_id AND b2.quux_id = 2'
             },
         );

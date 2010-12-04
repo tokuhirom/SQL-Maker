@@ -103,6 +103,7 @@ sub as_sql {
             $table = $self->_add_index_hint($table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
             $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $join->{table};
+            $sql .= ' ' . $join->{alias} if $join->{alias};
 
             if (ref $join->{condition}) {
                 $sql .= ' USING ('. join(', ', @{ $join->{condition} }) . ')';
