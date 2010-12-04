@@ -50,38 +50,38 @@ subtest 'select' => sub {
     my $builder = SQL::Builder->new(driver => 'sqlite');
     do {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
-        is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
+        is $sql, "SELECT `foo`, `bar`\nFROM `foo`\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
         is join(',', @binds), 'baz,man';
     };
     do {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [bar => 'baz', john => 'man'], {order_by => 'yo'});
-        is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
+        is $sql, "SELECT `foo`, `bar`\nFROM `foo`\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\n";
         is join(',', @binds), 'baz,man';
     };
     do {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [bar => 'baz', john => 'man'], {order_by => 'yo', limit => 1, offset => 3});
-        is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\nLIMIT 1 OFFSET 3\n";
+        is $sql, "SELECT `foo`, `bar`\nFROM `foo`\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\nLIMIT 1 OFFSET 3\n";
         is join(',', @binds), 'baz,man';
     };
     do {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [], {prefix => 'SELECT SQL_CALC_FOUND_ROWS '});
-        is $sql, "SELECT SQL_CALC_FOUND_ROWS foo, bar\nFROM foo\n";
+        is $sql, "SELECT SQL_CALC_FOUND_ROWS `foo`, `bar`\nFROM `foo`\n";
         is join(',', @binds), '';
     };
     subtest 'order_by' => sub {
         do {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
-            is $sql, "SELECT *\nFROM foo\nORDER BY yo\n";
+            is $sql, "SELECT *\nFROM `foo`\nORDER BY yo\n";
             is join(',', @binds), '';
         };
         do {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => ['yo', 'ya']});
-            is $sql, "SELECT *\nFROM foo\nORDER BY yo, ya\n";
+            is $sql, "SELECT *\nFROM `foo`\nORDER BY yo, ya\n";
             is join(',', @binds), '';
         };
         do {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => [{'yo' => 'DESC'}, 'ya']});
-            is $sql, "SELECT *\nFROM foo\nORDER BY yo DESC, ya\n";
+            is $sql, "SELECT *\nFROM `foo`\nORDER BY `yo` DESC, ya\n";
             is join(',', @binds), '';
         };
     };
