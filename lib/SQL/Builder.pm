@@ -131,6 +131,7 @@ sub select {
         select => $fields,
     );
     $stmt->add_from($table);
+    $stmt->prefix($opt->{prefix}) if $opt->{prefix};
 
     if ( $where ) {
         my @w = ref $where eq 'ARRAY' ? @$where : %$where;

@@ -7,7 +7,7 @@ use SQL::Builder::Part;
 use SQL::Builder::Where;
 
 Class::Accessor::Lite->mk_wo_accessors(qw/limit offset distinct for_update/);
-Class::Accessor::Lite->mk_accessors( qw(where) );
+Class::Accessor::Lite->mk_accessors( qw(where prefix) );
 
 sub new {
     my $class = shift;
@@ -24,6 +24,7 @@ sub new {
         index_hint         => +{},
         group_by           => +[],
         order_by           => +[],
+        prefix             => 'SELECT ',
         %args
     }, $class;
 
@@ -71,7 +72,7 @@ sub as_sql {
     my $self = shift;
     my $sql = '';
     if (@{ $self->{select} }) {
-        $sql .= 'SELECT ';
+        $sql .= $self->{prefix};
         $sql .= 'DISTINCT ' if $self->{distinct};
         $sql .= join(', ',  map {
             my $alias = $self->{select_map}->{$_};

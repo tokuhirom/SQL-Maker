@@ -4,6 +4,23 @@ use warnings;
 use SQL::Builder::Select;
 use Test::More;
 
+subtest 'PREFIX' => sub {
+    subtest 'simple' => sub {
+        my $stmt = ns();
+        $stmt->add_select('*');
+        $stmt->add_from('foo');
+        is($stmt->as_sql, "SELECT *\nFROM foo\n");
+    };
+
+    subtest 'SQL_CALC_FOUND_ROWS' => sub {
+        my $stmt = ns();
+        $stmt->prefix('SELECT SQL_CALC_FOUND_ROWS ');
+        $stmt->add_select('*');
+        $stmt->add_from('foo');
+        is($stmt->as_sql, "SELECT SQL_CALC_FOUND_ROWS *\nFROM foo\n");
+    };
+};
+
 subtest 'FROM' => sub {
     subtest 'single' => sub {
         my $stmt = ns();

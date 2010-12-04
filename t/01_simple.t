@@ -63,6 +63,11 @@ subtest 'select' => sub {
         is $sql, "SELECT foo, bar\nFROM foo\nWHERE (bar = ?) AND (john = ?)\nORDER BY yo\nLIMIT 1 OFFSET 3\n";
         is join(',', @binds), 'baz,man';
     };
+    do {
+        my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [], {prefix => 'SELECT SQL_CALC_FOUND_ROWS '});
+        is $sql, "SELECT SQL_CALC_FOUND_ROWS foo, bar\nFROM foo\n";
+        is join(',', @binds), '';
+    };
     subtest 'order_by' => sub {
         do {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
