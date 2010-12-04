@@ -38,8 +38,8 @@ sub bind {
 }
 
 sub add_select {
-    my $self = shift;
-    my($term, $col) = @_;
+    my ($self, $term, $col) = @_;
+
     $col ||= $term;
     push @{ $self->{select} }, $term;
     $self->{select_map}->{$term} = $col;
@@ -61,8 +61,8 @@ sub add_join {
 }
 
 sub add_index_hint {
-    my $self = shift;
-    my($table, $hint) = @_;
+    my ($self, $table, $hint) = @_;
+
     $self->{index_hint}->{$table} = {
         type => $hint->{type} || 'USE',
         list => ref($hint->{list}) eq 'ARRAY' ? $hint->{list} : [ $hint->{list} ],
@@ -71,6 +71,7 @@ sub add_index_hint {
 
 sub _quote {
     my ($self, $label) = @_;
+
     return $$label if ref $label;
     SQL::Builder::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
 }
@@ -201,8 +202,7 @@ sub as_sql_having {
 }
 
 sub add_having {
-    my $self = shift;
-    my($col, $val) = @_;
+    my ($self, $col, $val) = @_;
 
     if (my $orig = $self->{select_map_reverse}->{$col}) {
         $col = $self->_quote($orig);
