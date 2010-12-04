@@ -1,4 +1,5 @@
 .gitignore
+benchmarks/simple.pl
 Changes
 inc/Module/Install.pm
 inc/Module/Install/AuthorTests.pm
@@ -12,11 +13,25 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Pod/Markdown.pm
 lib/SQL/Builder.pm
+lib/SQL/Builder/Part.pm
+lib/SQL/Builder/Plugin/InsertMulti.pm
+lib/SQL/Builder/Plugin/Replace.pm
+lib/SQL/Builder/Select.pm
+lib/SQL/Builder/Select/Oracle.pm
+lib/SQL/Builder/SQLType.pm
+lib/SQL/Builder/Where.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
 README.mkdn
 t/00_compile.t
+t/01_simple.t
+t/02_where.t
+t/04_statement.t
+t/05_make_term.t
+t/06_sql_type.t
+t/plugins/01_insert_multi.t
+t/plugins/02_replace.t
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t
