@@ -333,7 +333,7 @@ subtest join_with_using => sub {
         },
     );
 
-    is $sql->as_sql, "FROM `foo` INNER JOIN `baz` USING (hoge_id, fuga_id)\n";
+    is $sql->as_sql, "FROM `foo` INNER JOIN `baz` USING (`hoge_id`, `fuga_id`)\n";
 };
 
 sub ns { SQL::Builder::Select->new(quote_char => q{`}, name_sep => q{.}) }
