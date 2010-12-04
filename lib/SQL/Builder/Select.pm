@@ -146,13 +146,7 @@ sub as_limit {
 
 sub add_order_by {
     my ($self, $col, $type) = @_;
-    push @{$self->{order_by}}, do {
-        if (ref $col) {
-            $$col;
-        } else {
-            $type ? "$col $type" : $col
-        }
-    };
+    push @{$self->{order_by}}, [$col, $type];
 }
 
 sub as_sql_order_by {
@@ -162,7 +156,14 @@ sub as_sql_order_by {
     return '' unless @attrs;
 
     return 'ORDER BY '
-           . join(', ', @attrs)
+           . join(', ', map { 
+                my ($col, $type) = @$_;
+                if (ref $col) {
+                    $$col
+                } else {
+                    $col ? $self->_quote($col) . " $type" : $self->_quote($col)
+                }
+           } @attrs)
            . "\n";
 }
 

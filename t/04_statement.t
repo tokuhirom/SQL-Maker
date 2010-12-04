@@ -159,7 +159,7 @@ subtest 'ORDER BY' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_order_by('baz' => 'DESC');
-        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC\n", 'single order by');
+        is($stmt->as_sql, "FROM `foo`\nORDER BY `baz` DESC\n", 'single order by');
     };
 
     do {
@@ -167,14 +167,14 @@ subtest 'ORDER BY' => sub {
         $stmt->add_from( 'foo' );
         $stmt->add_order_by( 'baz' => 'DESC' );
         $stmt->add_order_by( 'quux' => 'ASC' );
-        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC, quux ASC\n", 'multiple order by');
+        is($stmt->as_sql, "FROM `foo`\nORDER BY `baz` DESC, `quux` ASC\n", 'multiple order by');
     };
 
     subtest 'scalarref' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_order_by( \'baz DESC' );
-        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC\n");
+        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC\n"); # should not quote
     };
 };
 
@@ -183,7 +183,7 @@ subtest 'GROUP BY + ORDER BY' => sub {
     $stmt->add_from( 'foo' );
     $stmt->add_group_by('quux');
     $stmt->add_order_by('baz' => 'DESC');
-    is($stmt->as_sql, "FROM `foo`\nGROUP BY `quux`\nORDER BY baz DESC\n", 'group by with order by');
+    is($stmt->as_sql, "FROM `foo`\nGROUP BY `quux`\nORDER BY `baz` DESC\n", 'group by with order by');
 };
 
 subtest 'LIMIT OFFSET' => sub {
@@ -345,7 +345,7 @@ FROM `baz`
 WHERE (foo = ?)
 GROUP BY `baz`
 HAVING (COUNT(*) = ?)
-ORDER BY foo DESC
+ORDER BY `foo` DESC
 LIMIT 2
 SQL
 };
