@@ -1,6 +1,6 @@
 # NAME
 
-SQL::Builder - SQL builder class
+SQL::Builder - Yet another SQL builder
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ SQL::Builder - SQL builder class
 
 # DESCRIPTION
 
-SQL::Builder is SQL builder class. It is based on [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Skinny)'s SQL generator.
+SQL::Builder is yet another SQL builder class. It is based on [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Skinny)'s SQL generator.
 
 # METHODS
 
@@ -34,9 +34,7 @@ Attribuetes are following:
 
     - driver: Str
 
-    - dbh: Object
-
-    Driver or dbh is required. The driver type is needed to create SQL string.
+    Driver name is required. The driver type is needed to create SQL string.
 
     - quote_char: Str
 

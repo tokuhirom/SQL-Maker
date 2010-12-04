@@ -11,6 +11,7 @@ use Carp ();
 use SQL::Builder::Select;
 use SQL::Builder::Select::Oracle;
 use SQL::Builder::Where;
+use SQL::Builder::Util;
 use Module::Load ();
 
 sub load_plugin {
@@ -73,11 +74,7 @@ sub insert {
 sub _quote {
     my ($self, $label) = @_;
 
-    return $label if $label eq '*';
-
-    my $quote_char = $self->quote_char();
-    my $name_sep = $self->name_sep();
-    return join $name_sep, map { $quote_char . $_ . $quote_char } split /\Q$name_sep\E/, $label;
+    SQL::Builder::Util::quote_identifier($label, $self->quote_char(), $self->name_sep());
 }
 
 sub delete {
