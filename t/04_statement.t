@@ -9,7 +9,7 @@ subtest 'PREFIX' => sub {
         my $stmt = ns();
         $stmt->add_select('*');
         $stmt->add_from('foo');
-        is($stmt->as_sql, "SELECT *\nFROM foo\n");
+        is($stmt->as_sql, "SELECT *\nFROM `foo`\n");
     };
 
     subtest 'SQL_CALC_FOUND_ROWS' => sub {
@@ -17,7 +17,7 @@ subtest 'PREFIX' => sub {
         $stmt->prefix('SELECT SQL_CALC_FOUND_ROWS ');
         $stmt->add_select('*');
         $stmt->add_from('foo');
-        is($stmt->as_sql, "SELECT SQL_CALC_FOUND_ROWS *\nFROM foo\n");
+        is($stmt->as_sql, "SELECT SQL_CALC_FOUND_ROWS *\nFROM `foo`\n");
     };
 };
 
@@ -25,21 +25,21 @@ subtest 'FROM' => sub {
     subtest 'single' => sub {
         my $stmt = ns();
         $stmt->add_from('foo');
-        is($stmt->as_sql, "FROM foo\n");
+        is($stmt->as_sql, "FROM `foo`\n");
     };
 
     subtest 'multi' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_from( 'bar' );
-        is($stmt->as_sql, "FROM foo, bar\n");
+        is($stmt->as_sql, "FROM `foo`, `bar`\n");
     };
 
     subtest 'multi + alias' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' => 'f' );
         $stmt->add_from( 'bar' => 'b' );
-        is($stmt->as_sql, "FROM foo f, bar b\n");
+        is($stmt->as_sql, "FROM `foo` `f`, `bar` `b`\n");
     };
 };
 
@@ -48,7 +48,7 @@ subtest 'JOIN' => sub {
         my $stmt = ns();
         $stmt->add_join(foo => { type => 'inner', table => 'baz',
                                 condition => 'foo.baz_id = baz.baz_id' });
-        is($stmt->as_sql, "FROM foo INNER JOIN baz ON foo.baz_id = baz.baz_id\n");
+        is($stmt->as_sql, "FROM `foo` INNER JOIN baz ON foo.baz_id = baz.baz_id\n");
     };
 
     do {
@@ -56,7 +56,7 @@ subtest 'JOIN' => sub {
         $stmt->add_from( 'bar' );
         $stmt->add_join(foo => { type => 'inner', table => 'baz',
                                 condition => 'foo.baz_id = baz.baz_id' });
-        is($stmt->as_sql, "FROM foo INNER JOIN baz ON foo.baz_id = baz.baz_id, bar\n");
+        is($stmt->as_sql, "FROM `foo` INNER JOIN baz ON foo.baz_id = baz.baz_id, `bar`\n");
     };
 
     do {
@@ -67,7 +67,7 @@ subtest 'JOIN' => sub {
                 { type => 'left', table => 'baz b2',
                 condition => 'foo.baz_id = b2.baz_id AND b2.quux_id = 2' },
             ]);
-        is $stmt->as_sql, "FROM foo INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2\n";
+        is $stmt->as_sql, "FROM `foo` INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2\n";
     };
 
     subtest 'test case for bug found where add_join is called twice' => sub {
@@ -80,7 +80,7 @@ subtest 'JOIN' => sub {
                 { type => 'left', table => 'baz b2',
                 condition => 'foo.baz_id = b2.baz_id AND b2.quux_id = 2' },
             ]);
-        is $stmt->as_sql, "FROM foo INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2\n";
+        is $stmt->as_sql, "FROM `foo` INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2\n";
     };
 
     subtest 'test case adding another table onto the whole mess' => sub {
@@ -98,7 +98,7 @@ subtest 'JOIN' => sub {
                 condition => 'f1.quux_id = quux.q_id'}
             ]);
 
-        is $stmt->as_sql, "FROM foo INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2 INNER JOIN foo f1 ON f1.quux_id = quux.q_id\n";
+        is $stmt->as_sql, "FROM `foo` INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2 INNER JOIN foo f1 ON f1.quux_id = quux.q_id\n";
     };
 };
 
@@ -108,14 +108,14 @@ subtest 'GROUP BY' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz');
-        is($stmt->as_sql, "FROM foo\nGROUP BY baz\n", 'single bare group by');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz\n", 'single bare group by');
     };
 
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz' => 'DESC');
-        is($stmt->as_sql, "FROM foo\nGROUP BY baz DESC\n", 'single group by with desc');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz DESC\n", 'single group by with desc');
     };
 
     do {
@@ -123,7 +123,7 @@ subtest 'GROUP BY' => sub {
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz');
         $stmt->add_group_by('quux');
-        is($stmt->as_sql, "FROM foo\nGROUP BY baz, quux\n", 'multiple group by');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz, quux\n", 'multiple group by');
     };
 
     do {
@@ -131,7 +131,7 @@ subtest 'GROUP BY' => sub {
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz',  'DESC');
         $stmt->add_group_by('quux', 'DESC');
-        is($stmt->as_sql, "FROM foo\nGROUP BY baz DESC, quux DESC\n", 'multiple group by with desc');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz DESC, quux DESC\n", 'multiple group by with desc');
     };
 };
 
@@ -140,7 +140,7 @@ subtest 'ORDER BY' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_order_by('baz' => 'DESC');
-        is($stmt->as_sql, "FROM foo\nORDER BY baz DESC\n", 'single order by');
+        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC\n", 'single order by');
     };
 
     do {
@@ -148,14 +148,14 @@ subtest 'ORDER BY' => sub {
         $stmt->add_from( 'foo' );
         $stmt->add_order_by( 'baz' => 'DESC' );
         $stmt->add_order_by( 'quux' => 'ASC' );
-        is($stmt->as_sql, "FROM foo\nORDER BY baz DESC, quux ASC\n", 'multiple order by');
+        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC, quux ASC\n", 'multiple order by');
     };
 
     subtest 'scalarref' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_order_by( \'baz DESC' );
-        is($stmt->as_sql, "FROM foo\nORDER BY baz DESC\n");
+        is($stmt->as_sql, "FROM `foo`\nORDER BY baz DESC\n");
     };
 };
 
@@ -164,16 +164,16 @@ subtest 'GROUP BY + ORDER BY' => sub {
     $stmt->add_from( 'foo' );
     $stmt->add_group_by('quux');
     $stmt->add_order_by('baz' => 'DESC');
-    is($stmt->as_sql, "FROM foo\nGROUP BY quux\nORDER BY baz DESC\n", 'group by with order by');
+    is($stmt->as_sql, "FROM `foo`\nGROUP BY quux\nORDER BY baz DESC\n", 'group by with order by');
 };
 
 subtest 'LIMIT OFFSET' => sub {
     my $stmt = ns();
     $stmt->add_from( 'foo' );
     $stmt->limit(5);
-    is($stmt->as_sql, "FROM foo\nLIMIT 5\n");
+    is($stmt->as_sql, "FROM `foo`\nLIMIT 5\n");
     $stmt->offset(10);
-    is($stmt->as_sql, "FROM foo\nLIMIT 5 OFFSET 10\n");
+    is($stmt->as_sql, "FROM `foo`\nLIMIT 5 OFFSET 10\n");
     $stmt->limit("  15g");  ## Non-numerics should cause an error
     {
         my $sql = eval { $stmt->as_sql };
@@ -296,7 +296,7 @@ subtest 'add_select' => sub {
         $stmt->add_select(foo => 'foo');
         $stmt->add_select('bar');
         $stmt->add_from( qw( baz ) );
-        is($stmt->as_sql, "SELECT `foo`, `bar`\nFROM baz\n");
+        is($stmt->as_sql, "SELECT `foo`, `bar`\nFROM `baz`\n");
     };
 
     do {
@@ -304,7 +304,7 @@ subtest 'add_select' => sub {
         $stmt->add_select('f.foo' => 'foo');
         $stmt->add_select(\'COUNT(*)' => 'count');
         $stmt->add_from( qw( baz ) );
-        is($stmt->as_sql, "SELECT `f`.`foo`, COUNT(*) AS `count`\nFROM baz\n");
+        is($stmt->as_sql, "SELECT `f`.`foo`, COUNT(*) AS `count`\nFROM `baz`\n");
     };
 };
 
@@ -322,7 +322,7 @@ subtest 'HAVING' => sub {
 
     is($stmt->as_sql, <<SQL);
 SELECT `foo`, COUNT(*) AS `count`
-FROM baz
+FROM `baz`
 WHERE (foo = ?)
 GROUP BY baz
 HAVING (COUNT(*) = ?)
@@ -335,18 +335,18 @@ subtest 'DISTINCT' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_from( qw(baz) );
-    is($stmt->as_sql, "SELECT `foo`\nFROM baz\n", "DISTINCT is absent by default");
+    is($stmt->as_sql, "SELECT `foo`\nFROM `baz`\n", "DISTINCT is absent by default");
     $stmt->distinct(1);
-    is($stmt->as_sql, "SELECT DISTINCT `foo`\nFROM baz\n", "we can turn on DISTINCT");
+    is($stmt->as_sql, "SELECT DISTINCT `foo`\nFROM `baz`\n", "we can turn on DISTINCT");
 };
 
 subtest 'index hint' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_from( qw(baz) );
-    is($stmt->as_sql, "SELECT `foo`\nFROM baz\n", "index hint is absent by default");
+    is($stmt->as_sql, "SELECT `foo`\nFROM `baz`\n", "index hint is absent by default");
     $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
-    is($stmt->as_sql, "SELECT `foo`\nFROM baz USE INDEX (index_hint)\n", "we can turn on USE INDEX");
+    is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint)\n", "we can turn on USE INDEX");
 };
 
 subtest 'index hint with joins' => sub {
@@ -356,7 +356,7 @@ subtest 'index hint with joins' => sub {
         $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
         $stmt->add_join(baz => { type => 'inner', table => 'baz',
                                 condition => 'baz.baz_id = foo.baz_id' });
-        is($stmt->as_sql, "SELECT `foo`\nFROM baz USE INDEX (index_hint) INNER JOIN baz ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
+        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN baz ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
     };
     do {
         my $stmt = ns();
@@ -368,7 +368,7 @@ subtest 'index hint with joins' => sub {
                 { type => 'left', table => 'baz b2',
                 condition => 'baz.baz_id = b2.baz_id AND b2.quux_id = 2' },
             ]);
-        is($stmt->as_sql, "SELECT `foo`\nFROM baz USE INDEX (index_hint) INNER JOIN baz b1 ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
+        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN baz b1 ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
     };
 };
 
@@ -376,7 +376,7 @@ subtest 'select + from' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_from(qw(baz));
-    is($stmt->as_sql, "SELECT `foo`\nFROM baz\n");
+    is($stmt->as_sql, "SELECT `foo`\nFROM `baz`\n");
 };
 
 
@@ -389,7 +389,7 @@ subtest join_with_using => sub {
         },
     ] );
 
-    is $sql->as_sql, "FROM foo INNER JOIN baz USING (hoge_id, fuga_id)\n";
+    is $sql->as_sql, "FROM `foo` INNER JOIN baz USING (hoge_id, fuga_id)\n";
 
     done_testing;
 };

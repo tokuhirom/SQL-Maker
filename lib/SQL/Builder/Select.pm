@@ -117,7 +117,9 @@ sub as_sql {
     }
 
     if ($self->{from} && @{ $self->{from} }) {
-        $sql .= join ', ', map { $self->_add_index_hint($_) } map { $_->[1] ? "$_->[0] $_->[1]" : $_->[0] } @{ $self->{from} };
+        $sql .= join ', ',
+          map { $self->_add_index_hint($_->[0], $_->[1]) }
+             @{ $self->{from} };
     }
 
     $sql .= "\n";
@@ -217,16 +219,16 @@ sub as_for_update {
 }
 
 sub _add_index_hint {
-    my $self = shift;
-    my ($tbl_name) = @_;
+    my ($self, $tbl_name, $alias) = @_;
+    my $quoted = $alias ? $self->_quote($tbl_name) . ' ' . $self->_quote($alias) : $self->_quote($tbl_name);
     my $hint = $self->{index_hint}->{$tbl_name};
-    return $tbl_name unless $hint && ref($hint) eq 'HASH';
+    return $quoted unless $hint && ref($hint) eq 'HASH';
     if ($hint->{list} && @{ $hint->{list} }) {
-        return $tbl_name . ' ' . uc($hint->{type} || 'USE') . ' INDEX (' . 
+        return $quoted . ' ' . uc($hint->{type} || 'USE') . ' INDEX (' . 
                 join (',', @{ $hint->{list} }) .
                 ')';
     }
-    return $tbl_name;
+    return $quoted;
 }
 
 1;
