@@ -28,9 +28,6 @@ sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
     unless ($args{driver}) {
-        $args{driver} = $args{dbh}->{Driver}->{Name};
-    }
-    unless ($args{driver}) {
         Carp::croak("'driver' or 'dbh' is required for creating new instance of $class");
     }
     my $driver = $args{driver};
@@ -177,7 +174,7 @@ __END__
 
 =head1 NAME
 
-SQL::Builder - SQL builder class
+SQL::Builder - Yet another SQL builder
 
 =head1 SYNOPSIS
 
@@ -199,7 +196,7 @@ SQL::Builder - SQL builder class
 
 =head1 DESCRIPTION
 
-SQL::Builder is SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
+SQL::Builder is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
 
 =head1 METHODS
 
@@ -215,9 +212,7 @@ Attribuetes are following:
 
 =item driver: Str
 
-=item dbh: Object
-
-Driver or dbh is required. The driver type is needed to create SQL string.
+Driver name is required. The driver type is needed to create SQL string.
 
 =item quote_char: Str
 
