@@ -1,8 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use SQL::Builder::SQLType qw/sql_type/;
 use SQL::Builder::Part;
 use Data::Dumper;
+use DBI qw/:sql_types/;
 
 sub test {
     my ($source, $expected_term, $expected_bind) = @_;
@@ -95,6 +97,11 @@ test(@{$_}) for (
         ['foo_id' => {"NOT IN" => []}],
         "1=1",
         [qw//]
+    ],
+    [
+        ['foo_id' => sql_type(\3, SQL_INTEGER)],
+        "foo_id = ?",
+        [sql_type(\3, SQL_INTEGER)]
     ],
 );
 done_testing;
