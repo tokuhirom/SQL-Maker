@@ -36,9 +36,19 @@ sub make_term {
         my ( $op, $v ) = ( %{$val} );
         $op = uc($op);
         if ( ( $op eq 'IN' || $op eq 'NOT IN' ) && ref($v) eq 'ARRAY' ) {
-            # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
-            my $term = "$col $op (" . join( ',', ('?') x scalar @$v ) . ')';
-            return ($term, $v);
+            if (@$v == 0) {
+                if ($op eq 'IN') {
+                    # make_term(foo => +{'IN' => []}) => 0=1
+                    return ('0=1', []);
+                } else {
+                    # make_term(foo => +{'NOT IN' => []}) => 1=1
+                    return ('1=1', []);
+                }
+            } else {
+                # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
+                my $term = "$col $op (" . join( ',', ('?') x scalar @$v ) . ')';
+                return ($term, $v);
+            }
         }
         elsif ( ( $op eq 'BETWEEN' ) && ref($v) eq 'ARRAY' ) {
             Carp::croak("USAGE: make_term(foo => {BETWEEN => [\$a, \$b]})") if @$v != 2;
@@ -58,8 +68,13 @@ sub make_term {
         return ("$col $query", \@v);
     }
     else {
-        # make_term(foo => "3") => foo = 3
-        return ("$col = ?", [$val]);
+        if (defined $val) {
+            # make_term(foo => "3") => foo = 3
+            return ("$col = ?", [$val]);
+        } else {
+            # make_term(foo => undef) => foo IS NULL
+            return ("$col IS NULL", []);
+        }
     }
 }
 

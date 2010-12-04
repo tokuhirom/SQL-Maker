@@ -81,6 +81,21 @@ test(@{$_}) for (
         "foo_id MATCH (col1, col2) AGAINST (?)",
         [qw/apples/]
     ],
+    [
+        ['foo_id' => undef],
+        "foo_id IS NULL",
+        [qw//]
+    ],
+    [
+        ['foo_id' => {IN => []}],
+        "0=1",
+        [qw//]
+    ],
+    [
+        ['foo_id' => {"NOT IN" => []}],
+        "1=1",
+        [qw//]
+    ],
 );
 done_testing;
 
