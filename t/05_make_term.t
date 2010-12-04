@@ -11,9 +11,13 @@ sub test {
     local $Data::Dumper::Terse=1;
     local $Data::Dumper::Indent=0;
     subtest Dumper($source) => sub {
-        my ($term, $bind) = SQL::Builder::Condition->_make_term(@$source);
-        is $term, $expected_term;
-        is_deeply $bind, $expected_bind;
+        my $cond = SQL::Builder::Condition->new();
+        $cond->add(@$source);
+        my $sql = $cond->as_sql;
+        $sql =~ s/^\(//;
+        $sql =~ s/\)$//;
+        is $sql, $expected_term;
+        is_deeply [$cond->bind], $expected_bind;
     };
 }
 

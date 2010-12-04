@@ -33,7 +33,8 @@ sub new {
 }
 
 sub new_condition {
-    my $class = shift;
+    my $self = shift;
+
     SQL::Builder::Condition->new(
         quote_char => $self->{quote_char},
         name_sep   => $self->{name_sep},
