@@ -102,8 +102,8 @@ sub as_sql {
             my ($table, $join) = map { $j->{$_} } qw( table joins );
             $table = $self->_add_index_hint($table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
-            $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $join->{table};
-            $sql .= ' ' . $join->{alias} if $join->{alias};
+            $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $self->_quote($join->{table});
+            $sql .= ' ' . $self->_quote($join->{alias}) if $join->{alias};
 
             if (ref $join->{condition}) {
                 $sql .= ' USING ('. join(', ', @{ $join->{condition} }) . ')';

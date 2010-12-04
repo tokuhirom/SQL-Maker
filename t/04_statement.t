@@ -53,7 +53,7 @@ subtest 'JOIN' => sub {
                 condition => 'foo.baz_id = baz.baz_id'
             }
         );
-        is($stmt->as_sql, "FROM `foo` INNER JOIN baz ON foo.baz_id = baz.baz_id\n");
+        is($stmt->as_sql, "FROM `foo` INNER JOIN `baz` ON foo.baz_id = baz.baz_id\n");
     };
 
     do {
@@ -66,7 +66,7 @@ subtest 'JOIN' => sub {
                 condition => 'foo.baz_id = baz.baz_id'
             }
         );
-        is($stmt->as_sql, "FROM `foo` INNER JOIN baz ON foo.baz_id = baz.baz_id, `bar`\n");
+        is($stmt->as_sql, "FROM `foo` INNER JOIN `baz` ON foo.baz_id = baz.baz_id, `bar`\n");
     };
 
     subtest 'test case for bug found where add_join is called twice' => sub {
@@ -87,7 +87,7 @@ subtest 'JOIN' => sub {
                 condition => 'foo.baz_id = b2.baz_id AND b2.quux_id = 2'
             },
         );
-        is $stmt->as_sql, "FROM `foo` INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2\n";
+        is $stmt->as_sql, "FROM `foo` INNER JOIN `baz` `b1` ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN `baz` `b2` ON foo.baz_id = b2.baz_id AND b2.quux_id = 2\n";
     };
 
     subtest 'test case adding another table onto the whole mess' => sub {
@@ -117,7 +117,7 @@ subtest 'JOIN' => sub {
             }
         );
 
-        is $stmt->as_sql, "FROM `foo` INNER JOIN baz b1 ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON foo.baz_id = b2.baz_id AND b2.quux_id = 2 INNER JOIN foo f1 ON f1.quux_id = quux.q_id\n";
+        is $stmt->as_sql, "FROM `foo` INNER JOIN `baz` `b1` ON foo.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN `baz` `b2` ON foo.baz_id = b2.baz_id AND b2.quux_id = 2 INNER JOIN `foo` `f1` ON f1.quux_id = quux.q_id\n";
     };
 };
 
@@ -380,7 +380,7 @@ subtest 'index hint with joins' => sub {
                 condition => 'baz.baz_id = foo.baz_id'
             }
         );
-        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN baz ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
+        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN `baz` ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
     };
     do {
         my $stmt = ns();
@@ -402,7 +402,7 @@ subtest 'index hint with joins' => sub {
                 condition => 'baz.baz_id = b2.baz_id AND b2.quux_id = 2'
             },
         );
-        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN baz b1 ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
+        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN `baz` `b1` ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN `baz` `b2` ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
     };
 };
 
@@ -424,7 +424,7 @@ subtest join_with_using => sub {
         },
     );
 
-    is $sql->as_sql, "FROM `foo` INNER JOIN baz USING (hoge_id, fuga_id)\n";
+    is $sql->as_sql, "FROM `foo` INNER JOIN `baz` USING (hoge_id, fuga_id)\n";
 };
 
 sub ns { SQL::Builder::Select->new(quote_char => q{`}, name_sep => q{.}) }
