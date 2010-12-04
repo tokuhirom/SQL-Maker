@@ -5,6 +5,7 @@ use utf8;
 use Class::Accessor::Lite;
 use SQL::Builder::Part;
 use SQL::Builder::Where;
+use SQL::Builder::Util;
 
 Class::Accessor::Lite->mk_wo_accessors(qw/limit offset distinct for_update/);
 Class::Accessor::Lite->mk_accessors( qw(where prefix) );
@@ -68,6 +69,12 @@ sub add_index_hint {
     };
 }
 
+sub _quote {
+    my ($self, $label) = @_;
+    return $$label if ref $label;
+    SQL::Builder::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
+}
+
 sub as_sql {
     my $self = shift;
     my $sql = '';
@@ -77,11 +84,11 @@ sub as_sql {
         $sql .= join(', ',  map {
             my $alias = $self->{select_map}->{$_};
             if (!$alias) {
-                $_
+                $self->_quote($_)
             } elsif ($alias && $_ =~ /(?:^|\.)\Q$alias\E$/) {
-                $_
+                $self->_quote($_)
             } else {
-                "$_ AS $alias";
+                $self->_quote($_) . ' AS ' .  $self->_quote($alias)
             }
         } @{ $self->{select} }) . "\n";
     }
@@ -196,7 +203,7 @@ sub add_having {
     my($col, $val) = @_;
 
     if (my $orig = $self->{select_map_reverse}->{$col}) {
-        $col = $orig;
+        $col = $self->_quote($orig);
     }
 
     my($term, $bind) = SQL::Builder::Part->make_term($col, $val);

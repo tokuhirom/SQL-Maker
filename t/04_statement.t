@@ -296,15 +296,15 @@ subtest 'add_select' => sub {
         $stmt->add_select(foo => 'foo');
         $stmt->add_select('bar');
         $stmt->add_from( qw( baz ) );
-        is($stmt->as_sql, "SELECT foo, bar\nFROM baz\n");
+        is($stmt->as_sql, "SELECT `foo`, `bar`\nFROM baz\n");
     };
 
     do {
         my $stmt = ns();
         $stmt->add_select('f.foo' => 'foo');
-        $stmt->add_select('COUNT(*)' => 'count');
+        $stmt->add_select(\'COUNT(*)' => 'count');
         $stmt->add_from( qw( baz ) );
-        is($stmt->as_sql, "SELECT f.foo, COUNT(*) AS count\nFROM baz\n");
+        is($stmt->as_sql, "SELECT `f`.`foo`, COUNT(*) AS `count`\nFROM baz\n");
     };
 };
 
@@ -312,7 +312,7 @@ subtest 'add_select' => sub {
 subtest 'HAVING' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
-    $stmt->add_select('COUNT(*)' => 'count');
+    $stmt->add_select(\'COUNT(*)' => 'count');
     $stmt->add_from( qw(baz) );
     $stmt->where->add(foo => 1);
     $stmt->add_group_by('baz');
@@ -321,7 +321,7 @@ subtest 'HAVING' => sub {
     $stmt->add_having(count => 2);
 
     is($stmt->as_sql, <<SQL);
-SELECT foo, COUNT(*) AS count
+SELECT `foo`, COUNT(*) AS `count`
 FROM baz
 WHERE (foo = ?)
 GROUP BY baz
@@ -335,18 +335,18 @@ subtest 'DISTINCT' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_from( qw(baz) );
-    is($stmt->as_sql, "SELECT foo\nFROM baz\n", "DISTINCT is absent by default");
+    is($stmt->as_sql, "SELECT `foo`\nFROM baz\n", "DISTINCT is absent by default");
     $stmt->distinct(1);
-    is($stmt->as_sql, "SELECT DISTINCT foo\nFROM baz\n", "we can turn on DISTINCT");
+    is($stmt->as_sql, "SELECT DISTINCT `foo`\nFROM baz\n", "we can turn on DISTINCT");
 };
 
 subtest 'index hint' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_from( qw(baz) );
-    is($stmt->as_sql, "SELECT foo\nFROM baz\n", "index hint is absent by default");
+    is($stmt->as_sql, "SELECT `foo`\nFROM baz\n", "index hint is absent by default");
     $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
-    is($stmt->as_sql, "SELECT foo\nFROM baz USE INDEX (index_hint)\n", "we can turn on USE INDEX");
+    is($stmt->as_sql, "SELECT `foo`\nFROM baz USE INDEX (index_hint)\n", "we can turn on USE INDEX");
 };
 
 subtest 'index hint with joins' => sub {
@@ -356,7 +356,7 @@ subtest 'index hint with joins' => sub {
         $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
         $stmt->add_join(baz => { type => 'inner', table => 'baz',
                                 condition => 'baz.baz_id = foo.baz_id' });
-        is($stmt->as_sql, "SELECT foo\nFROM baz USE INDEX (index_hint) INNER JOIN baz ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
+        is($stmt->as_sql, "SELECT `foo`\nFROM baz USE INDEX (index_hint) INNER JOIN baz ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
     };
     do {
         my $stmt = ns();
@@ -368,7 +368,7 @@ subtest 'index hint with joins' => sub {
                 { type => 'left', table => 'baz b2',
                 condition => 'baz.baz_id = b2.baz_id AND b2.quux_id = 2' },
             ]);
-        is($stmt->as_sql, "SELECT foo\nFROM baz USE INDEX (index_hint) INNER JOIN baz b1 ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
+        is($stmt->as_sql, "SELECT `foo`\nFROM baz USE INDEX (index_hint) INNER JOIN baz b1 ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN baz b2 ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
     };
 };
 
@@ -376,7 +376,7 @@ subtest 'select + from' => sub {
     my $stmt = ns();
     $stmt->add_select(foo => 'foo');
     $stmt->add_from(qw(baz));
-    is($stmt->as_sql, "SELECT foo\nFROM baz\n");
+    is($stmt->as_sql, "SELECT `foo`\nFROM baz\n");
 };
 
 
@@ -394,6 +394,6 @@ subtest join_with_using => sub {
     done_testing;
 };
 
-sub ns { SQL::Builder::Select->new }
+sub ns { SQL::Builder::Select->new(quote_char => q{`}, name_sep => q{.}) }
 
 done_testing;
