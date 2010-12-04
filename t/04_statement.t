@@ -127,14 +127,14 @@ subtest 'GROUP BY' => sub {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz');
-        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz\n", 'single bare group by');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY `baz`\n", 'single bare group by');
     };
 
     do {
         my $stmt = ns();
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz' => 'DESC');
-        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz DESC\n", 'single group by with desc');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY `baz` DESC\n", 'single group by with desc');
     };
 
     do {
@@ -142,7 +142,7 @@ subtest 'GROUP BY' => sub {
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz');
         $stmt->add_group_by('quux');
-        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz, quux\n", 'multiple group by');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY `baz`, `quux`\n", 'multiple group by');
     };
 
     do {
@@ -150,7 +150,7 @@ subtest 'GROUP BY' => sub {
         $stmt->add_from( 'foo' );
         $stmt->add_group_by('baz',  'DESC');
         $stmt->add_group_by('quux', 'DESC');
-        is($stmt->as_sql, "FROM `foo`\nGROUP BY baz DESC, quux DESC\n", 'multiple group by with desc');
+        is($stmt->as_sql, "FROM `foo`\nGROUP BY `baz` DESC, `quux` DESC\n", 'multiple group by with desc');
     };
 };
 
@@ -183,7 +183,7 @@ subtest 'GROUP BY + ORDER BY' => sub {
     $stmt->add_from( 'foo' );
     $stmt->add_group_by('quux');
     $stmt->add_order_by('baz' => 'DESC');
-    is($stmt->as_sql, "FROM `foo`\nGROUP BY quux\nORDER BY baz DESC\n", 'group by with order by');
+    is($stmt->as_sql, "FROM `foo`\nGROUP BY `quux`\nORDER BY baz DESC\n", 'group by with order by');
 };
 
 subtest 'LIMIT OFFSET' => sub {
@@ -343,7 +343,7 @@ subtest 'HAVING' => sub {
 SELECT `foo`, COUNT(*) AS `count`
 FROM `baz`
 WHERE (foo = ?)
-GROUP BY baz
+GROUP BY `baz`
 HAVING (COUNT(*) = ?)
 ORDER BY foo DESC
 LIMIT 2
@@ -365,7 +365,7 @@ subtest 'index hint' => sub {
     $stmt->add_from( qw(baz) );
     is($stmt->as_sql, "SELECT `foo`\nFROM `baz`\n", "index hint is absent by default");
     $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
-    is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint)\n", "we can turn on USE INDEX");
+    is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (`index_hint`)\n", "we can turn on USE INDEX");
 };
 
 subtest 'index hint with joins' => sub {
@@ -380,7 +380,7 @@ subtest 'index hint with joins' => sub {
                 condition => 'baz.baz_id = foo.baz_id'
             }
         );
-        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN `baz` ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
+        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (`index_hint`) INNER JOIN `baz` ON baz.baz_id = foo.baz_id\n", 'USE INDEX with JOIN');
     };
     do {
         my $stmt = ns();
@@ -402,7 +402,7 @@ subtest 'index hint with joins' => sub {
                 condition => 'baz.baz_id = b2.baz_id AND b2.quux_id = 2'
             },
         );
-        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (index_hint) INNER JOIN `baz` `b1` ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN `baz` `b2` ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
+        is($stmt->as_sql, "SELECT `foo`\nFROM `baz` USE INDEX (`index_hint`) INNER JOIN `baz` `b1` ON baz.baz_id = b1.baz_id AND b1.quux_id = 1 LEFT JOIN `baz` `b2` ON baz.baz_id = b2.baz_id AND b2.quux_id = 2\n", 'USE INDEX with JOINs');
     };
 };
 

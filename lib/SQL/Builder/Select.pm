@@ -168,7 +168,7 @@ sub as_sql_order_by {
 
 sub add_group_by {
     my ($self, $group, $order) = @_;
-    push @{$self->{group_by}}, $order ? "$group $order" : $group;
+    push @{$self->{group_by}}, $order ? $self->_quote($group) . " $order" : $self->_quote($group);
 }
 
 sub as_sql_group_by {
@@ -224,7 +224,7 @@ sub _add_index_hint {
     return $quoted unless $hint && ref($hint) eq 'HASH';
     if ($hint->{list} && @{ $hint->{list} }) {
         return $quoted . ' ' . uc($hint->{type} || 'USE') . ' INDEX (' . 
-                join (',', @{ $hint->{list} }) .
+                join (',', map { $self->_quote($_) } @{ $hint->{list} }) .
                 ')';
     }
     return $quoted;
