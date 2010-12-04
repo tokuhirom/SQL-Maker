@@ -18,7 +18,6 @@ sub new {
         distinct           => 0,
         select_map         => +{},
         select_map_reverse => +{},
-        having_bind        => +[],
         from               => +[],
         where              => SQL::Builder::Where->new(),
         joins              => +[],
@@ -34,7 +33,10 @@ sub new {
 
 sub bind {
     my $self = shift;
-    return [$self->where->bind, @{$self->{having_bind}}];
+    my @bind;
+    push @bind, $self->where->bind;
+    push @bind, $self->{having}->bind if $self->{having};
+    return \@bind;
 }
 
 sub add_select {
@@ -194,8 +196,8 @@ sub as_sql_where {
 
 sub as_sql_having {
     my $self = shift;
-    if ($self->{having} && @{$self->{having}}) {
-        'HAVING ' . join(' AND ', @{ $self->{having} }) . "\n";
+    if ($self->{having}) {
+        'HAVING ' . $self->{having}->as_sql . "\n";
     } else {
         ''
     }
@@ -208,9 +210,8 @@ sub add_having {
         $col = $self->_quote($orig);
     }
 
-    my($term, $bind) = SQL::Builder::Part->make_term($col, $val);
-    push @{ $self->{having} }, "($term)";
-    push @{ $self->{having_bind} }, @$bind;
+    $self->{having} ||= SQL::Builder::Condition->new();
+    $self->{having}->add($col, $val);
 }
 
 sub as_for_update {
