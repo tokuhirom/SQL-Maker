@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use SQL::Builder::SQLType qw/sql_type/;
-use SQL::Builder::Part;
+use SQL::Builder::Condition;
 use Data::Dumper;
 use DBI qw/:sql_types/;
 
@@ -11,7 +11,7 @@ sub test {
     local $Data::Dumper::Terse=1;
     local $Data::Dumper::Indent=0;
     subtest Dumper($source) => sub {
-        my ($term, $bind) = SQL::Builder::Part->make_term(@$source);
+        my ($term, $bind) = SQL::Builder::Condition->_make_term(@$source);
         is $term, $expected_term;
         is_deeply $bind, $expected_bind;
     };
