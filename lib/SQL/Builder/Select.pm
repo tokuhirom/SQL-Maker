@@ -6,6 +6,7 @@ use Class::Accessor::Lite;
 use SQL::Builder::Part;
 use SQL::Builder::Where;
 use SQL::Builder::Util;
+use SQL::Builder::Condition;
 
 Class::Accessor::Lite->mk_wo_accessors(qw/limit offset distinct for_update/);
 Class::Accessor::Lite->mk_accessors( qw(where prefix) );
@@ -29,6 +30,14 @@ sub new {
     }, $class;
 
     return $self;
+}
+
+sub new_condition {
+    my $class = shift;
+    SQL::Builder::Condition->new(
+        quote_char => $self->{quote_char},
+        name_sep   => $self->{name_sep},
+    );
 }
 
 sub bind {
@@ -112,7 +121,7 @@ sub as_sql {
                 $sql .= ' USING ('. join(', ', map { $self->_quote($_) } @{ $join->{condition} }) . ')';
             }
             else {
-                $sql .= ' ON ' . $join->{condition};
+                $sql .= ' ON ' . $join->{condition}; # TODO: use Condition object at here!
             }
         }
         $sql .= ', ' if @{ $self->{from} };
@@ -210,7 +219,7 @@ sub add_having {
         $col = $self->_quote($orig);
     }
 
-    $self->{having} ||= SQL::Builder::Condition->new();
+    $self->{having} ||= $self->new_condition();
     $self->{having}->add($col, $val);
 }
 
