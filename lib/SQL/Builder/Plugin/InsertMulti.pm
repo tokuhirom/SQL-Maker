@@ -41,3 +41,6 @@ __END__
     my $builder = SQL::Builder->new();
     my ($sql, @binds) = $builder->insert_multi($table, \@rows);
 
+=head1 DESCRIPTION
+
+This is a plugin to generate MySQL's INSERT-multi statement.
