@@ -9,3 +9,5 @@ Build
 _build/
 xshelper.h
 tags
+nytprof/
+nytprof.out
