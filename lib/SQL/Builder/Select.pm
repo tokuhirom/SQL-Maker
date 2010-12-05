@@ -2,14 +2,15 @@ package SQL::Builder::Select;
 use strict;
 use warnings;
 use utf8;
-use Class::Accessor::Lite;
 use SQL::Builder::Part;
 use SQL::Builder::Where;
 use SQL::Builder::Util;
 use SQL::Builder::Condition;
-
-Class::Accessor::Lite->mk_wo_accessors(qw/limit offset distinct for_update/);
-Class::Accessor::Lite->mk_accessors( qw(where prefix) );
+use Class::Accessor::Lite (
+    new => 0,
+    wo => [qw/limit offset distinct for_update/],
+    rw => [qw/prefix/],
+);
 
 sub new {
     my $class = shift;
@@ -27,7 +28,6 @@ sub new {
         prefix             => 'SELECT ',
         %args
     }, $class;
-    $self->{where} = $self->new_condition();
 
     return $self;
 }
@@ -44,7 +44,7 @@ sub new_condition {
 sub bind {
     my $self = shift;
     my @bind;
-    push @bind, $self->where->bind;
+    push @bind, $self->{where}->bind  if $self->{where};
     push @bind, $self->{having}->bind if $self->{having};
     return \@bind;
 }
@@ -135,7 +135,7 @@ sub as_sql {
     }
 
     $sql .= "\n";
-    $sql .= $self->as_sql_where();
+    $sql .= $self->as_sql_where()   if $self->{where};
 
     $sql .= $self->as_sql_group_by  if $self->{group_by};
     $sql .= $self->as_sql_having    if $self->{having};
@@ -195,6 +195,18 @@ sub as_sql_group_by {
     return 'GROUP BY '
            . join(', ', @$elems)
            . "\n";
+}
+
+sub set_where {
+    my ($self, $where) = @_;
+    $self->{where} = $where;
+}
+
+sub add_where {
+    my ($self, $col, $val) = @_;
+
+    $self->{where} ||= $self->new_condition();
+    $self->{where}->add($col, $val);
 }
 
 sub as_sql_where {

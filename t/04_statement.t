@@ -203,14 +203,25 @@ subtest 'LIMIT OFFSET' => sub {
 subtest 'WHERE' => sub {
     do {
         my $stmt = ns();
-        $stmt->where->add(foo => 'bar');
+        $stmt->add_where(foo => 'bar');
         is($stmt->as_sql_where, "WHERE (`foo` = ?)\n");
         is(scalar @{ $stmt->bind }, 1);
         is($stmt->bind->[0], 'bar');
     };
 
     do {
-        my $stmt = ns(); $stmt->where->add(foo => [ 'bar', 'baz' ]);
+        my $stmt = ns(); $stmt->add_where(foo => [ 'bar', 'baz' ]);
+        is($stmt->as_sql_where, "WHERE (`foo` IN (?,?))\n");
+        is(scalar @{ $stmt->bind }, 2);
+        is($stmt->bind->[0], 'bar');
+        is($stmt->bind->[1], 'baz');
+    };
+
+    do {
+        my $stmt = ns();
+        my $cond =  $stmt->new_condition();
+        $cond->add(foo => [ 'bar', 'baz' ]);
+        $stmt->set_where($cond);
         is($stmt->as_sql_where, "WHERE (`foo` IN (?,?))\n");
         is(scalar @{ $stmt->bind }, 2);
         is($stmt->bind->[0], 'bar');
@@ -242,7 +253,7 @@ subtest 'HAVING' => sub {
     $stmt->add_select(foo => 'foo');
     $stmt->add_select(\'COUNT(*)' => 'count');
     $stmt->add_from( qw(baz) );
-    $stmt->where->add(foo => 1);
+    $stmt->add_where(foo => 1);
     $stmt->add_group_by('baz');
     $stmt->add_order_by('foo' => 'DESC');
     $stmt->limit(2);

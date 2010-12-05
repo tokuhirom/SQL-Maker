@@ -139,7 +139,7 @@ sub select {
     if ( $where ) {
         my @w = ref $where eq 'ARRAY' ? @$where : %$where;
         while (my ($col, $val) = splice @w, 0, 2) {
-            $stmt->where->add($col => $val);
+            $stmt->add_where($col => $val);
         }
     }
 
