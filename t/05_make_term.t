@@ -11,7 +11,10 @@ sub test {
     local $Data::Dumper::Terse=1;
     local $Data::Dumper::Indent=0;
     subtest Dumper($source) => sub {
-        my $cond = SQL::Builder::Condition->new();
+        my $cond = SQL::Builder::Condition->new(
+            quote_char => q{`},
+            name_sep   => q{.},
+        );
         $cond->add(@$source);
         my $sql = $cond->as_sql;
         $sql =~ s/^\(//;
@@ -24,72 +27,72 @@ sub test {
 test(@{$_}) for (
     [
         ['foo' => 'bar'],
-        "foo = ?",
+        "`foo` = ?",
         ['bar']
     ],
     [
         ['foo' => ['bar', 'baz']],
-        "foo IN (?,?)",
+        "`foo` IN (?,?)",
         ['bar', 'baz']
     ],
     [
         ['foo' => {IN => ['bar', 'baz']}],
-        "foo IN (?,?)",
+        "`foo` IN (?,?)",
         ['bar', 'baz']
     ],
     [
         ['foo' => {'not IN' => ['bar', 'baz']}],
-        "foo NOT IN (?,?)",
+        "`foo` NOT IN (?,?)",
         ['bar', 'baz']
     ],
     [
         ['foo' => {'!=' => 'bar'}],
-        "foo != ?",
+        "`foo` != ?",
         ['bar']
     ],
     [
         ['foo' => \'IS NOT NULL'],
-        "foo IS NOT NULL",
+        "`foo` IS NOT NULL",
         []
     ],
     [
         ['foo' => {between => [qw/1 2/]}],
-        "foo BETWEEN ? AND ?",
+        "`foo` BETWEEN ? AND ?",
         [qw/1 2/]
     ],
     [
         ['foo' => {like => 'xaic%'}],
-        "foo LIKE ?",
+        "`foo` LIKE ?",
         [qw/xaic%/]
     ],
     [
         ['foo' => [{'>' => 'bar'}, {'<', => 'baz'}]],
-        "(foo > ?) OR (foo < ?)",
+        "(`foo` > ?) OR (`foo` < ?)",
         [qw/bar baz/]
     ],
     [
         ['foo' => [-and => {'>' => 'bar'}, {'<', => 'baz'}]],
-        "(foo > ?) AND (foo < ?)",
+        "(`foo` > ?) AND (`foo` < ?)",
         [qw/bar baz/]
     ],
     [
         ['foo' => [-and => 'foo', 'bar', 'baz']],
-        "(foo = ?) AND (foo = ?) AND (foo = ?)",
+        "(`foo` = ?) AND (`foo` = ?) AND (`foo` = ?)",
         [qw/foo bar baz/]
     ],
     [
         ['foo_id' => \['IN (SELECT foo_id FROM bar WHERE t=?)', 44]],
-        "foo_id IN (SELECT foo_id FROM bar WHERE t=?)",
+        "`foo_id` IN (SELECT foo_id FROM bar WHERE t=?)",
         [qw/44/]
     ],
     [
         ['foo_id' => \['MATCH (col1, col2) AGAINST (?)', 'apples']],
-        "foo_id MATCH (col1, col2) AGAINST (?)",
+        "`foo_id` MATCH (col1, col2) AGAINST (?)",
         [qw/apples/]
     ],
     [
         ['foo_id' => undef],
-        "foo_id IS NULL",
+        "`foo_id` IS NULL",
         [qw//]
     ],
     [
@@ -104,7 +107,7 @@ test(@{$_}) for (
     ],
     [
         ['foo_id' => sql_type(\3, SQL_INTEGER)],
-        "foo_id = ?",
+        "`foo_id` = ?",
         [sql_type(\3, SQL_INTEGER)]
     ],
 );

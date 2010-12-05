@@ -20,7 +20,6 @@ sub new {
         select_map         => +{},
         select_map_reverse => +{},
         from               => +[],
-        where              => SQL::Builder::Where->new(),
         joins              => +[],
         index_hint         => +{},
         group_by           => +[],
@@ -28,6 +27,7 @@ sub new {
         prefix             => 'SELECT ',
         %args
     }, $class;
+    $self->{where} = $self->new_condition();
 
     return $self;
 }
@@ -217,7 +217,7 @@ sub add_having {
     my ($self, $col, $val) = @_;
 
     if (my $orig = $self->{select_map_reverse}->{$col}) {
-        $col = $self->_quote($orig);
+        $col = $orig;
     }
 
     $self->{having} ||= $self->new_condition();

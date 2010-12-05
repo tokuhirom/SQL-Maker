@@ -204,14 +204,14 @@ subtest 'WHERE' => sub {
     do {
         my $stmt = ns();
         $stmt->where->add(foo => 'bar');
-        is($stmt->as_sql_where, "WHERE (foo = ?)\n");
+        is($stmt->as_sql_where, "WHERE (`foo` = ?)\n");
         is(scalar @{ $stmt->bind }, 1);
         is($stmt->bind->[0], 'bar');
     };
 
     do {
         my $stmt = ns(); $stmt->where->add(foo => [ 'bar', 'baz' ]);
-        is($stmt->as_sql_where, "WHERE (foo IN (?,?))\n");
+        is($stmt->as_sql_where, "WHERE (`foo` IN (?,?))\n");
         is(scalar @{ $stmt->bind }, 2);
         is($stmt->bind->[0], 'bar');
         is($stmt->bind->[1], 'baz');
@@ -251,7 +251,7 @@ subtest 'HAVING' => sub {
     is($stmt->as_sql, <<SQL);
 SELECT `foo`, COUNT(*) AS `count`
 FROM `baz`
-WHERE (foo = ?)
+WHERE (`foo` = ?)
 GROUP BY `baz`
 HAVING (COUNT(*) = ?)
 ORDER BY `foo` DESC

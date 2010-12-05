@@ -3,10 +3,18 @@ use strict;
 use warnings;
 use utf8;
 use SQL::Builder::Part;
+use SQL::Builder::Util;
 use overload
     '&' => sub { $_[0]->compose_and($_[1]) },
     '|' => sub { $_[0]->compose_or($_[1]) },
     fallback => 1;
+
+sub _quote {
+    my ($self, $label) = @_;
+
+    return $$label if ref $label;
+    SQL::Builder::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
+}
 
 sub new {
     my $class = shift;
@@ -39,7 +47,7 @@ sub _make_term {
         }
         else {
             # make_term(foo => [1,2,3]) => foo IN (1,2,3)
-            my $term = "$col IN (" . join( ',', ('?') x scalar @$val ) . ')';
+            my $term = $self->_quote($col) . " IN (" . join( ',', ('?') x scalar @$val ) . ')';
             return ($term, $val);
         }
     }
@@ -57,34 +65,34 @@ sub _make_term {
                 }
             } else {
                 # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
-                my $term = "$col $op (" . join( ',', ('?') x scalar @$v ) . ')';
+                my $term = $self->_quote($col) . " $op (" . join( ',', ('?') x scalar @$v ) . ')';
                 return ($term, $v);
             }
         }
         elsif ( ( $op eq 'BETWEEN' ) && ref($v) eq 'ARRAY' ) {
             Carp::croak("USAGE: make_term(foo => {BETWEEN => [\$a, \$b]})") if @$v != 2;
-            return ("$col BETWEEN ? AND ?", $v);
+            return ($self->_quote($col) . " BETWEEN ? AND ?", $v);
         }
         else {
             # make_term(foo => +{ '<', 3 }) => foo < 3
-            return ("$col $op ?", [$v]);
+            return ($self->_quote($col) . " $op ?", [$v]);
         }
     }
     elsif ( ref($val) eq 'SCALAR' ) {
         # make_term(foo => \"> 3") => foo > 3
-        return ("$col $$val", []);
+        return ($self->_quote($col) . " $$val", []);
     }
     elsif ( ref($val) eq 'REF') {
         my ($query, @v) = @{${$val}};
-        return ("$col $query", \@v);
+        return ($self->_quote($col) . " $query", \@v);
     }
     else {
         if (defined $val) {
             # make_term(foo => "3") => foo = 3
-            return ("$col = ?", [$val]);
+            return ($self->_quote($col) . " = ?", [$val]);
         } else {
             # make_term(foo => undef) => foo IS NULL
-            return ("$col IS NULL", []);
+            return ($self->_quote($col) . " IS NULL", []);
         }
     }
 }
