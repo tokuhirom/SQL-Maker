@@ -124,7 +124,7 @@ sub _make_where_clause {
     return [$sql ? " WHERE $sql" : '', [$w->bind]];
 }
 
-# my($stmt, @bind) = $sql−>select($table, \@fields, \%where, \@order);
+# my($stmt, @bind) = $sql−>select($table, \@fields, \%where, \%opt);
 sub select {
     my ($self, $table, $fields, $where, $opt) = @_;
 
