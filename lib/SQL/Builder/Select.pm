@@ -122,7 +122,7 @@ sub as_sql {
                 $sql .= ' USING ('. join(', ', map { $self->_quote($_) } @{ $join->{condition} }) . ')';
             }
             else {
-                $sql .= ' ON ' . $join->{condition}; # TODO: use Condition object at here!
+                $sql .= ' ON ' . $join->{condition};
             }
         }
         $sql .= ', ' if @{ $self->{from} };
