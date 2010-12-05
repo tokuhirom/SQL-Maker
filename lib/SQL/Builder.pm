@@ -113,7 +113,10 @@ sub update {
 
 sub _make_where_clause {
     my ($self, $where) = @_;
-    my $w = SQL::Builder::Condition->new();
+    my $w = SQL::Builder::Condition->new(
+        quote_char => $self->quote_char,
+        name_sep   => $self->name_sep,
+    );
     while (my ($col, $val) = each %$where) {
         $w->add($col => $val);
     }
