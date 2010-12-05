@@ -10,7 +10,7 @@ Class::Accessor::Lite->mk_ro_accessors(qw/quote_char name_sep driver statement_c
 use Carp ();
 use SQL::Builder::Select;
 use SQL::Builder::Select::Oracle;
-use SQL::Builder::Where;
+use SQL::Builder::Condition;
 use SQL::Builder::Util;
 use Module::Load ();
 
@@ -80,13 +80,10 @@ sub _quote {
 sub delete {
     my ($self, $table, $where) = @_;
 
-    my $w = SQL::Builder::Where->new();
-    while (my ($col, $val) = each %$where) {
-        $w->add($col => $val);
-    }
+    my $w = $self->_make_where_clause($where);
     my $quoted_table = $self->_quote($table);
-    my $sql = "DELETE FROM $quoted_table" . $w->as_sql(1);
-    return ($sql, $w->bind);
+    my $sql = "DELETE FROM $quoted_table" . $w->[0];
+    return ($sql, @{$w->[1]});
 }
 
 sub update {
@@ -106,15 +103,22 @@ sub update {
         }
     }
 
-    my $w = SQL::Builder::Where->new();
+    my $w = $self->_make_where_clause($where);
+    push @bind_columns, @{$w->[1]};
+
+    my $quoted_table = $self->_quote($table);
+    my $sql = "UPDATE $quoted_table SET " . join(', ', @columns) . $w->[0];
+    return ($sql, @bind_columns);
+}
+
+sub _make_where_clause {
+    my ($self, $where) = @_;
+    my $w = SQL::Builder::Condition->new();
     while (my ($col, $val) = each %$where) {
         $w->add($col => $val);
     }
-    push @bind_columns, $w->bind;
-
-    my $quoted_table = $self->_quote($table);
-    my $sql = "UPDATE $quoted_table SET " . join(', ', @columns) . $w->as_sql(1);
-    return ($sql, @bind_columns);
+    my $sql = $w->as_sql(1);
+    return [$sql ? " WHERE $sql" : '', [$w->bind]];
 }
 
 # my($stmt, @bind) = $sql−>select($table, \@fields, \%where, \@order);
