@@ -69,6 +69,12 @@ sub _make_term {
                 return ($term, $v);
             }
         }
+        elsif ( ( $op eq 'IN' || $op eq 'NOT IN' ) && ref($v) eq 'REF' ) {
+            # make_term(foo => +{ 'IN', \['SELECT foo FROM bar'] }) => foo IN (SELECT foo FROM bar)
+            my @values = @{$$v};
+            my $term = $self->_quote($col) . " $op (" . shift(@values) . ')';
+            return ($term, \@values);
+        }
         elsif ( ( $op eq 'BETWEEN' ) && ref($v) eq 'ARRAY' ) {
             Carp::croak("USAGE: make_term(foo => {BETWEEN => [\$a, \$b]})") if @$v != 2;
             return ($self->_quote($col) . " BETWEEN ? AND ?", $v);
@@ -136,4 +142,35 @@ sub bind {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+SQL::Builder::Condition - condition object for SQL::Builder
+
+=head1 SYNOPSIS
+
+    my $condition = SQL::Builder::Condition->new(
+        name_sep   => '.',
+        quote_char => '`',
+    );
+    $condition->add('foo_id' => 3);
+    $condition->add('bar_id' => 4);
+    my $sql = $condition->as_sql(); # (`foo_id`=?) AND (`bar_id`=?)
+    my @bind = $condition->bind();  # (3, 4)
+
+    # composite and
+    my $other = SQL::Builder::Condition->new(
+        name_sep => '.',
+        quote_char => '`',
+    );
+    $other->add('name' => 'john');
+    my $comp_and = $condition & $other;
+    my $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) AND (`name`=?)
+    my @bind = $comp_and->bind();  # (3, 4, 'john')
+
+    # composite or
+    my $comp_or = $condition | $other;
+    my $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) OR (`name`=?)
+    my @bind = $comp_and->bind();  # (3, 4, 'john')
 

@@ -312,6 +312,10 @@ Here is a cheat sheet for conditions.
     OUT QUERY: '`foo_id` IN (SELECT foo_id FROM bar WHERE t=?)'
     OUT BIND:  ('44')
 
+    IN:        ['foo_id', {IN => \['SELECT foo_id FROM bar WHERE t=?',44]}]
+    OUT QUERY: '`foo_id` IN (SELECT foo_id FROM bar WHERE t=?)'
+    OUT BIND:  ('44')
+
     IN:        ['foo_id',\['MATCH (col1, col2) AGAINST (?)','apples']]
     OUT QUERY: '`foo_id` MATCH (col1, col2) AGAINST (?)'
     OUT BIND:  ('apples')
