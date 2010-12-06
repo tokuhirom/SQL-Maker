@@ -46,6 +46,16 @@ subtest 'update' => sub {
     }
 };
 
+subtest 'select_query' => sub {
+    my $builder = SQL::Builder->new(driver => 'sqlite');
+
+    do {
+        my $stmt = $builder->select_query('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
+        is $stmt->as_sql, "SELECT `foo`, `bar`\nFROM `foo`\nWHERE (`bar` = ?) AND (`john` = ?)\nORDER BY yo\n";
+        is join(',', $stmt->bind), 'baz,man';
+    };
+};
+
 subtest 'select' => sub {
     my $builder = SQL::Builder->new(driver => 'sqlite');
     do {

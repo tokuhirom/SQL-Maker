@@ -126,6 +126,11 @@ sub _make_where_clause {
 
 # my($stmt, @bind) = $sql−>select($table, \@fields, \%where, \%opt);
 sub select {
+    my $stmt = shift->select_query(@_);
+    return ($stmt->as_sql,@{$stmt->bind});
+}
+
+sub select_query {
     my ($self, $table, $fields, $where, $opt) = @_;
 
     my $stmt = $self->statement_class->new(
@@ -170,7 +175,7 @@ sub select {
     }
 
     $stmt->for_update(1) if $opt->{for_update};
-    return ($stmt->as_sql,@{$stmt->bind});
+    return $stmt;
 }
 
 1;
