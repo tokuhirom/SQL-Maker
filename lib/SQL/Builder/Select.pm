@@ -19,7 +19,6 @@ sub offset {
 }
 
 sub limit {
-warn "--- @_";
     Carp::croak("This accessor is write only: limit") if @_==1;
     $_[0]->{limit} = $_[1];
     return $_[0];

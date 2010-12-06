@@ -178,6 +178,10 @@ __END__
 
 =encoding utf8
 
+=for test_synopsis
+
+my ($table, @fields, %where, %opt, %values, %set);
+
 =head1 NAME
 
 SQL::Builder - Yet another SQL builder

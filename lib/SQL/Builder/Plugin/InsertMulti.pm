@@ -34,7 +34,13 @@ sub insert_multi {
 1;
 __END__
 
+=for test_synopsis
+
+my ($table, @rows);
+
 =head1 SYNOPSIS
+
+    use SQL::Builder;
 
     SQL::Builder->load_plugin('SQL::Builder::Plugin::InsertMulti');
 
