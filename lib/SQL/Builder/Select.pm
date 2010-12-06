@@ -13,6 +13,7 @@ use Class::Accessor::Lite (
 );
 
 sub offset {
+    Carp::croak("This accessor is write only: offset") if @_==1;
     if (@_==1) {
         return $_[0]->{offset};
     } else {
