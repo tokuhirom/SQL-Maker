@@ -138,7 +138,7 @@ sub as_sql {
 
 sub bind {
     my $self = shift;
-    return @{$self->{bind}};
+    return wantarray ? @{$self->{bind}} : $self->{bind};
 }
 
 1;

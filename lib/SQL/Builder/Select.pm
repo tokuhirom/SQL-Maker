@@ -46,7 +46,7 @@ sub bind {
     my @bind;
     push @bind, $self->{where}->bind  if $self->{where};
     push @bind, $self->{having}->bind if $self->{having};
-    return \@bind;
+    return wantarray ? @bind : \@bind;
 }
 
 sub add_select {
