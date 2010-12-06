@@ -272,10 +272,12 @@ SQL::Builder::Select - dynamic SQL generator
 
 =head1 SYNOPSIS
 
-    my $sql = SQL::Builder::Select->new;
-    $sql->add_select($_) for qw/foo bar baz/;
-    $sql->add_from('table_name');
-    $sql->as_sql;
+    my $sql = SQL::Builder::Select->new()
+                                  ->add_select('foo')
+                                  ->add_select('bar')
+                                  ->add_select('baz')
+                                  ->add_from('table_name')
+                                  ->as_sql;
     # => "SELECT foo, bar, baz FROM table_name"
 
 =head1 DESCRIPTION
