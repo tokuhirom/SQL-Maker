@@ -14,14 +14,21 @@ use Class::Accessor::Lite (
 
 sub offset {
     Carp::croak("This accessor is write only: offset") if @_==1;
-    $_[0]->{offset} = $_[1];
-    return $_[0];
+    if (@_==1) {
+        return $_[0]->{offset};
+    } else {
+        $_[0]->{offset} = $_[1];
+        return $_[0];
+    }
 }
 
 sub limit {
-    Carp::croak("This accessor is write only: limit") if @_==1;
-    $_[0]->{limit} = $_[1];
-    return $_[0];
+    if (@_==1) {
+        $_[0]->{limit};
+    } else {
+        $_[0]->{limit} = $_[1];
+        return $_[0];
+    }
 }
 
 sub new {
