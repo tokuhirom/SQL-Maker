@@ -55,5 +55,5 @@ This is a wrapper class for SQL types.
 
 =head1 SEE ALSO
 
-L<SQL::Builder::SQLType>
+L<SQL::Builder::SQLType>, L<http://labs.cybozu.co.jp/blog/kazuho/archives/2007/09/mysql_param_binding.php>
 

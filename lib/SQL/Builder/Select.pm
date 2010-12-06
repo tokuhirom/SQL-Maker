@@ -8,9 +8,22 @@ use SQL::Builder::Util;
 use SQL::Builder::Condition;
 use Class::Accessor::Lite (
     new => 0,
-    wo => [qw/limit offset distinct for_update/],
+    wo => [qw/distinct for_update/],
     rw => [qw/prefix/],
 );
+
+sub offset {
+    Carp::croak("This accessor is write only: offset") if @_==1;
+    $_[0]->{offset} = $_[1];
+    return $_[0];
+}
+
+sub limit {
+warn "--- @_";
+    Carp::croak("This accessor is write only: limit") if @_==1;
+    $_[0]->{limit} = $_[1];
+    return $_[0];
+}
 
 sub new {
     my $class = shift;

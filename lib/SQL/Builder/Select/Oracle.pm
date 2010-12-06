@@ -11,11 +11,11 @@ sub as_limit {
 ## Override as_sql to emulate the LIMIT clause.
 sub as_sql {
     my $stmt   = shift;
-    my $limit  = $stmt->limit;
-    my $offset = $stmt->offset;
+    my $limit  = $stmt->{limit};
+    my $offset = $stmt->{offset};
 
     if (defined $limit && defined $offset) {
-        $stmt->select( @{ $stmt->select }, "ROW_NUMBER() OVER (ORDER BY 1) R" );
+        $stmt->add_select( \"ROW_NUMBER() OVER (ORDER BY 1) R" );
     }
 
     my $sql = $stmt->SUPER::as_sql(@_);
