@@ -2,7 +2,7 @@ package SQL::Builder::Select;
 use strict;
 use warnings;
 use utf8;
-use SQL::Builder::Where;
+use SQL::Builder::Condition;
 use SQL::Builder::Util;
 use SQL::Builder::Condition;
 use Class::Accessor::Lite (

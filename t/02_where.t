@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 use Test::More;
-use SQL::Builder::Where;
+use SQL::Builder::Condition;
 
-my $w1 = SQL::Builder::Where->new();
+my $w1 = SQL::Builder::Condition->new();
 $w1->add(x => 1);
 $w1->add(y => 2);
 
-my $w2 = SQL::Builder::Where->new();
+my $w2 = SQL::Builder::Condition->new();
 $w2->add(a => 3);
 $w2->add(b => 4);
 

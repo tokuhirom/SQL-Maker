@@ -115,7 +115,7 @@ sub add {
 sub compose_and {
     my ($self, $other) = @_;
 
-    return SQL::Builder::Where->new(
+    return SQL::Builder::Condition->new(
         sql => ['(' . $self->as_sql() . ') AND (' . $other->as_sql() . ')'],
         bind => [@{$self->{bind}}, @{$other->{bind}}],
     );
@@ -124,7 +124,7 @@ sub compose_and {
 sub compose_or {
     my ($self, $other) = @_;
 
-    return SQL::Builder::Where->new(
+    return SQL::Builder::Condition->new(
         sql => ['(' . $self->as_sql() . ') OR (' . $other->as_sql() . ')'],
         bind => [@{$self->{bind}}, @{$other->{bind}}],
     );
