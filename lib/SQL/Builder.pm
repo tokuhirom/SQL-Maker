@@ -268,6 +268,7 @@ SQL::Builder supports plugin system. Write the code like following.
     package My::SQL::Builder;
     use parent qw/SQL::Builder/;
     __PACKAGE__->load_plugin('InsertMulti');
+
 =head1 AUTHOR
 
 Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF GMAIL COME<gt>
