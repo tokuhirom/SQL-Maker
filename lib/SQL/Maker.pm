@@ -213,6 +213,8 @@ SQL::Maker - Yet another SQL builder
 
 SQL::Maker is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
 
+B<THE SOFTWARE IS IT'S IN ALPHA QUALITY. IT MAY CHANGE THE API WITHOUT NOTICE.>
+
 =head1 METHODS
 
 =over 4

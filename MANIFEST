@@ -31,6 +31,7 @@ t/06_sql_type.t
 t/07_sql_type.t
 t/08_oracle.t
 t/plugins/01_insert_multi.t
+util/popopod.psgi
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t
