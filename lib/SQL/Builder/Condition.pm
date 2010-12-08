@@ -2,7 +2,6 @@ package SQL::Builder::Condition;
 use strict;
 use warnings;
 use utf8;
-use SQL::Builder::Part;
 use SQL::Builder::Util;
 use overload
     '&' => sub { $_[0]->compose_and($_[1]) },
