@@ -357,6 +357,16 @@ SQL::Builder supports plugin system. Write the code like following.
     use parent qw/SQL::Builder/;
     __PACKAGE__->load_plugin('InsertMulti');
 
+=head1 FAQ
+
+=over 4
+
+=item Why don't you use  SQL::Abstract?
+
+I need more extensible one.
+
+=back
+
 =head1 AUTHOR
 
 Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF GMAIL COME<gt>
