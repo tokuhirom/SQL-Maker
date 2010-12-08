@@ -143,6 +143,10 @@ sub bind {
 1;
 __END__
 
+=for test_synopsis
+
+my ($sql, @bind);
+
 =head1 NAME
 
 SQL::Builder::Condition - condition object for SQL::Builder
@@ -155,8 +159,8 @@ SQL::Builder::Condition - condition object for SQL::Builder
     );
     $condition->add('foo_id' => 3);
     $condition->add('bar_id' => 4);
-    my $sql = $condition->as_sql(); # (`foo_id`=?) AND (`bar_id`=?)
-    my @bind = $condition->bind();  # (3, 4)
+    $sql = $condition->as_sql(); # (`foo_id`=?) AND (`bar_id`=?)
+    @bind = $condition->bind();  # (3, 4)
 
     # composite and
     my $other = SQL::Builder::Condition->new(
@@ -165,11 +169,92 @@ SQL::Builder::Condition - condition object for SQL::Builder
     );
     $other->add('name' => 'john');
     my $comp_and = $condition & $other;
-    my $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) AND (`name`=?)
-    my @bind = $comp_and->bind();  # (3, 4, 'john')
+    $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) AND (`name`=?)
+    @bind = $comp_and->bind();  # (3, 4, 'john')
 
     # composite or
     my $comp_or = $condition | $other;
-    my $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) OR (`name`=?)
-    my @bind = $comp_and->bind();  # (3, 4, 'john')
+    $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) OR (`name`=?)
+    @bind = $comp_and->bind();  # (3, 4, 'john')
+
+
+=head1 CONDITION CHEAT SHEET
+
+Here is a cheat sheet for conditions.
+
+    IN:        ['foo','bar']
+    OUT QUERY: '`foo` = ?'
+    OUT BIND:  ('bar')
+
+    IN:        ['foo',['bar','baz']]
+    OUT QUERY: '`foo` IN (?,?)'
+    OUT BIND:  ('bar','baz')
+
+    IN:        ['foo',{'IN' => ['bar','baz']}]
+    OUT QUERY: '`foo` IN (?,?)'
+    OUT BIND:  ('bar','baz')
+
+    IN:        ['foo',{'not IN' => ['bar','baz']}]
+    OUT QUERY: '`foo` NOT IN (?,?)'
+    OUT BIND:  ('bar','baz')
+
+    IN:        ['foo',{'!=' => 'bar'}]
+    OUT QUERY: '`foo` != ?'
+    OUT BIND:  ('bar')
+
+    IN:        ['foo',\'IS NOT NULL']
+    OUT QUERY: '`foo` IS NOT NULL'
+    OUT BIND:  ()
+
+    IN:        ['foo',{'between' => ['1','2']}]
+    OUT QUERY: '`foo` BETWEEN ? AND ?'
+    OUT BIND:  ('1','2')
+
+    IN:        ['foo',{'like' => 'xaic%'}]
+    OUT QUERY: '`foo` LIKE ?'
+    OUT BIND:  ('xaic%')
+
+    IN:        ['foo',[{'>' => 'bar'},{'<' => 'baz'}]]
+    OUT QUERY: '(`foo` > ?) OR (`foo` < ?)'
+    OUT BIND:  ('bar','baz')
+
+    IN:        ['foo',['-and',{'>' => 'bar'},{'<' => 'baz'}]]
+    OUT QUERY: '(`foo` > ?) AND (`foo` < ?)'
+    OUT BIND:  ('bar','baz')
+
+    IN:        ['foo',['-and','foo','bar','baz']]
+    OUT QUERY: '(`foo` = ?) AND (`foo` = ?) AND (`foo` = ?)'
+    OUT BIND:  ('foo','bar','baz')
+
+    IN:        ['foo_id',\['IN (SELECT foo_id FROM bar WHERE t=?)',44]]
+    OUT QUERY: '`foo_id` IN (SELECT foo_id FROM bar WHERE t=?)'
+    OUT BIND:  ('44')
+
+    IN:        ['foo_id', {IN => \['SELECT foo_id FROM bar WHERE t=?',44]}]
+    OUT QUERY: '`foo_id` IN (SELECT foo_id FROM bar WHERE t=?)'
+    OUT BIND:  ('44')
+
+    IN:        ['foo_id',\['MATCH (col1, col2) AGAINST (?)','apples']]
+    OUT QUERY: '`foo_id` MATCH (col1, col2) AGAINST (?)'
+    OUT BIND:  ('apples')
+
+    IN:        ['foo_id',undef]
+    OUT QUERY: '`foo_id` IS NULL'
+    OUT BIND:  ()
+
+    IN:        ['foo_id',{'IN' => []}]
+    OUT QUERY: '0=1'
+    OUT BIND:  ()
+
+    IN:        ['foo_id',{'NOT IN' => []}]
+    OUT QUERY: '1=1'
+    OUT BIND:  ()
+
+    IN:        ['foo_id', sql_type(\3, SQL_INTEGER)]
+    OUT QUERY: '`foo_id` = ?'
+    OUT BIND:  sql_type(\3, SQL_INTEGER)
+
+=head1 SEE ALSO
+
+L<SQL::Builder>
 

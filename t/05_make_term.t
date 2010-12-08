@@ -6,7 +6,7 @@ use SQL::Builder::Condition;
 use Data::Dumper;
 use DBI qw/:sql_types/;
 
-open my $fh, '<', 'lib/SQL/Builder.pm' or die "cannot open file: $!";
+open my $fh, '<', 'lib/SQL/Builder/Condition.pm' or die "cannot open file: $!";
 # skip header
 while (<$fh>) {
     last if /=head1 CONDITION CHEAT SHEET/;
