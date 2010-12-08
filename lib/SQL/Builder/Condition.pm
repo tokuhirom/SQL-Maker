@@ -144,7 +144,6 @@ sub bind {
 __END__
 
 =for test_synopsis
-
 my ($sql, @bind);
 
 =head1 NAME

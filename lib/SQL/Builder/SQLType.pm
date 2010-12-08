@@ -24,7 +24,6 @@ sub type      { $_[0]->{type} }
 __END__
 
 =for test_synopsis
-
 my ($dbh);
 
 =head1 NAME

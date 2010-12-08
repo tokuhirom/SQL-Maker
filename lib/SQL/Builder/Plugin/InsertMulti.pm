@@ -35,7 +35,6 @@ sub insert_multi {
 __END__
 
 =for test_synopsis
-
 my ($table, @rows);
 
 =head1 SYNOPSIS
