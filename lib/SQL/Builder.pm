@@ -245,19 +245,107 @@ Default: '.'
 
 =item my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
 
-Generates SELECT query.
+This method returns SQL string and bind variables for SELECT statement.
+
+=over 4
+
+=item $table
+
+Table name in scalar.
+
+=item \@fields
+
+This is a list for retrieving fields from database.
+
+=item \%where
+
+SQL::Builder creates where clause from this hashref via L<SQL::Builder::Condition>.
+
+=item \%opt
+
+This is a options for select statemet
+
+=over 4
+
+=item $opt->{prefix}
+
+This is a prefix for SELECT statement.
+
+For example, you can provide the 'SELECT SQL_CALC_FOUND_ROWS '. It's useful for MySQL.
+
+Default Value: 'SELECT '
+
+=item $opt->{limit}
+
+This option makes 'LIMIT $n' clause.
+
+=item $opt->{offset}
+
+This option makes 'OFFSET $n' clause.
+
+=item $opt->{having}
+
+This option makes HAVING clause
+
+=item $opt->{for_update}
+
+This option makes 'FOR UPDATE" clause.
+
+=back
+
+=back
 
 =item my ($sql, @binds) = $builder->insert($table, \%values);
 
 Generate INSERT query.
 
-=item my ($sql, @binds) = $builder->delete($table, \%values);
+=over 4
+
+=item $table
+
+Table name in scalar.
+
+=item \%values
+
+This is a values for INSERT statement.
+
+=back
+
+=item my ($sql, @binds) = $builder->delete($table, \%where);
 
 Generate DELETE query.
+
+=over 4
+
+=item $table
+
+Table name in scalar.
+
+=item \%where
+
+SQL::Builder creates where clause from this hashref via L<SQL::Builder::Condition>.
+
+=back
 
 =item my ($sql, @binds) = $builder->update($table, \%set, \%where);
 
 Generate UPDATE query.
+
+=over 4
+
+=item $table
+
+Table name in scalar.
+
+=item \%set
+
+Setting values.
+
+=item \%where
+
+SQL::Builder creates where clause from this hashref via L<SQL::Builder::Condition>.
+
+=back
 
 =back
 
