@@ -4,7 +4,7 @@ use Test::More;
 use Test::Requires 'DBD::SQLite';
 use Data::Dumper;
 
-my $code = compile('lib/SQL/Builder/SQLType.pm');
+my $code = compile('lib/SQL/Maker/SQLType.pm');
 my $dbh = DBI->connect('dbi:SQLite:', '', '', {RaiseError => 1});
 $dbh->do(q{CREATE TABLE foo (id, bar)});
 $dbh->do(q{INSERT INTO foo VALUES (1, "oyoyo")});

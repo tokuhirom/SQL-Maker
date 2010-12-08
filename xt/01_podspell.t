@@ -6,7 +6,7 @@ $ENV{LANG} = 'C';
 all_pod_files_spelling_ok('lib');
 __DATA__
 Tokuhiro Matsuno
-SQL::Builder
+SQL::Maker
 tokuhirom
 AAJKLFJEF
 GMAIL
@@ -34,3 +34,9 @@ API
 URL
 URI
 db
+Str
+PLUGINS
+FAQ
+MySQL
+cnt
+MySQL's

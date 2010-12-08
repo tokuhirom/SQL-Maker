@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use SQL::Builder;
+use SQL::Maker;
 use Test::Requires 'Tie::IxHash';
 
 sub ordered_hashref {
@@ -9,9 +9,9 @@ sub ordered_hashref {
     return \%params;
 }
 
-SQL::Builder->load_plugin('InsertMulti');
+SQL::Maker->load_plugin('InsertMulti');
 
-my $builder = SQL::Builder->new(driver => 'mysql');
+my $builder = SQL::Maker->new(driver => 'mysql');
 my ( $sql, @binds ) = $builder->insert_multi(
     'foo' => [
         ordered_hashref( bar => 'baz', john => 'man' ),

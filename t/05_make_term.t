@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 use Test::More;
-use SQL::Builder::SQLType qw/sql_type/;
-use SQL::Builder::Condition;
+use SQL::Maker::SQLType qw/sql_type/;
+use SQL::Maker::Condition;
 use Data::Dumper;
 use DBI qw/:sql_types/;
 
-open my $fh, '<', 'lib/SQL/Builder/Condition.pm' or die "cannot open file: $!";
+open my $fh, '<', 'lib/SQL/Maker/Condition.pm' or die "cannot open file: $!";
 # skip header
 while (<$fh>) {
     last if /=head1 CONDITION CHEAT SHEET/;
@@ -29,7 +29,7 @@ sub test {
     local $Data::Dumper::Indent = 0;
 
     subtest Dumper($source) => sub {
-        my $cond = SQL::Builder::Condition->new(
+        my $cond = SQL::Maker::Condition->new(
             quote_char => q{`},
             name_sep   => q{.},
         );

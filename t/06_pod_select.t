@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 use Test::More;
-use SQL::Builder::SQLType qw/sql_type/;
-use SQL::Builder::Select;
+use SQL::Maker::SQLType qw/sql_type/;
+use SQL::Maker::Select;
 use Data::Dumper;
 use DBI qw/:sql_types/;
 
-open my $fh, '<', 'lib/SQL/Builder/Select.pm' or die "cannot open file: $!";
+open my $fh, '<', 'lib/SQL/Maker/Select.pm' or die "cannot open file: $!";
 # skip header
 while (<$fh>) {
     last if /=head1/;

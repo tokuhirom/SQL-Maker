@@ -1,4 +1,4 @@
-package SQL::Builder::Plugin::InsertMulti;
+package SQL::Maker::Plugin::InsertMulti;
 use strict;
 use warnings;
 use utf8;
@@ -40,11 +40,11 @@ my ($table, @rows);
 
 =head1 SYNOPSIS
 
-    use SQL::Builder;
+    use SQL::Maker;
 
-    SQL::Builder->load_plugin('SQL::Builder::Plugin::InsertMulti');
+    SQL::Maker->load_plugin('SQL::Maker::Plugin::InsertMulti');
 
-    my $builder = SQL::Builder->new();
+    my $builder = SQL::Maker->new();
     my ($sql, @binds) = $builder->insert_multi($table, \@rows);
 
 =head1 DESCRIPTION

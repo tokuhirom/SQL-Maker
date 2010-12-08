@@ -1,4 +1,4 @@
-package SQL::Builder::Util;
+package SQL::Maker::Util;
 use strict;
 use warnings;
 use utf8;

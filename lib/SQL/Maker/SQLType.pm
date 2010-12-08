@@ -1,4 +1,4 @@
-package SQL::Builder::SQLType;
+package SQL::Maker::SQLType;
 use strict;
 use warnings;
 use utf8;
@@ -8,7 +8,7 @@ our @EXPORT_OK = qw/sql_type/;
 
 sub sql_type {
     my ($value_ref, $type) = @_;
-    SQL::Builder::SQLType->new(value_ref => $value_ref, type => $type);
+    SQL::Maker::SQLType->new(value_ref => $value_ref, type => $type);
 }
 
 sub new {
@@ -29,15 +29,15 @@ my ($dbh);
 
 =head1 NAME
 
-SQL::Builder::SQLType - SQL Types wrapper
+SQL::Maker::SQLType - SQL Types wrapper
 
 =head1 SYNOPSIS
 
-    use SQL::Builder::SQLType qw/sql_type/;
+    use SQL::Maker::SQLType qw/sql_type/;
     use DBI qw/:sql_types/;
-    use SQL::Builder::Select;
+    use SQL::Maker::Select;
     
-    my $cond = SQL::Builder::Select->new()
+    my $cond = SQL::Maker::Select->new()
                                    ->add_select('id')
                                    ->add_from('foo')
                                    ->add_where(bar => sql_type(\"bar", SQL_VARCHAR));
@@ -55,5 +55,5 @@ This is a wrapper class for SQL types.
 
 =head1 SEE ALSO
 
-L<SQL::Builder::SQLType>, L<http://labs.cybozu.co.jp/blog/kazuho/archives/2007/09/mysql_param_binding.php>
+L<SQL::Maker::SQLType>, L<http://labs.cybozu.co.jp/blog/kazuho/archives/2007/09/mysql_param_binding.php>
 

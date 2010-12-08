@@ -1,7 +1,7 @@
-package SQL::Builder::Select::Oracle;
+package SQL::Maker::Select::Oracle;
 use strict;
 use warnings;
-use parent qw(SQL::Builder::Select);
+use parent qw(SQL::Maker::Select);
 
 ## Oracle doesn't have the LIMIT clause.
 sub as_limit {
