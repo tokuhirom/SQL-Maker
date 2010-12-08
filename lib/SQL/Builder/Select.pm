@@ -438,5 +438,5 @@ Add having clause
 
 =head1 SEE ALSO
 
-+<Data::ObjectDriver::SQL>
+L<Data::ObjectDriver::SQL>
 
