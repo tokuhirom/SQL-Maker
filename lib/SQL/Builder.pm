@@ -3,9 +3,9 @@ use strict;
 use warnings;
 use 5.008001;
 our $VERSION = '0.01';
-use Class::Accessor::Lite;
-
-Class::Accessor::Lite->mk_ro_accessors(qw/quote_char name_sep driver statement_class/);
+use Class::Accessor::Lite 0.05 (
+    ro => [qw/quote_char name_sep driver select_class/],
+);
 
 use Carp ();
 use SQL::Builder::Select;
@@ -40,7 +40,7 @@ sub new {
         }
     };
     $args{name_sep}    ||= '.';
-    $args{statement_class} = $driver eq 'Oracle' ? 'SQL::Builder::Select::Oracle' : 'SQL::Builder::Select';
+    $args{select_class} = $driver eq 'Oracle' ? 'SQL::Builder::Select::Oracle' : 'SQL::Builder::Select';
     bless {%args}, $class;
 }
 
@@ -133,7 +133,7 @@ sub select {
 sub select_query {
     my ($self, $table, $fields, $where, $opt) = @_;
 
-    my $stmt = $self->statement_class->new(
+    my $stmt = $self->select_class->new(
         name_sep   => $self->name_sep,
         quote_char => $self->quote_char,
         select     => $fields,
@@ -185,7 +185,7 @@ __END__
 
 =for test_synopsis
 
-my ($table, @fields, %where, %opt, %values, %set);
+my ($table, @fields, %where, %opt, %values, %set, $sql, @binds);
 
 =head1 NAME
 
@@ -198,16 +198,16 @@ SQL::Builder - Yet another SQL builder
     my $builder = SQL::Builder->new();
 
     # SELECT
-    my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
+    ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
 
     # INSERT
-    my ($sql, @binds) = $builder->insert($table, \%values);
+    ($sql, @binds) = $builder->insert($table, \%values);
 
     # DELETE
-    my ($sql, @binds) = $builder->delete($table, \%values);
+    ($sql, @binds) = $builder->delete($table, \%values);
 
     # UPDATE
-    my ($sql, @binds) = $builder->update($table, \%set, \%where);
+    ($sql, @binds) = $builder->update($table, \%set, \%where);
 
 =head1 DESCRIPTION
 

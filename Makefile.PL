@@ -5,7 +5,7 @@ name 'SQL-Builder';
 all_from 'lib/SQL/Builder.pm';
 
 requires 'DBI';
-requires 'Class::Accessor::Lite';
+requires 'Class::Accessor::Lite' => 0.05;
 requires 'Module::Load';
 requires 'parent';
 
