@@ -1,8 +1,8 @@
-package SQL::Builder::Condition;
+package SQL::Maker::Condition;
 use strict;
 use warnings;
 use utf8;
-use SQL::Builder::Util;
+use SQL::Maker::Util;
 use overload
     '&' => sub { $_[0]->compose_and($_[1]) },
     '|' => sub { $_[0]->compose_or($_[1]) },
@@ -12,7 +12,7 @@ sub _quote {
     my ($self, $label) = @_;
 
     return $$label if ref $label;
-    SQL::Builder::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
+    SQL::Maker::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
 }
 
 sub new {
@@ -115,7 +115,7 @@ sub add {
 sub compose_and {
     my ($self, $other) = @_;
 
-    return SQL::Builder::Condition->new(
+    return SQL::Maker::Condition->new(
         sql => ['(' . $self->as_sql() . ') AND (' . $other->as_sql() . ')'],
         bind => [@{$self->{bind}}, @{$other->{bind}}],
     );
@@ -124,7 +124,7 @@ sub compose_and {
 sub compose_or {
     my ($self, $other) = @_;
 
-    return SQL::Builder::Condition->new(
+    return SQL::Maker::Condition->new(
         sql => ['(' . $self->as_sql() . ') OR (' . $other->as_sql() . ')'],
         bind => [@{$self->{bind}}, @{$other->{bind}}],
     );
@@ -148,11 +148,11 @@ my ($sql, @bind);
 
 =head1 NAME
 
-SQL::Builder::Condition - condition object for SQL::Builder
+SQL::Maker::Condition - condition object for SQL::Maker
 
 =head1 SYNOPSIS
 
-    my $condition = SQL::Builder::Condition->new(
+    my $condition = SQL::Maker::Condition->new(
         name_sep   => '.',
         quote_char => '`',
     );
@@ -162,7 +162,7 @@ SQL::Builder::Condition - condition object for SQL::Builder
     @bind = $condition->bind();  # (3, 4)
 
     # composite and
-    my $other = SQL::Builder::Condition->new(
+    my $other = SQL::Maker::Condition->new(
         name_sep => '.',
         quote_char => '`',
     );
@@ -255,5 +255,5 @@ Here is a cheat sheet for conditions.
 
 =head1 SEE ALSO
 
-L<SQL::Builder>
+L<SQL::Maker>
 

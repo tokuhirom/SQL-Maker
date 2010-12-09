@@ -1,8 +1,8 @@
 use inc::Module::Install;
 use Module::Install::AuthorTests;
 
-name 'SQL-Builder';
-all_from 'lib/SQL/Builder.pm';
+name 'SQL-Maker';
+all_from 'lib/SQL/Maker.pm';
 
 requires 'DBI';
 requires 'Class::Accessor::Lite' => 0.05;

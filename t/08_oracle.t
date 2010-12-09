@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
-use SQL::Builder::Select::Oracle;
+use SQL::Maker::Select::Oracle;
 
-my $sel = SQL::Builder::Select::Oracle->new()
+my $sel = SQL::Maker::Select::Oracle->new()
                                       ->add_select('foo')
                                       ->add_from('user')
                                       ->limit(10)

@@ -1,4 +1,4 @@
-package SQL::Builder;
+package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
@@ -8,15 +8,15 @@ use Class::Accessor::Lite 0.05 (
 );
 
 use Carp ();
-use SQL::Builder::Select;
-use SQL::Builder::Select::Oracle;
-use SQL::Builder::Condition;
-use SQL::Builder::Util;
+use SQL::Maker::Select;
+use SQL::Maker::Select::Oracle;
+use SQL::Maker::Condition;
+use SQL::Maker::Util;
 use Module::Load ();
 
 sub load_plugin {
     my ($class, $role) = @_;
-    $role = $role =~ s/^\+// ? $role : "SQL::Builder::Plugin::$role";
+    $role = $role =~ s/^\+// ? $role : "SQL::Maker::Plugin::$role";
     Module::Load::load($role);
 
     no strict 'refs';
@@ -40,7 +40,7 @@ sub new {
         }
     };
     $args{name_sep}    ||= '.';
-    $args{select_class} = $driver eq 'Oracle' ? 'SQL::Builder::Select::Oracle' : 'SQL::Builder::Select';
+    $args{select_class} = $driver eq 'Oracle' ? 'SQL::Maker::Select::Oracle' : 'SQL::Maker::Select';
     bless {%args}, $class;
 }
 
@@ -74,7 +74,7 @@ sub insert {
 sub _quote {
     my ($self, $label) = @_;
 
-    SQL::Builder::Util::quote_identifier($label, $self->quote_char(), $self->name_sep());
+    SQL::Maker::Util::quote_identifier($label, $self->quote_char(), $self->name_sep());
 }
 
 sub delete {
@@ -113,7 +113,7 @@ sub update {
 
 sub _make_where_clause {
     my ($self, $where) = @_;
-    my $w = SQL::Builder::Condition->new(
+    my $w = SQL::Maker::Condition->new(
         quote_char => $self->quote_char,
         name_sep   => $self->name_sep,
     );
@@ -188,13 +188,13 @@ my ($table, @fields, %where, %opt, %values, %set, $sql, @binds);
 
 =head1 NAME
 
-SQL::Builder - Yet another SQL builder
+SQL::Maker - Yet another SQL builder
 
 =head1 SYNOPSIS
 
-    use SQL::Builder;
+    use SQL::Maker;
 
-    my $builder = SQL::Builder->new();
+    my $builder = SQL::Maker->new();
 
     # SELECT
     ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
@@ -210,17 +210,19 @@ SQL::Builder - Yet another SQL builder
 
 =head1 DESCRIPTION
 
-SQL::Builder is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
+SQL::Maker is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
+
+B<THE SOFTWARE IS IT'S IN ALPHA QUALITY. IT MAY CHANGE THE API WITHOUT NOTICE.>
 
 =head1 METHODS
 
 =over 4
 
-=item my $builder = SQL::Builder->new(%args);
+=item my $builder = SQL::Maker->new(%args);
 
-Create new instance of SQL::Builder.
+Create new instance of SQL::Maker.
 
-Attribuetes are following:
+Attributes are following:
 
 =over 4
 
@@ -258,11 +260,11 @@ This is a list for retrieving fields from database.
 
 =item \%where
 
-SQL::Builder creates where clause from this hashref via L<SQL::Builder::Condition>.
+SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
 
 =item \%opt
 
-This is a options for select statemet
+This is a options for SELECT statement
 
 =over 4
 
@@ -322,7 +324,7 @@ Table name in scalar.
 
 =item \%where
 
-SQL::Builder creates where clause from this hashref via L<SQL::Builder::Condition>.
+SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
 
 =back
 
@@ -342,7 +344,7 @@ Setting values.
 
 =item \%where
 
-SQL::Builder creates where clause from this hashref via L<SQL::Builder::Condition>.
+SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
 
 =back
 
@@ -350,10 +352,10 @@ SQL::Builder creates where clause from this hashref via L<SQL::Builder::Conditio
 
 =head1 PLUGINS
 
-SQL::Builder supports plugin system. Write the code like following.
+SQL::Maker supports plugin system. Write the code like following.
 
-    package My::SQL::Builder;
-    use parent qw/SQL::Builder/;
+    package My::SQL::Maker;
+    use parent qw/SQL::Maker/;
     __PACKAGE__->load_plugin('InsertMulti');
 
 =head1 FAQ
