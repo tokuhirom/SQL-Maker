@@ -1,6 +1,6 @@
 use strict;
 use YAML::Tiny;
-use Plack::Maker;
+use Plack::Builder;
 use Pod::Simple::XHTML;
 use Plack::Request;
 use Plack::Loader;
