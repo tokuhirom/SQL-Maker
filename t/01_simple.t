@@ -56,6 +56,14 @@ subtest 'select_query' => sub {
     };
 };
 
+subtest 'new_select' => sub {
+    my $builder = SQL::Maker->new(driver => 'sqlite', quote_char => q{`}, name_sep => q{.});
+    my $select = $builder->new_select();
+    isa_ok $select, 'SQL::Maker::Select';
+    is $select->quote_char, q{`};
+    is $select->name_sep, q{.};
+};
+
 subtest 'select' => sub {
     my $builder = SQL::Maker->new(driver => 'sqlite');
     do {

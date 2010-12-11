@@ -44,6 +44,16 @@ sub new {
     bless {%args}, $class;
 }
 
+sub new_select {
+    my ($self, @args) = @_;
+
+    return $self->select_class->new(
+        name_sep   => $self->name_sep,
+        quote_char => $self->quote_char,
+        @args,
+    );
+}
+
 # $builder->insert($table, \%values);
 sub insert {
     my ($self, $table, $values, $opt) = @_;
@@ -133,9 +143,7 @@ sub select {
 sub select_query {
     my ($self, $table, $fields, $where, $opt) = @_;
 
-    my $stmt = $self->select_class->new(
-        name_sep   => $self->name_sep,
-        quote_char => $self->quote_char,
+    my $stmt = $self->new_select(
         select     => $fields,
     );
     $stmt->add_from($table);
@@ -243,6 +251,12 @@ This is the character that separates a table and column name.
 Default: '.'
 
 =back
+
+=item my $select = $builder->new_select();
+
+Create new instance of L<SQL::Builder::Select> from the settings from B<$builder>.
+
+This method returns instance of L<SQL::Builder::Select>.
 
 =item my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
 

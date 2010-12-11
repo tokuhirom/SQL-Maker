@@ -9,6 +9,7 @@ use Class::Accessor::Lite (
     new => 0,
     wo => [qw/distinct for_update/],
     rw => [qw/prefix/],
+    ro => [qw/quote_char name_sep/],
 );
 
 sub offset {
