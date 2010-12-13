@@ -101,7 +101,8 @@ sub update {
 
     my (@columns, @bind_columns);
     # make "SET" clause.
-    while (my ($col, $val) = each %$args) {
+    my @args = ref $args eq 'HASH' ? %$args : @$args;
+    while (my ($col, $val) = splice @args, 0, 2) {
         my $quoted_col = $self->_quote($col);
         if (ref($val) eq 'SCALAR') {
             # $builder->update(foo => { created_on => \"NOW()" });
@@ -109,7 +110,7 @@ sub update {
         } else {
             # normal values
             push @columns, "$quoted_col = ?";
-            push @bind_columns, $args->{$col};
+            push @bind_columns, $val;
         }
     }
 
@@ -215,6 +216,7 @@ SQL::Maker - Yet another SQL builder
 
     # UPDATE
     ($sql, @binds) = $builder->update($table, \%set, \%where);
+    ($sql, @binds) = $builder->update($table, \@set, \%where);
 
 =head1 DESCRIPTION
 
@@ -344,7 +346,11 @@ SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
 
 =item my ($sql, @binds) = $builder->update($table, \%set, \%where);
 
+=item my ($sql, @binds) = $builder->update($table, \@set, \%where);
+
 Generate UPDATE query.
+
+    my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
 
 =over 4
 

@@ -34,6 +34,11 @@ subtest 'delete' => sub {
 subtest 'update' => sub {
     my $builder = SQL::Maker->new(driver => 'sqlite');
     {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
+        is $sql, "UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)";
+        is join(',', @binds), 'john,john@example.com,3';
+    }
+    {
         my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
         is $sql, "UPDATE `foo` SET `bar` = ?, `john` = ? WHERE (`yo` = ?)";
         is join(',', @binds), 'baz,man,king';
