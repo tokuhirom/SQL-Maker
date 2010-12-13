@@ -1,4 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+0.02
+
+        - added new method 'new_select'.
+        - pod fix
+
 0.01    Sat Nov 27 11:37:12 2010
         - original version
