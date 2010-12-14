@@ -33,10 +33,10 @@ sub new {
     }
     my $driver = $args{driver};
     $args{quote_char}  ||= do{
-        if ($driver eq  'Oracle' || $driver eq 'Pg') {
-            q{"}
-        } else {
+        if ($driver eq  'mysql') {
             q{`}
+        } else {
+            q{"}
         }
     };
     $args{name_sep}    ||= '.';
