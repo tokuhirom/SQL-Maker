@@ -114,6 +114,8 @@ sub _quote {
 sub as_sql {
     my $self = shift;
     my $sql = '';
+    my $new_line = $self->new_line;
+    
     if (@{ $self->{select} }) {
         $sql .= $self->{prefix};
         $sql .= 'DISTINCT ' if $self->{distinct};
@@ -126,7 +128,7 @@ sub as_sql {
             } else {
                 $self->_quote($_) . ' AS ' .  $self->_quote($alias)
             }
-        } @{ $self->{select} }) . $self->new_line;
+        } @{ $self->{select} }) . $new_line;
     }
 
     $sql .= 'FROM ';
@@ -157,7 +159,7 @@ sub as_sql {
              @{ $self->{from} };
     }
 
-    $sql .= $self->new_line;
+    $sql .= $new_line;
     $sql .= $self->as_sql_where()   if $self->{where};
 
     $sql .= $self->as_sql_group_by  if $self->{group_by};
@@ -167,6 +169,7 @@ sub as_sql {
     $sql .= $self->as_sql_limit     if $self->{limit};
 
     $sql .= $self->as_sql_for_update;
+    $sql =~ s/${new_line}+$//;
 
     return $sql;
 }
@@ -246,7 +249,7 @@ sub as_sql_where {
 sub as_sql_having {
     my $self = shift;
     if ($self->{having}) {
-        'HAVING ' . $self->{having}->as_sql . "\n";
+        'HAVING ' . $self->{having}->as_sql . $self->new_line;
     } else {
         ''
     }
@@ -374,7 +377,7 @@ Add new where clause.
                                    ->add_where('name' => 'john')
                                    ->add_where('type' => {IN => [qw/1 2 3/]})
                                    ->as_sql();
-    # => "SELECT c FROM foo WHERE (name = ?) AND (type IN (?,?,?))"
+    # => "SELECT c FROM foo WHERE (name = ?) AND (type IN (?, ?, ?))"
 
 =item $stmt->set_where($condition)
 
@@ -391,7 +394,7 @@ $condition should be instance of L<SQL::Maker::Condition>.
                                    ->add_from('foo')
                                    ->set_where($cond1 & $cond2)
                                    ->as_sql();
-    # => "SELECT c FROM foo WHERE ((name = ?)) AND ((type IN (?,?,?)))"
+    # => "SELECT c FROM foo WHERE ((name = ?)) AND ((type IN (?, ?, ?)))"
 
 =item $stmt->add_order_by('foo');
 

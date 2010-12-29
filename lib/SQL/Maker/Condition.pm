@@ -64,7 +64,7 @@ sub _make_term {
                 }
             } else {
                 # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
-                my $term = $self->_quote($col) . " $op (" . join( ',', ('?') x scalar @$v ) . ')';
+                my $term = $self->_quote($col) . " $op (" . join( ', ', ('?') x scalar @$v ) . ')';
                 return ($term, $v);
             }
         }
@@ -190,11 +190,11 @@ Here is a cheat sheet for conditions.
     OUT BIND:  ('bar','baz')
 
     IN:        ['foo',{'IN' => ['bar','baz']}]
-    OUT QUERY: '`foo` IN (?,?)'
+    OUT QUERY: '`foo` IN (?, ?)'
     OUT BIND:  ('bar','baz')
 
     IN:        ['foo',{'not IN' => ['bar','baz']}]
-    OUT QUERY: '`foo` NOT IN (?,?)'
+    OUT QUERY: '`foo` NOT IN (?, ?)'
     OUT BIND:  ('bar','baz')
 
     IN:        ['foo',{'!=' => 'bar'}]

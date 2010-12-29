@@ -22,10 +22,10 @@ sub insert_multi {
         }
     }
 
-    my $sql = "INSERT INTO $table\n";
-       $sql .= '(' . join(', ', @cols) . ')' . "\nVALUES ";
+    my $sql = "INSERT INTO $table" . $self->new_line;
+       $sql .= '(' . join(', ', @cols) . ')' . $self->new_line . "VALUES ";
 
-    my $values = '(' . join(', ', ('?') x @cols) . ')' . "\n";
+    my $values = '(' . join(', ', ('?') x @cols) . ')' . $self->new_line;
     $sql .= join(',', ($values) x (scalar(@bind) / scalar(@cols)));
 
     return ($sql, @bind);
