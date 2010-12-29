@@ -1,5 +1,11 @@
 Revision history for Perl extension SQL::Maker
 
+0.03
+
+    - 60ded52 (HEAD, zigorou/master, origin/master, master) remove last new_line on as_sql(), add tests for different new args(zigorou++)
+    - 1d54a09 add new_line opts to SQL::Maker, SQL::Maker::Select(zigorou++)
+    - 0b84cd7 change the quote_char detection logic. see http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
+
 0.02
 
         - added new method 'new_select'.
