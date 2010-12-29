@@ -4,7 +4,7 @@ use warnings;
 use 5.008001;
 our $VERSION = '0.02';
 use Class::Accessor::Lite 0.05 (
-    ro => [qw/quote_char name_sep driver select_class/],
+    ro => [qw/quote_char name_sep new_line driver select_class/],
 );
 
 use Carp ();
@@ -32,14 +32,17 @@ sub new {
         Carp::croak("'driver' or 'dbh' is required for creating new instance of $class");
     }
     my $driver = $args{driver};
-    $args{quote_char}  ||= do{
-        if ($driver eq  'mysql') {
-            q{`}
-        } else {
-            q{"}
-        }
-    };
-    $args{name_sep}    ||= '.';
+    unless ( defined $args{quote_char} ) {
+	$args{quote_char} = do{
+	    if ($driver eq  'mysql') {
+		q{`}
+	    } else {
+		q{"}
+	    }
+	};
+    }
+    $args{name_sep}   ||= '.';
+    $args{new_line}   ||= "\n";
     $args{select_class} = $driver eq 'Oracle' ? 'SQL::Maker::Select::Oracle' : 'SQL::Maker::Select';
     bless {%args}, $class;
 }
@@ -50,6 +53,7 @@ sub new_select {
     return $self->select_class->new(
         name_sep   => $self->name_sep,
         quote_char => $self->quote_char,
+	new_line   => $self->new_line,
         @args,
     );
 }
@@ -74,9 +78,9 @@ sub insert {
         }
     }
 
-    my $sql  = "$prefix INTO $quoted_table\n";
-       $sql .= '(' . join(', ', @quoted_columns) .')' . "\n" .
-               'VALUES (' . join(', ', @columns) . ')' . "\n";
+    my $sql  = "$prefix INTO $quoted_table" . $self->new_line;
+       $sql .= '(' . join(', ', @quoted_columns) .')' . $self->new_line .
+               'VALUES (' . join(', ', @columns) . ')';
 
     return ($sql, @bind_columns);
 }
