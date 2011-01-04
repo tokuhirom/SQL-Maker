@@ -396,6 +396,8 @@ SQL::Maker supports plugin system. Write the code like following.
 
 I need more extensible one.
 
+So, this module contains L<SQL::Maker::Select>, the extensible B<SELECT> clause object.
+
 =back
 
 =head1 AUTHOR
