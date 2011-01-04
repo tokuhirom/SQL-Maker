@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+0.04
+
+    - add space each comma on using IN statement(zigorou)
+
 0.03
 
     - 60ded52 (HEAD, zigorou/master, origin/master, master) remove last new_line on as_sql(), add tests for different new args(zigorou++)
