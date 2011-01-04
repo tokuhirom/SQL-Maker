@@ -422,7 +422,7 @@ subtest 'WHERE' => sub {
 	do {
 	    my $stmt = ns( quote_char => q{`}, name_sep => q{.}, );
 	    $stmt->add_where(foo => [ 'bar', 'baz' ]);
-	    is($stmt->as_sql_where, "WHERE (`foo` IN (?,?))\n");
+	    is($stmt->as_sql_where, "WHERE (`foo` IN (?, ?))\n");
 	    is(scalar @{ $stmt->bind }, 2);
 	    is($stmt->bind->[0], 'bar');
 	    is($stmt->bind->[1], 'baz');
@@ -433,7 +433,7 @@ subtest 'WHERE' => sub {
 	    my $cond =  $stmt->new_condition();
 	    $cond->add(foo => [ 'bar', 'baz' ]);
 	    $stmt->set_where($cond);
-	    is($stmt->as_sql_where, "WHERE (`foo` IN (?,?))\n");
+	    is($stmt->as_sql_where, "WHERE (`foo` IN (?, ?))\n");
 	    is(scalar @{ $stmt->bind }, 2);
 	    is($stmt->bind->[0], 'bar');
 	    is($stmt->bind->[1], 'baz');
@@ -452,7 +452,7 @@ subtest 'WHERE' => sub {
 	do {
 	    my $stmt = ns( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
 	    $stmt->add_where(foo => [ 'bar', 'baz' ]);
-	    is($stmt->as_sql_where, "WHERE (foo IN (?,?)) ");
+	    is($stmt->as_sql_where, "WHERE (foo IN (?, ?)) ");
 	    is(scalar @{ $stmt->bind }, 2);
 	    is($stmt->bind->[0], 'bar');
 	    is($stmt->bind->[1], 'baz');
@@ -463,7 +463,7 @@ subtest 'WHERE' => sub {
 	    my $cond =  $stmt->new_condition();
 	    $cond->add(foo => [ 'bar', 'baz' ]);
 	    $stmt->set_where($cond);
-	    is($stmt->as_sql_where, "WHERE (foo IN (?,?)) ");
+	    is($stmt->as_sql_where, "WHERE (foo IN (?, ?)) ");
 	    is(scalar @{ $stmt->bind }, 2);
 	    is($stmt->bind->[0], 'bar');
 	    is($stmt->bind->[1], 'baz');

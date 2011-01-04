@@ -256,6 +256,12 @@ This is the character that separates a table and column name.
 
 Default: '.'
 
+=item new_line: Str
+
+This is the character that separates a part of statements.
+
+Default: '\n'
+
 =back
 
 =item my $select = $builder->new_select();
