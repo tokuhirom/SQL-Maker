@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+0.05
+
+    - doc fix(lestrrat)
+
 0.04
 
     - add space each comma on using IN statement(zigorou)
