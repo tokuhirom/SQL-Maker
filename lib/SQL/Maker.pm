@@ -29,7 +29,7 @@ sub new {
     my $class = shift;
     my %args = @_ == 1 ? %{$_[0]} : @_;
     unless ($args{driver}) {
-        Carp::croak("'driver' or 'dbh' is required for creating new instance of $class");
+        Carp::croak("'driver' is required for creating new instance of $class");
     }
     my $driver = $args{driver};
     unless ( defined $args{quote_char} ) {
@@ -207,7 +207,9 @@ SQL::Maker - Yet another SQL builder
 
     use SQL::Maker;
 
-    my $builder = SQL::Maker->new();
+    my $builder = SQL::Maker->new(
+        driver => 'SQLite', # or your favorite driver
+    );
 
     # SELECT
     ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
