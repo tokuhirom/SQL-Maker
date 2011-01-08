@@ -48,13 +48,14 @@ sub new {
 }
 
 sub new_select {
-    my ($self, @args) = @_;
+    my $self = shift;
+    my %args = @_==1 ? %{$_[0]} : @_;
 
     return $self->select_class->new(
         name_sep   => $self->name_sep,
         quote_char => $self->quote_char,
-	new_line   => $self->new_line,
-        @args,
+        new_line   => $self->new_line,
+        %args,
     );
 }
 
@@ -197,7 +198,7 @@ __END__
 =encoding utf8
 
 =for test_synopsis
-my ($table, @fields, %where, %opt, %values, %set, $sql, @binds);
+my ($table, @fields, %where, %opt, %values, %set, $sql, @binds, @set);
 
 =head1 NAME
 
@@ -266,7 +267,7 @@ Default: '\n'
 
 =back
 
-=item my $select = $builder->new_select();
+=item my $select = $builder->new_select(%args|\%args);
 
 Create new instance of L<SQL::Builder::Select> from the settings from B<$builder>.
 
