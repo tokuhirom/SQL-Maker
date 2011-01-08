@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+0.06
+
+    - allow hashref in new_select() method
+
 0.05
 
     - doc fix(lestrrat)
