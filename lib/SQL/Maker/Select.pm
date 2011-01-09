@@ -11,6 +11,7 @@ use Class::Accessor::Lite (
     rw => [qw/prefix/],
     ro => [qw/quote_char name_sep new_line/],
 );
+use Scalar::Util qw(blessed);
 
 sub offset {
     if (@_==1) {
@@ -63,6 +64,7 @@ sub new_condition {
 sub bind {
     my $self = shift;
     my @bind;
+    push @bind, map { $_->bind } @{$self->{subqueries}} if $self->{subqueries};
     push @bind, $self->{where}->bind  if $self->{where};
     push @bind, $self->{having}->bind if $self->{having};
     return wantarray ? @bind : \@bind;
@@ -80,7 +82,13 @@ sub add_select {
 
 sub add_from {
     my ($self, $table, $alias) = @_;
-    push @{$self->{from}}, [$table, $alias];
+    if ( blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
+        push @{ $self->{subqueries} }, $table;
+        push @{$self->{from}}, [ \do{ '(' . $table->as_sql . ')' }, $alias ];
+    }
+    else {
+        push @{$self->{from}}, [$table, $alias];
+    }
     return $self;
 }
 
