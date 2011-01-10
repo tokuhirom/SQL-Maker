@@ -318,6 +318,17 @@ This option makes 'LIMIT $n' clause.
 
 This option makes 'OFFSET $n' clause.
 
+=item $opt->{order_by}
+
+This option makes B<ORDER BY> clause
+
+You can write it as following forms:
+
+    $builder->select(..., order_by => 'foo DESC, bar ASC');
+    $builder->select(..., order_by => ['foo DESC', 'bar ASC']);
+    $builder->select(..., order_by => {foo => 'DESC'});
+    $builder->select(..., order_by => [{foo => 'DESC'}, {bar => 'ASC'}]);
+
 =item $opt->{having}
 
 This option makes HAVING clause
