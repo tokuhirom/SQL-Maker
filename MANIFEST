@@ -30,6 +30,7 @@ t/06_pod_select.t
 t/06_sql_type.t
 t/07_sql_type.t
 t/08_oracle.t
+t/10_subquery.t
 t/plugins/01_insert_multi.t
 util/popopod.psgi
 xt/01_podspell.t

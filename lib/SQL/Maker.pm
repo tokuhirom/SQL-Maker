@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line driver select_class/],
 );
@@ -273,7 +273,7 @@ Create new instance of L<SQL::Builder::Select> from the settings from B<$builder
 
 This method returns instance of L<SQL::Builder::Select>.
 
-=item my ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
+=item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where, \%opt);
 
 This method returns SQL string and bind variables for SELECT statement.
 
@@ -281,7 +281,9 @@ This method returns SQL string and bind variables for SELECT statement.
 
 =item $table
 
-Table name in scalar.
+=item \@tables
+
+Table name for B<FROM> clause in scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for subquery.
 
 =item \@fields
 

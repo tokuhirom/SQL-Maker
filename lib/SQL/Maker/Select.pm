@@ -11,7 +11,7 @@ use Class::Accessor::Lite (
     rw => [qw/prefix/],
     ro => [qw/quote_char name_sep new_line/],
 );
-use Scalar::Util qw(blessed);
+use Scalar::Util ();
 
 sub offset {
     if (@_==1) {
@@ -82,7 +82,7 @@ sub add_select {
 
 sub add_from {
     my ($self, $table, $alias) = @_;
-    if ( blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
+    if ( Scalar::Util::blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
         push @{ $self->{subqueries} }, $table->bind;
         push @{$self->{from}}, [ \do{ '(' . $table->as_sql . ')' }, $alias ];
     }
@@ -332,9 +332,11 @@ Get bind variables.
 
 Add new select term. It's quote automatically.
 
-=item $stmt->add_from('user');
+=item $stmt->add_from($table :Str | $select :SQL::Maker::Select) : SQL::Maker::Select
 
-Add new from term.
+Add new from clause. You can specify the table name or instance of L<SQL::Maker::Select> for subquery.
+
+I<Return:> $stmt itself.
 
 =item $stmt->add_join(user => {type => 'inner', table => 'config', condition => 'user.user_id = config.user_id'});
 
