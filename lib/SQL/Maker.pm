@@ -33,13 +33,13 @@ sub new {
     }
     my $driver = $args{driver};
     unless ( defined $args{quote_char} ) {
-	$args{quote_char} = do{
-	    if ($driver eq  'mysql') {
-		q{`}
-	    } else {
-		q{"}
-	    }
-	};
+    $args{quote_char} = do{
+        if ($driver eq  'mysql') {
+        q{`}
+        } else {
+        q{"}
+        }
+    };
     }
     $args{name_sep}   ||= '.';
     $args{new_line}   ||= "\n";
