@@ -1,5 +1,10 @@
 Revision history for Perl extension SQL::Maker
 
+0.08
+
+    - doc enhancements(tokuhirom)
+    - support $builder->select(order_by => {foo => 'DESC'}) form for skinny
+
 0.07
 
     - allow subquery in from clause(makamaka)
