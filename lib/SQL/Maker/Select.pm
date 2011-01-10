@@ -299,6 +299,35 @@ sub _add_index_hint {
     return $quoted;
 }
 
+use SQL::Maker::SelectSet;
+use overload
+    '*' => sub { $_[0]->intersect($_[1]) },
+    '+' => sub { $_[0]->union($_[1]) },
+    '-' => sub { $_[0]->except($_[1]) },
+    fallback => 1;
+
+sub intersect {
+    shift->_compose_set( 'INTERSECT', @_ );
+}
+
+sub union {
+    shift->_compose_set( 'UNION', @_ );
+}
+
+sub except {
+    shift->_compose_set( 'EXCEPT', @_ );
+}
+
+sub all {
+    my ( $self ) = @_;
+    return [ 'all', $self ];
+}
+
+sub _compose_set {
+    my ( $self, $operator, $other ) = @_;
+    return SQL::Maker::SelectSet->new_set( $operator, $self, $other );
+}
+
 1;
 __END__
 
