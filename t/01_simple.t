@@ -169,6 +169,11 @@ subtest 'select' => sub {
 		is join(',', @binds), '';
 	    };
 	    do {
+		my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => {'yo' => 'DESC'}});
+		is $sql, qq{SELECT *\nFROM "foo"\nORDER BY "yo" DESC};
+		is join(',', @binds), '';
+	    };
+	    do {
 		my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => ['yo', 'ya']});
 		is $sql, qq{SELECT *\nFROM "foo"\nORDER BY yo, ya};
 		is join(',', @binds), '';
@@ -204,17 +209,17 @@ subtest 'select' => sub {
 	    is join(',', @binds), '';
 	};
 	subtest 'order_by' => sub {
-	    do {
+	    subtest 'plain' => sub {
 		my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
 		is $sql, qq{SELECT * FROM foo ORDER BY yo};
 		is join(',', @binds), '';
 	    };
-	    do {
+	    subtest 'ArrayRef[Scalar]' => sub {
 		my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => ['yo', 'ya']});
 		is $sql, qq{SELECT * FROM foo ORDER BY yo, ya};
 		is join(',', @binds), '';
 	    };
-	    do {
+	    subtest 'ArrayRef[HashRef]' => sub {
 		my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => [{'yo' => 'DESC'}, 'ya']});
 		is $sql, qq{SELECT * FROM foo ORDER BY yo DESC, ya};
 		is join(',', @binds), '';

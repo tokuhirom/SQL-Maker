@@ -163,9 +163,9 @@ sub select_query {
     }
 
     if (my $o = $opt->{order_by}) {
-        if (ref $o) {
+        if (ref $o eq 'ARRAY') {
             for my $order (@$o) {
-                if (ref $order) {
+                if (ref $order eq 'HASH') {
                     # Skinny-ish [{foo => 'DESC'}, {bar => 'ASC'}]
                     $stmt->add_order_by(%$order);
                 } else {
@@ -173,6 +173,9 @@ sub select_query {
                     $stmt->add_order_by(\$order);
                 }
             }
+        } elsif (ref $o eq 'HASH') {
+            # Skinny-ish {foo => 'DESC'}
+            $stmt->add_order_by(%$o);
         } else {
             # just 'foo DESC, bar ASC'
             $stmt->add_order_by(\$o);
