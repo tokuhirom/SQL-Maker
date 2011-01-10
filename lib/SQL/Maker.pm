@@ -359,6 +359,10 @@ This is a values for INSERT statement.
 
 =item my ($sql, @binds) = $builder->delete($table, \%where);
 
+    my ($sql, @binds) = $builder->delete($table, \%where);
+    # => $sql: DELETE FROM `user` WHERE (`name` = ?)
+    # => \@binds => ['john']
+
 Generate DELETE query.
 
 =over 4
@@ -380,6 +384,8 @@ SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
 Generate UPDATE query.
 
     my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
+    # => $sql: 'UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)'
+    # => \@binds: ['john','john@example.com',3]
 
 =over 4
 
