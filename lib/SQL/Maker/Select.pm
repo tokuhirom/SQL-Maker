@@ -93,10 +93,16 @@ sub add_from {
 }
 
 sub add_join {
-    my ($self, $table, $joins) = @_;
+    my ($self, $table_ref, $joins) = @_;
+    my ($table, $alias) = ref($table_ref) eq 'ARRAY' ? @$table_ref : ($table_ref);
+
+    if ( Scalar::Util::blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
+        push @{ $self->{subqueries} }, $table->bind;
+        $table = \do{ '(' . $table->as_sql . ')' };
+    }
 
     push @{ $self->{joins} }, {
-        table => $table,
+        table => [ $table, $alias ],
         joins => $joins,
     };
     return $self;
@@ -146,7 +152,7 @@ sub as_sql {
         my $initial_table_written = 0;
         for my $j (@{ $self->{joins} }) {
             my ($table, $join) = map { $j->{$_} } qw( table joins );
-            $table = $self->_add_index_hint($table); ## index hint handling
+            $table = $self->_add_index_hint(@$table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
             $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $self->_quote($join->{table});
             $sql .= ' ' . $self->_quote($join->{alias}) if $join->{alias};
