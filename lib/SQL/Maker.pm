@@ -41,10 +41,13 @@ sub new {
         }
     };
     }
-    $args{name_sep}   ||= '.';
-    $args{new_line}   ||= "\n";
     $args{select_class} = $driver eq 'Oracle' ? 'SQL::Maker::Select::Oracle' : 'SQL::Maker::Select';
-    bless {%args}, $class;
+
+    return bless {
+        name_sep => '.',
+        new_line => "\n",
+        %args
+    }, $class;
 }
 
 sub new_select {
