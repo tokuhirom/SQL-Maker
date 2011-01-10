@@ -43,14 +43,14 @@ sub add_set_operator {
 
 sub as_sql {
     my ( $self ) = @_;
-    my @operators = ( @{ $self->{ operators } }, '-' ); # - ... stopper
+    my @operators = @{ $self->{ operators } };
     my $sql = '';
     my $new_line = $self->new_line;
 
     for my $select ( @{ $self->{ selects } } ) {
-        my $operator = shift @operators || die "operator mismatch";
+        my $operator = shift @operators;
         $sql .= $select->as_sql;
-        last if $operator eq '-';
+        last unless $operator;
         $sql .= $select->new_line . $operator . $select->new_line;
     }
 
