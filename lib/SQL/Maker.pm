@@ -152,6 +152,10 @@ sub select {
 sub select_query {
     my ($self, $table, $fields, $where, $opt) = @_;
 
+    unless (ref $fields eq 'ARRAY') {
+        Carp::croak("SQL::Maker::select_query: \$fields should be ArrayRef[Str]");
+    }
+
     my $stmt = $self->new_select(
         select     => $fields,
     );
@@ -281,6 +285,11 @@ This method returns instance of L<SQL::Builder::Select>.
 
 =item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where, \%opt);
 
+    my ($sql, @binds) = $builder->select('user', ['*'], {name => 'john'}, {order_by => 'user_id DESC'});
+    # =>
+    #   SELECT * FROM `user` WHERE (`name` = ?) ORDER BY user_id DESC
+    #   ['john']
+
 This method returns SQL string and bind variables for SELECT statement.
 
 =over 4
@@ -346,6 +355,11 @@ This option makes 'FOR UPDATE" clause.
 
 =item my ($sql, @binds) = $builder->insert($table, \%values);
 
+    my ($sql, @binds) = $builder->insert(user => {name => 'john'});
+    # =>
+    #    INSERT INTO `user` (`name`) VALUES (?)
+    #    ['john']
+
 Generate INSERT query.
 
 =over 4
@@ -363,8 +377,9 @@ This is a values for INSERT statement.
 =item my ($sql, @binds) = $builder->delete($table, \%where);
 
     my ($sql, @binds) = $builder->delete($table, \%where);
-    # => $sql: DELETE FROM `user` WHERE (`name` = ?)
-    # => \@binds => ['john']
+    # =>
+    #    DELETE FROM `user` WHERE (`name` = ?)
+    #    ['john']
 
 Generate DELETE query.
 
@@ -387,8 +402,9 @@ SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
 Generate UPDATE query.
 
     my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
-    # => $sql: 'UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)'
-    # => \@binds: ['john','john@example.com',3]
+    # =>
+    #    'UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)'
+    #    ['john','john@example.com',3]
 
 =over 4
 
