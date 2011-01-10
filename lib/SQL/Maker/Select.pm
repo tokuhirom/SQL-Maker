@@ -64,7 +64,7 @@ sub new_condition {
 sub bind {
     my $self = shift;
     my @bind;
-    push @bind, map { $_->bind } @{$self->{subqueries}} if $self->{subqueries};
+    push @bind, @{$self->{subqueries}} if $self->{subqueries};
     push @bind, $self->{where}->bind  if $self->{where};
     push @bind, $self->{having}->bind if $self->{having};
     return wantarray ? @bind : \@bind;
@@ -83,7 +83,7 @@ sub add_select {
 sub add_from {
     my ($self, $table, $alias) = @_;
     if ( blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
-        push @{ $self->{subqueries} }, $table;
+        push @{ $self->{subqueries} }, $table->bind;
         push @{$self->{from}}, [ \do{ '(' . $table->as_sql . ')' }, $alias ];
     }
     else {

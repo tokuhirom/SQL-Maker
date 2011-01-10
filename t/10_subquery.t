@@ -33,6 +33,17 @@ subtest 'select_subquery' => sub {
             is $stmt3->as_sql, qq{SELECT "baz"\nFROM (SELECT "foo", "bar"\nFROM (SELECT "hoge", "fuga"\nFROM "sakura"\nWHERE ("fuga" = ?) AND ("zun" = ?)) "stmt1"\nWHERE ("bar" = ?) AND ("john" = ?)) "stmt2"\nWHERE ("baz" = ?)\nORDER BY yo};
             is join(',', $stmt3->bind), 'piyo,doko,baz,man,bar';
         };
+
+        do {
+            my $stmt = $builder->new_select;
+            $stmt->add_select( 'id' );
+            $stmt->add_where( 'foo'=>'bar' );
+            $stmt->add_from( $stmt, 'itself' );
+
+            is( $stmt->as_sql, qq{SELECT "id"\nFROM (SELECT "id"\nFROM \nWHERE ("foo" = ?)) "itself"\nWHERE ("foo" = ?)} );
+            is join(',', $stmt->bind), 'bar,bar';
+        };
+
     };
 
 
