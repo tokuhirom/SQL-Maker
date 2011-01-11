@@ -85,3 +85,48 @@ sub bind {
 1;
 __END__
 
+=head1 NAME
+
+SQL::Maker::SelectSet - SQL::Maker::Select set
+
+=head1 SYNOPSIS
+
+    my $s1 = SQL::Maker::Select ->new()
+                                ->add_select('foo')
+                                ->add_from('t1');
+    my $s2 = SQL::Maker::Select ->new()
+                                ->add_select('bar')
+                                ->add_from('t2');
+
+    SQL::Maker::SelectSet->new_set( 'UNION', $s1, $s2 )->as_sql;
+    # => "SELECT foo FROM t1 UNION SELECT bar FROM t2"
+    # => $s1->union( $s2 )->as_sql;
+    # => do{ $s1 + $s2 }->as_sql;
+
+    SQL::Maker::SelectSet->new_set( 'EXCEPT', $s1, $s2->all )->as_sql;
+    # => "SELECT foo FROM t1 EXCEPT ALL SELECT bar FROM t2"
+    # => $s1->except( all $s2 )->as_sql;
+    # => do{ $s1 - all $s2 }->as_sql;
+
+=head1 DESCRIPTION
+
+Set representation inherited from L<SQL::Maker::Select>.
+
+=head1 METHODS
+
+Can call SQL::Maker::Select methods except of C<add_from> and C<add_join>.
+
+=over4
+
+=item SQL::Maker::SelectSet->new_set( $operator, $one, $another)
+
+$opretaor is a set opretaor.
+$one and $another are SQL::Maker::Select object or SQL::Maker::SelectSet object.
+It returns a SQL::Maker::SelectSet object.
+
+=back
+
+=head1 SEE ALSO
+
+L<SQL::Maker::Select>
+
