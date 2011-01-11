@@ -13,30 +13,30 @@ sub new_set {
         $operator .= ' ALL';
     }
 
-    $set->_expand_select( $s1 );
+    $set->_expand_statement( $s1 );
     $set->add_set_operator( $operator );
-    $set->_expand_select( $s2 );
+    $set->_expand_statement( $s2 );
 
     return $set;
 }
 
-sub _expand_select {
+sub _expand_statement {
     my ( $self, $s ) = @_;
     if ( $s->isa('SQL::Maker::SelectSet') ) {
-        for my $select ( @{ $s->{ selects } } ) {
-            $self->add_select( $select );
+        for my $statement ( @{ $s->{ statements } } ) {
+            $self->add_statement( $statement );
             my $op = shift @{ $s->{ operators } };
             $self->add_set_operator( $op ) if $op;
         }
     }
     else {
-        $self->add_select( $s );
+        $self->add_statement( $s );
     }
 }
 
-sub add_select {
-    my ( $self, $select ) = @_;
-    push @{ $self->{ selects } }, $select;
+sub add_statement {
+    my ( $self, $statement ) = @_;
+    push @{ $self->{ statements } }, $statement;
 }
 
 sub add_set_operator {
@@ -50,11 +50,11 @@ sub as_sql {
     my $sql = '';
     my $new_line = $self->new_line;
 
-    for my $select ( @{ $self->{ selects } } ) {
+    for my $statement ( @{ $self->{ statements } } ) {
         my $operator = shift @operators;
-        $sql .= $select->as_sql;
+        $sql .= $statement->as_sql;
         last unless $operator;
-        $sql .= $select->new_line . $operator . $select->new_line;
+        $sql .= $new_line . $operator . $new_line;
     }
 
     $sql .= $new_line;
@@ -114,7 +114,7 @@ Set representation inherited from L<SQL::Maker::Select>.
 
 =head1 METHODS
 
-Can call SQL::Maker::Select methods except of C<add_from> and C<add_join>.
+Can call SQL::Maker::Select methods except of C<add_select>, C<add_from> and C<add_join>.
 
 =over4
 
