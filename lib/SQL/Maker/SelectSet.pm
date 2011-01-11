@@ -13,22 +13,25 @@ sub new_set {
         $operator .= ' ALL';
     }
 
-    for my $s ( $s1, $s2 ) {
-        if ( $s->isa('SQL::Maker::SelectSet') ) {
-            for my $select ( @{ $s->{ selects } } ) {
-                $set->add_select( $select );
-                my $op = shift @{ $s->{ operators } };
-                $set->add_set_operator( $op ) if $op;
-            }
-        }
-        else {
-            $set->add_select( $s );
-        }
-    }
-
+    $set->_expand_select( $s1 );
     $set->add_set_operator( $operator );
+    $set->_expand_select( $s2 );
 
     return $set;
+}
+
+sub _expand_select {
+    my ( $self, $s ) = @_;
+    if ( $s->isa('SQL::Maker::SelectSet') ) {
+        for my $select ( @{ $s->{ selects } } ) {
+            $self->add_select( $select );
+            my $op = shift @{ $s->{ operators } };
+            $self->add_set_operator( $op ) if $op;
+        }
+    }
+    else {
+        $self->add_select( $s );
+    }
 }
 
 sub add_select {
