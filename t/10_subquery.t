@@ -45,9 +45,49 @@ subtest 'select_subquery' => sub {
         };
 
     };
+};
 
+subtest 'subquery_and_join' => sub {
+    my $subquery = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $subquery->add_select('*');
+    $subquery->add_from( 'foo' );
+    $subquery->add_where( 'hoge' => 'fuga' );
 
+    my $stmt = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $stmt->add_join(
+        [ $subquery, 'bar' ] => {
+            type      => 'inner',
+            table     => 'baz',
+            alias     => 'b1',
+            condition => 'bar.baz_id = b1.baz_id'
+        },
+    );
+    is $stmt->as_sql, "FROM (SELECT * FROM foo WHERE (hoge = ?)) bar INNER JOIN baz b1 ON bar.baz_id = b1.baz_id";
+    is join(',', $stmt->bind), 'fuga';
+};
 
+subtest 'complex' => sub {
+    my $s1 = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $s1->add_select('*');
+    $s1->add_from( 'foo' );
+    $s1->add_where( 'hoge' => 'fuga' );
+
+    my $s2 = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $s2->add_select('*');
+    $s2->add_from( $s1, 'f' );
+    $s2->add_where( 'piyo' => 'puyo' );
+
+    my $stmt = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $stmt->add_join(
+        [ $s2, 'bar' ] => {
+            type      => 'inner',
+            table     => 'baz',
+            alias     => 'b1',
+            condition => 'bar.baz_id = b1.baz_id'
+        },
+    );
+    is $stmt->as_sql, "FROM (SELECT * FROM (SELECT * FROM foo WHERE (hoge = ?)) f WHERE (piyo = ?)) bar INNER JOIN baz b1 ON bar.baz_id = b1.baz_id";
+    is join(',', $stmt->bind), 'fuga,puyo';
 };
 
 done_testing;

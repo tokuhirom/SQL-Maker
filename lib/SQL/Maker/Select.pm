@@ -93,10 +93,16 @@ sub add_from {
 }
 
 sub add_join {
-    my ($self, $table, $joins) = @_;
+    my ($self, $table_ref, $joins) = @_;
+    my ($table, $alias) = ref($table_ref) eq 'ARRAY' ? @$table_ref : ($table_ref);
+
+    if ( Scalar::Util::blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
+        push @{ $self->{subqueries} }, $table->bind;
+        $table = \do{ '(' . $table->as_sql . ')' };
+    }
 
     push @{ $self->{joins} }, {
-        table => $table,
+        table => [ $table, $alias ],
         joins => $joins,
     };
     return $self;
@@ -146,7 +152,7 @@ sub as_sql {
         my $initial_table_written = 0;
         for my $j (@{ $self->{joins} }) {
             my ($table, $join) = map { $j->{$_} } qw( table joins );
-            $table = $self->_add_index_hint($table); ## index hint handling
+            $table = $self->_add_index_hint(@$table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
             $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $self->_quote($join->{table});
             $sql .= ' ' . $self->_quote($join->{alias}) if $join->{alias};
@@ -396,6 +402,22 @@ Add new JOIN clause. If you pass arrayref for 'condition' then it uses 'USING'.
     );
     $stmt->as_sql();
     # => 'SELECT name FROM user INNER JOIN config USING (user_id)'
+
+    my $subquery = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $subquery->add_select('*');
+    $subquery->add_from( 'foo' );
+    $subquery->add_where( 'hoge' => 'fuga' );
+    my $stmt = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $stmt->add_join(
+        [ $subquery, 'bar' ] => {
+            type      => 'inner',
+            table     => 'baz',
+            alias     => 'b1',
+            condition => 'bar.baz_id = b1.baz_id'
+        },
+    );
+    $stmt->as_sql;
+    # => "FROM (SELECT * FROM foo WHERE (hoge = ?)) bar INNER JOIN baz b1 ON bar.baz_id = b1.baz_id";
 
 =item $stmt->add_index_hint(foo => {type => 'USE', list => ['index_hint']});
 
