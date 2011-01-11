@@ -403,11 +403,11 @@ Add new JOIN clause. If you pass arrayref for 'condition' then it uses 'USING'.
     $stmt->as_sql();
     # => 'SELECT name FROM user INNER JOIN config USING (user_id)'
 
-    my $subquery = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    my $subquery = SQL::Maker::Select->new();
     $subquery->add_select('*');
     $subquery->add_from( 'foo' );
     $subquery->add_where( 'hoge' => 'fuga' );
-    my $stmt = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    my $stmt = SQL::Maker::Select->new();
     $stmt->add_join(
         [ $subquery, 'bar' ] => {
             type      => 'inner',
@@ -499,6 +499,49 @@ Add having clause
                                    ->add_having(cnt => 2)
                                    ->as_sql();
     # => "SELECT COUNT(*) AS cnt FROM foo HAVING (COUNT(*) = ?)"
+
+
+=item $stmt->union($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+
+=item $stmt->intersect($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+
+=item $stmt->except($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+
+Set fuction - UNION, INTERSECT and EXCEPT.
+with C<all> method, operators are followed by C<ALL>.
+
+    my $s1 = SQL::Maker::Select->new()
+                               ->add_from( 'table1' )
+                               ->add_select( 'id' );
+    my $s2 = SQL::Maker::Select ->new()
+                               ->add_from( 'table2' )
+                               ->add_select( 'id' );
+    $s1->union( $s2 )->as_sql;
+    # => "SELECT id FROM table1 UNION SELECT id FROM table2"
+    $s1->union( all $s2 )->as_sql;
+    # => "SELECT id FROM table1 UNION ALL SELECT id FROM table2"
+    do{ $s1 + $s2 }->as_sql;
+    # => "SELECT id FROM table1 UNION SELECT id FROM table2"
+    do{ $s1 + all $s2 }->as_sql;
+    # => "SELECT id FROM table1 UNION ALL SELECT id FROM table2"
+    $s1->intersect( $s2 )->as_sql;
+    # => "SELECT id FROM table1 INTERSECT SELECT id FROM table2"
+    $s1->intersect( all $s2 )->as_sql;
+    # => "SELECT id FROM table1 INTERSECT ALL SELECT id FROM table2"
+    do{ $s1 * $s2 }->as_sql;
+    # => "SELECT id FROM table1 INTERSECT SELECT id FROM table2"
+    do{ $s1 * all $s2 }->as_sql;
+    # => "SELECT id FROM table1 INTERSECT ALL SELECT id FROM table2"
+    $s1->except( $s2 )->as_sql;
+    # => "SELECT id FROM table1 EXCEPT SELECT id FROM table2"
+    $s1->except( all $s2 )->as_sql;
+    # => "SELECT id FROM table1 EXCEPT ALL SELECT id FROM table2"
+    do{ $s1 - $s2 }->as_sql;
+    # => "SELECT id FROM table1 EXCEPT SELECT id FROM table2"
+    do{ $s1 - all $s2 }->as_sql;
+    # => "SELECT id FROM table1 EXCEPT ALL SELECT id FROM table2"
+
+See to L<SQL::Maker::SelectSet>.
 
 =back
 
