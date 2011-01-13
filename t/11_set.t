@@ -4,137 +4,136 @@ use Test::More;
 use SQL::Maker;
 use Test::Requires 'Tie::IxHash';
 
-
-subtest 'basic' => sub {
-
-my $builder = SQL::Maker->new(driver => 'sqlite');
-
-my $s1 = $builder->new_select();
-$s1->add_from( 'table1' );
-$s1->add_select( 'id' );
-$s1->add_where( foo => 100 );
-
-my $s2 = $builder->new_select();
-$s2->add_from( 'table2' );
-$s2->add_select( 'id' );
-$s2->add_where( bar => 200 );
-
-my $s3 = $builder->new_select();
-$s3->add_from( 'table3' );
-$s3->add_select( 'id' );
-$s3->add_where( baz => 300 );
-
-subtest 'union' => sub {
-    my $set = $s1 + $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set = $set + $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nUNION\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = $s1 + $s2;
-    $set = $s3 + $set;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)\nUNION\nSELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '300, 100, 200';
-
-    $set = $s1 + all $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set->add_order_by( 'id' );
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nORDER BY id};
-    is join(', ', $set->bind), '100, 200';
-
-    $set = $s3 + $s1 + $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)\nUNION\nSELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '300, 100, 200';
-
-    my $set1 = $s1 + $s2;
-    my $set2 = $s2 + $s3;
-    $set = $set1 + $set2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nUNION\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 200, 300';
-};
-
-subtest 'intersect' => sub {
-    my $set = $s1 * $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nINTERSECT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set = $set * $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nINTERSECT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nINTERSECT\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = $s1 * $s2;
-    $set = $s3 * $set;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)\nINTERSECT\nSELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nINTERSECT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '300, 100, 200';
-
-    $set = $s1 * all $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nINTERSECT ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set->add_order_by( 'id' );
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nINTERSECT ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nORDER BY id};
-    is join(', ', $set->bind), '100, 200';
-};
-
-subtest 'except' => sub {
-    my $set = $s1 - $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set = $set - $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nEXCEPT\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = $s1 - $s2;
-    $set = $s3 - $set;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)\nEXCEPT\nSELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '300, 100, 200';
-
-    $set = $s1 - all $s2;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set->add_order_by( 'id' );
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nORDER BY id};
-    is join(', ', $set->bind), '100, 200';
-};
-
-subtest 'multiple' => sub {
-    my $set = ($s1 - $s2) * $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nINTERSECT\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = ($s1 - $s2) * all $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nINTERSECT ALL\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = $s1 - $s2 + $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nUNION\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = $s1 - all $s2 + $s3;
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nEXCEPT ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nUNION\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-
-    $set = $s1->union( $s2 );
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)};
-    is join(', ', $set->bind), '100, 200';
-
-    $set = $s1->union( all $s2 )->intersect( $s3 );
-    is $set->as_sql, qq{SELECT "id"\nFROM "table1"\nWHERE ("foo" = ?)\nUNION ALL\nSELECT "id"\nFROM "table2"\nWHERE ("bar" = ?)\nINTERSECT\nSELECT "id"\nFROM "table3"\nWHERE ("baz" = ?)};
-    is join(', ', $set->bind), '100, 200, 300';
-};
-
-};
-
+use SQL::Maker::SelectSet qw(union union_all intersect intersect_all except except_all);
 
 sub ns {
     SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
 }
+
+subtest 'basic' => sub {
+
+my $s1 = ns()
+    ->add_from( 'table1' )
+    ->add_select( 'id' )
+    ->add_where( foo => 100 );
+
+my $s2 = ns()
+    ->add_from( 'table2' )
+    ->add_select( 'id' )
+    ->add_where( bar => 200 );
+
+my $s3 = ns()
+    ->add_from( 'table3' )
+    ->add_select( 'id' )
+    ->add_where( baz => 300 );
+
+
+subtest 'error' => sub {
+    eval { union( 1, 2 ) };
+    ok( $@ );
+
+    eval { SQL::Maker::SelectSet->union( $s1, $s2 ) };
+    ok( $@ );;
+
+    eval { SQL::Maker::SelectSet->union( $s1 ) };
+    ok( $@ );
+};
+
+subtest 'union' => sub {
+    my $set = union( $s1, $s2 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '100, 200';
+
+    $set = union( $set, $s3 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION SELECT id FROM table2 WHERE (bar = ?) UNION SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+
+    $set = union( $s3, union( $s1, $s2 ) );
+    is $set->as_sql, qq{SELECT id FROM table3 WHERE (baz = ?) UNION SELECT id FROM table1 WHERE (foo = ?) UNION SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '300, 100, 200';
+
+    $set = union_all( $s1, $s2 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION ALL SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '100, 200';
+
+    $set->add_order_by( 'id' );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
+    is join(', ', $set->bind), '100, 200';
+
+    $set = union( union( $s3, $s1 ), $s2 );
+    is $set->as_sql, qq{SELECT id FROM table3 WHERE (baz = ?) UNION SELECT id FROM table1 WHERE (foo = ?) UNION SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '300, 100, 200';
+
+    $set = union( union( $s1, $s2 ), union( $s2, $s3) );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION SELECT id FROM table2 WHERE (bar = ?) UNION SELECT id FROM table2 WHERE (bar = ?) UNION SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 200, 300';
+};
+
+subtest 'intersect' => sub {
+    my $set = intersect( $s1, $s2 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '100, 200';
+
+    $set = intersect( $set, $s3);
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT SELECT id FROM table2 WHERE (bar = ?) INTERSECT SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+
+    $set = intersect( $s3, intersect( $s1, $s2 ) );
+    is $set->as_sql, qq{SELECT id FROM table3 WHERE (baz = ?) INTERSECT SELECT id FROM table1 WHERE (foo = ?) INTERSECT SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '300, 100, 200';
+
+    $set = intersect_all( $s1, $s2 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT ALL SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '100, 200';
+
+    $set->add_order_by( 'id' );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
+    is join(', ', $set->bind), '100, 200';
+};
+
+subtest 'except' => sub {
+    my $set = except( $s1, $s2 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '100, 200';
+
+    $set = except( $set, $s3 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT SELECT id FROM table2 WHERE (bar = ?) EXCEPT SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+
+    $set = except( $s3, except( $s1, $s2 ) );
+    is $set->as_sql, qq{SELECT id FROM table3 WHERE (baz = ?) EXCEPT SELECT id FROM table1 WHERE (foo = ?) EXCEPT SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '300, 100, 200';
+
+    $set = except_all( $s1, $s2 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT ALL SELECT id FROM table2 WHERE (bar = ?)};
+    is join(', ', $set->bind), '100, 200';
+
+    $set->add_order_by( 'id' );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
+    is join(', ', $set->bind), '100, 200';
+};
+
+subtest 'multiple' => sub {
+    my $set = intersect( except($s1, $s2), $s3 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT SELECT id FROM table2 WHERE (bar = ?) INTERSECT SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+
+    $set = intersect_all( except( $s1, $s2 ), $s3 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT SELECT id FROM table2 WHERE (bar = ?) INTERSECT ALL SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+
+    $set = union( except( $s1, $s2), $s3 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT SELECT id FROM table2 WHERE (bar = ?) UNION SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+
+    $set = union( except_all( $s1, $s2 ), $s3 );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT ALL SELECT id FROM table2 WHERE (bar = ?) UNION SELECT id FROM table3 WHERE (baz = ?)};
+    is join(', ', $set->bind), '100, 200, 300';
+};
+
+};
+
+
 
 sub check_sql {
     my @lines = split/\n/, $_[0];
@@ -222,7 +221,7 @@ SQL
                 } )
                 ->add_where( 'g2.is_deleted' => 'f' );
 
-    my $set = $s4 - $s5;
+    my $set = except( $s4, $s5 );
 
     my $s6 = ns ->add_join(
                     [$set, 'g'] => {
@@ -253,7 +252,7 @@ SQL
 
     is join(', ', $s6->bind), 'hoge, t, f, ja';
 
-    $set = $s3 + $s6;
+    $set = union( $s3, $s6 );
 
     my $s7 = ns ->add_select( 'id' )
                 ->add_select( 'is_group' )
@@ -288,7 +287,6 @@ SQL
 
     is join(', ', $s7->bind), 'f, f, ja, hoge, t, f, ja';
 };
-
 
 
 done_testing;
