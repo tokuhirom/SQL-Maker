@@ -6,7 +6,7 @@ use Scalar::Util ();
 
 our @EXPORT_OK = qw(union union_all intersect intersect_all except except_all);
 
-# Class methods
+# Functions
 
 sub union ($$) {
     SQL::Maker::SelectSet->new_set( 'UNION', @_ );
@@ -32,9 +32,9 @@ sub except_all ($$) {
     SQL::Maker::SelectSet->new_set( 'EXCEPT ALL', @_ );
 }
 
-sub _compose_set {
-    return SQL::Maker::SelectSet->new_set( @_ );
-}
+#
+# Methods
+#
 
 sub new_set {
     my ( $class, $operator, $s1, $s2 ) = @_;
@@ -54,10 +54,6 @@ sub new_set {
 
     return $set;
 }
-
-#
-# Methods
-#
 
 sub _expand_statement {
     my ( $self, $s ) = @_;
