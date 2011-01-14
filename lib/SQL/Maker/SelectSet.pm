@@ -4,6 +4,7 @@ use warnings;
 use parent qw(Exporter);
 use Scalar::Util ();
 use Carp ();
+use SQL::Maker::Util;
 use Class::Accessor::Lite (
     ro => [qw/new_line operator/],
 );
@@ -55,16 +56,42 @@ sub add_statement {
     return $self; # method chain
 }
 
+sub as_sql_order_by {
+    my ($self) = @_;
+
+    my @attrs = @{$self->{order_by}};
+    return '' unless @attrs;
+
+    return 'ORDER BY '
+           . join(', ', map {
+                my ($col, $type) = @$_;
+                if (ref $col) {
+                    $$col
+                } else {
+                    $type ? $self->_quote($col) . " $type" : $self->_quote($col)
+                }
+           } @attrs);
+}
+
+sub _quote {
+    my ($self, $label) = @_;
+
+    return $$label if ref $label eq 'SCALAR';
+    SQL::Maker::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
+}
+
 sub as_sql {
     my ($self) = @_;
 
     my $new_line = $self->new_line;
     my $operator = $self->operator;
 
-    return join(
+    my $sql = join(
         $new_line . $operator . $new_line,
         map { $_->as_sql } @{ $self->{statements} }
     );
+    $sql .= ' ' . $self->as_sql_order_by() if $self->{order_by};
+    return $sql;
 }
 
 sub bind {
@@ -76,6 +103,11 @@ sub bind {
     return @binds;
 }
 
+sub add_order_by {
+    my ($self, $col, $type) = @_;
+    push @{$self->{order_by}}, [$col, $type];
+    return $self;
+}
 
 1;
 __END__

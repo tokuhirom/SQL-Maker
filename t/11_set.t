@@ -56,12 +56,9 @@ subtest 'union' => sub {
     is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION ALL SELECT id FROM table2 WHERE (bar = ?)};
     is join(', ', $set->bind), '100, 200';
 
-    TODO: {
-        todo_skip 'foo', 2;
-        $set->add_order_by( 'id' );
-        is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
-        is join(', ', $set->bind), '100, 200';
-    };
+    $set->add_order_by( 'id' );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) UNION ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
+    is join(', ', $set->bind), '100, 200';
 
     $set = union( union( $s3, $s1 ), $s2 );
     is $set->as_sql, qq{SELECT id FROM table3 WHERE (baz = ?) UNION SELECT id FROM table1 WHERE (foo = ?) UNION SELECT id FROM table2 WHERE (bar = ?)};
@@ -89,12 +86,9 @@ subtest 'intersect' => sub {
     is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT ALL SELECT id FROM table2 WHERE (bar = ?)};
     is join(', ', $set->bind), '100, 200';
 
-    TODO: {
-        todo_skip foo => 2;
-        $set->add_order_by( 'id' );
-        is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
-        is join(', ', $set->bind), '100, 200';
-    };
+    $set->add_order_by( 'id' );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) INTERSECT ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
+    is join(', ', $set->bind), '100, 200';
 };
 
 subtest 'except' => sub {
@@ -114,12 +108,9 @@ subtest 'except' => sub {
     is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT ALL SELECT id FROM table2 WHERE (bar = ?)};
     is join(', ', $set->bind), '100, 200';
 
-    TODO: {
-        todo_skip foo => 2;
-        $set->add_order_by( 'id' );
-        is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
-        is join(', ', $set->bind), '100, 200';
-    };
+    $set->add_order_by( 'id' );
+    is $set->as_sql, qq{SELECT id FROM table1 WHERE (foo = ?) EXCEPT ALL SELECT id FROM table2 WHERE (bar = ?) ORDER BY id};
+    is join(', ', $set->bind), '100, 200';
 };
 
 subtest 'multiple' => sub {
