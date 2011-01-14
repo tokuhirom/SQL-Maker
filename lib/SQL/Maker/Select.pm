@@ -82,7 +82,7 @@ sub add_select {
 
 sub add_from {
     my ($self, $table, $alias) = @_;
-    if ( Scalar::Util::blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
+    if ( Scalar::Util::blessed( $table ) and $table->can('as_sql') ) {
         push @{ $self->{subqueries} }, $table->bind;
         push @{$self->{from}}, [ \do{ '(' . $table->as_sql . ')' }, $alias ];
     }
@@ -96,7 +96,7 @@ sub add_join {
     my ($self, $table_ref, $joins) = @_;
     my ($table, $alias) = ref($table_ref) eq 'ARRAY' ? @$table_ref : ($table_ref);
 
-    if ( Scalar::Util::blessed( $table ) and $table->isa('SQL::Maker::Select') ) {
+    if ( Scalar::Util::blessed( $table ) and $table->can('as_sql') ) {
         push @{ $self->{subqueries} }, $table->bind;
         $table = \do{ '(' . $table->as_sql . ')' };
     }
@@ -121,7 +121,7 @@ sub add_index_hint {
 sub _quote {
     my ($self, $label) = @_;
 
-    return $$label if ref $label;
+    return $$label if ref $label eq 'SCALAR';
     SQL::Maker::Util::quote_identifier($label, $self->{quote_char}, $self->{name_sep})
 }
 
