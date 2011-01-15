@@ -15,6 +15,7 @@ lib/SQL/Maker/Condition.pm
 lib/SQL/Maker/Plugin/InsertMulti.pm
 lib/SQL/Maker/Select.pm
 lib/SQL/Maker/Select/Oracle.pm
+lib/SQL/Maker/SelectSet.pm
 lib/SQL/Maker/SQLType.pm
 lib/SQL/Maker/Util.pm
 Makefile.PL
@@ -32,6 +33,7 @@ t/07_sql_type.t
 t/08_oracle.t
 t/09_new_line.t
 t/10_subquery.t
+t/11_set.t
 t/plugins/01_insert_multi.t
 util/popopod.psgi
 xt/01_podspell.t

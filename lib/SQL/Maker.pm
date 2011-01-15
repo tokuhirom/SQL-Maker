@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line driver select_class/],
 );
@@ -298,7 +298,7 @@ This method returns SQL string and bind variables for SELECT statement.
 
 =item \@tables
 
-Table name for B<FROM> clause in scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for subquery.
+Table name for B<FROM> clause in scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for sub-query.
 
 =item \@fields
 

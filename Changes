@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+0.10
+
+    - support union, intersect, except(makamaka)
+
 0.09
 
     - allow SELECT object and alias to add_join(makamaka)

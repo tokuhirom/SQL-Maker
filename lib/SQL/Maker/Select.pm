@@ -341,7 +341,7 @@ Add new select term. It's quote automatically.
 
 =item $stmt->add_from($table :Str | $select :SQL::Maker::Select) : SQL::Maker::Select
 
-Add new from clause. You can specify the table name or instance of L<SQL::Maker::Select> for subquery.
+Add new from clause. You can specify the table name or instance of L<SQL::Maker::Select> for sub-query.
 
 I<Return:> $stmt itself.
 
