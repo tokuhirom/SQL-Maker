@@ -119,6 +119,14 @@ subtest 'select_query' => sub {
     };
 };
 
+subtest 'new_condition' => sub {
+    my $builder = SQL::Maker->new(driver => 'sqlite', quote_char => q{`}, name_sep => q{.});
+    my $cond = $builder->new_condition;
+    isa_ok $cond, 'SQL::Maker::Condition';
+    is $cond->{quote_char}, q{`};
+    is $cond->{name_sep}, q{.};
+};
+
 subtest 'new_select' => sub {
     subtest 'driver: sqlite, quote_char: "`", name_sep: "."' => sub {
     my $builder = SQL::Maker->new(driver => 'sqlite', quote_char => q{`}, name_sep => q{.});

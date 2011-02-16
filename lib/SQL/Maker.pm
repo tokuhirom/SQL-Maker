@@ -50,6 +50,15 @@ sub new {
     }, $class;
 }
 
+sub new_condition {
+    my $self = shift;
+
+    SQL::Maker::Condition->new(
+        quote_char => $self->{quote_char},
+        name_sep   => $self->{name_sep},
+    );
+}
+
 sub new_select {
     my $self = shift;
     my %args = @_==1 ? %{$_[0]} : @_;
