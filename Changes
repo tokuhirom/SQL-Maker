@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+0.11
+
+    - added SQL::Maker#new_condition method(nekokak)
+
 0.10
 
     - support union, intersect, except(makamaka)
