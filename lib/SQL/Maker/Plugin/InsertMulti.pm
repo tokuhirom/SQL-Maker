@@ -37,11 +37,15 @@ __END__
 =for test_synopsis
 my ($table, @rows);
 
+=head1 NAME
+
+SQL::Maker::Plugin::InsertMulti - insert multiple rows at once on MySQL
+
 =head1 SYNOPSIS
 
     use SQL::Maker;
 
-    SQL::Maker->load_plugin('SQL::Maker::Plugin::InsertMulti');
+    SQL::Maker->load_plugin('InsertMulti');
 
     my $builder = SQL::Maker->new();
     my ($sql, @binds) = $builder->insert_multi($table, \@rows);
