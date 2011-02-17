@@ -11,15 +11,29 @@ sub ordered_hashref {
 
 SQL::Maker->load_plugin('InsertMulti');
 
-my $builder = SQL::Maker->new(driver => 'mysql');
-my ( $sql, @binds ) = $builder->insert_multi(
-    'foo' => [
-        ordered_hashref( bar => 'baz', john => 'man' ),
-        ordered_hashref( bar => 'bee', john => 'row' )
-    ]
-);
-is $sql, "INSERT INTO foo\n(bar, john)\nVALUES (?, ?)\n,(?, ?)\n";
-is join(',', @binds), 'baz,man,bee,row';
+subtest 'ok' => sub {
+    my $builder = SQL::Maker->new(driver => 'mysql');
+    my ( $sql, @binds ) = $builder->insert_multi(
+        'foo' => [
+            ordered_hashref( bar => 'baz', john => 'man' ),
+            ordered_hashref( bar => 'bee', john => 'row' )
+        ]
+    );
+    is $sql, "INSERT INTO foo\n(bar, john)\nVALUES (?, ?)\n,(?, ?)\n";
+    is join(',', @binds), 'baz,man,bee,row';
+};
+
+subtest 'confused' => sub {
+    my $builder = SQL::Maker->new(driver => 'mysql');
+    my ( $sql, @binds ) = $builder->insert_multi(
+        'foo' => [
+            ordered_hashref( bar => 'baz', john => 'man' ),
+            ordered_hashref( john => 'row', bar => 'bee' )
+        ]
+    );
+    is $sql, "INSERT INTO foo\n(bar, john)\nVALUES (?, ?)\n,(?, ?)\n";
+    is join(',', @binds), 'baz,man,bee,row';
+};
 
 done_testing;
 

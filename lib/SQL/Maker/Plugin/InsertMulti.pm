@@ -8,16 +8,18 @@ our @EXPORT = qw/insert_multi/;
 # for mysql
 sub insert_multi {
     my ($self, $table, $args) = @_;
+    return unless @$args;
 
-    my (@cols, @bind);
+    # setting cols
+    my @cols;
+    my ($first_arg,) = @{$args};
+    for my $col (keys %{$first_arg}) {
+        push @cols, $col;
+    }
+
+    my @bind;
     for my $arg (@{$args}) {
-        if (scalar(@cols)==0) {
-            for my $col (keys %{$arg}) {
-                push @cols, $col;
-            }
-        }
-
-        for my $col (keys %{$arg}) {
+        for my $col (@cols) {
             push @bind, $arg->{$col};
         }
     }
