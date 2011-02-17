@@ -1,5 +1,13 @@
 Revision history for Perl extension SQL::Maker
 
+0.12
+
+    SQL::Maker::Plugin::InsertMulti before 0.12 have a critical issue.
+    I highly recomment version up to 0.12+, if you are using SQL::Maker::Plugin::InsertMulti.
+
+    - FIX: SQL::Maker::Plugin::InsertMulti doesn't works correctly.
+    - doc fix on SQL::Maker::Plugin::InsertMulti
+
 0.11
 
     - added SQL::Maker#new_condition method(nekokak)
