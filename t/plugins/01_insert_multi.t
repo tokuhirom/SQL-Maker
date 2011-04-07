@@ -11,7 +11,7 @@ sub ordered_hashref {
 
 SQL::Maker->load_plugin('InsertMulti');
 
-subtest 'insert_multi( $table, \@colvals )' => sub {
+subtest 'insert_multi( $table, \@colvals, \%opts )' => sub {
     subtest 'ok' => sub {
 	my $builder = SQL::Maker->new(driver => 'mysql');
 	my ( $sql, @binds ) = $builder->insert_multi(
@@ -20,7 +20,7 @@ subtest 'insert_multi( $table, \@colvals )' => sub {
 		ordered_hashref( bar => 'bee', john => 'row' )
 	    ]
 	);
-	is $sql, "INSERT INTO foo\n(bar, john)\nVALUES (?, ?)\n,(?, ?)";
+	is $sql, "INSERT INTO `foo`\n(`bar`, `john`)\nVALUES (?, ?)\n,(?, ?)";
 	is join(',', @binds), 'baz,man,bee,row';
     };
 
@@ -32,18 +32,41 @@ subtest 'insert_multi( $table, \@colvals )' => sub {
 		ordered_hashref( john => 'row', bar => 'bee' )
 	    ]
 	);
-	is $sql, "INSERT INTO foo\n(bar, john)\nVALUES (?, ?)\n,(?, ?)";
+	is $sql, "INSERT INTO `foo`\n(`bar`, `john`)\nVALUES (?, ?)\n,(?, ?)";
+	is join(',', @binds), 'baz,man,bee,row';
+    };
+
+    subtest 'insert ignore' => sub {
+	my $builder = SQL::Maker->new(driver => 'mysql');
+	my ( $sql, @binds ) = $builder->insert_multi(
+	    'foo' => [
+		ordered_hashref( bar => 'baz', john => 'man' ),
+		ordered_hashref( bar => 'bee', john => 'row' )
+	    ],
+	    +{ prefix => 'INSERT IGNORE' },
+	);
+	is $sql, "INSERT IGNORE `foo`\n(`bar`, `john`)\nVALUES (?, ?)\n,(?, ?)";
 	is join(',', @binds), 'baz,man,bee,row';
     };
 };
 
-subtest 'insert_multi( $table, \@cols, \@values )' => sub {
+subtest 'insert_multi( $table, \@cols, \@values, \%opts )' => sub {
     subtest 'ok' => sub {
 	my $builder = SQL::Maker->new(driver => 'mysql');
 	my ( $sql, @binds ) = $builder->insert_multi(
 	    'foo' => [ qw/bar john/ ], [ [ qw/baz man/ ], [ qw/bee row/ ], ],
 	);
-	is $sql, "INSERT INTO foo\n(bar, john)\nVALUES (?, ?)\n,(?, ?)";
+	is $sql, "INSERT INTO `foo`\n(`bar`, `john`)\nVALUES (?, ?)\n,(?, ?)";
+	is join(',', @binds), 'baz,man,bee,row';
+    };
+
+    subtest 'insert ignore' => sub {
+	my $builder = SQL::Maker->new(driver => 'mysql');
+	my ( $sql, @binds ) = $builder->insert_multi(
+	    'foo' => [ qw/bar john/ ], [ [ qw/baz man/ ], [ qw/bee row/ ], ],
+	    +{ prefix => 'INSERT IGNORE' },
+	);
+	is $sql, "INSERT IGNORE `foo`\n(`bar`, `john`)\nVALUES (?, ?)\n,(?, ?)";
 	is join(',', @binds), 'baz,man,bee,row';
     };
 };
