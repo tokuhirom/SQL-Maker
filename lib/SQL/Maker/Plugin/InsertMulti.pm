@@ -121,8 +121,14 @@ SQL::Maker::Plugin::InsertMulti - insert multiple rows at once on MySQL
     my @rows = ( +{ bar => 'baz', john => 'man' }, +{ bar => 'bee', john => 'row' } );
     my $builder = SQL::Maker->new();
     my ($sql, @binds);
+    ### INSERT INTO `foo` (`bar`, `john`) VALUES (?, ?), (?, ?)
     ( $sql, @binds ) = $builder->insert_multi($table, \@rows);
     ( $sql, @binds ) = $builder->insert_multi($table, [qw/bar john/], [ map { @$_{qw/bar john/} } @rows ]);
+    ### INSERT IGNORE `foo` (`bar`, `john`) VALUES (?, ?), (?, ?)
+    ( $sql, @binds ) = $builder->insert_multi($table, [qw/bar john/], [ map { @$_{qw/bar john/} } @rows ], +{ prefix => 'INSERT IGNORE' });
+    ### INSERT INTO `foo` (`bar`. `john`) VALUES (?, ?), (?, ?) ON DUPLICATE KEY UPDATE bar => ?
+    ( $sql, @binds ) = $builder->update_multi($table, \@rows, +{ bar => 'updated' });
+    ( $sql, @binds ) = $builder->update_multi($table, [qw/bar john/], [ map { @$_{qw/bar john/} } @rows ], +{ bar => 'updated' });
 
 =head1 DESCRIPTION
 
