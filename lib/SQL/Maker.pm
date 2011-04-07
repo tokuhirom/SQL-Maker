@@ -121,10 +121,17 @@ sub update {
     my @args = ref $args eq 'HASH' ? %$args : @$args;
     while (my ($col, $val) = splice @args, 0, 2) {
         my $quoted_col = $self->_quote($col);
-        if (ref($val) eq 'SCALAR') {
+        if (ref $val eq 'SCALAR') {
             # $builder->update(foo => { created_on => \"NOW()" });
             push @columns, "$quoted_col = " . $$val;
-        } else {
+        }
+	elsif ( ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
+	    # $builder->update( foo => \[ 'VALUES(foo) + ?', 10 ] );
+	    my ( $stmt, @sub_bind ) = @{$$val};
+	    push @columns, "$quoted_col = " . $stmt;
+	    push @bind_columns, @sub_bind;
+	}
+	else {
             # normal values
             push @columns, "$quoted_col = ?";
             push @bind_columns, $val;
