@@ -74,12 +74,13 @@ sub new_select {
 # $builder->insert($table, \%values);
 sub insert {
     my ($self, $table, $values, $opt) = @_;
-    my $prefix = $opt->{prefix} || 'INSERT';
+    my $prefix = $opt->{prefix} || 'INSERT INTO';
 
     my $quoted_table = $self->_quote($table);
 
-    my (@columns, @bind_columns, @quoted_columns);
-    while (my ($col, $val) = each %$values) {
+    my (@columns, @bind_columns, @quoted_columns, @values);
+    @values = ref $values eq 'HASH' ? %$values : @$values;
+    while (my ($col, $val) = splice(@values, 0, 2)) {
         push @quoted_columns, $self->_quote($col);
         if (ref($val) eq 'SCALAR') {
             # $builder->insert(foo => { created_on => \"NOW()" });
@@ -91,7 +92,7 @@ sub insert {
         }
     }
 
-    my $sql  = "$prefix INTO $quoted_table" . $self->new_line;
+    my $sql  = "$prefix $quoted_table" . $self->new_line;
        $sql .= '(' . join(', ', @quoted_columns) .')' . $self->new_line .
                'VALUES (' . join(', ', @columns) . ')';
 
@@ -211,6 +212,13 @@ sub select_query {
     if (my $terms = $opt->{having}) {
         while (my ($col, $val) = each %$terms) {
             $stmt->add_having($col => $val);
+        }
+    }
+
+    if ($opt->{joins}) {
+        my @joins = @{$opt->{joins}};
+        while (my ($table_ref, $joins) = splice(@joins, 0, 2)) {
+            $stmt->add_join($table_ref, $joins);
         }
     }
 

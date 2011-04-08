@@ -45,7 +45,7 @@ sub new {
         group_by           => +[],
         order_by           => +[],
         prefix             => 'SELECT ',
-    new_line           => "\n",
+	new_line           => "\n",
         %args
     }, $class;
 
