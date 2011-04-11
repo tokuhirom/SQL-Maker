@@ -11,35 +11,62 @@ sub ordered_hashref {
 
 subtest 'driver sqlite' => sub {
     subtest 'hash column-value' => sub {
-	my $builder = SQL::Maker->new(driver => 'sqlite');
-	my ($sql, @binds) = $builder->insert('foo' => ordered_hashref(bar => 'baz', john => 'man', created_on => \"datetime('now')" ));
-	is $sql, qq{INSERT INTO "foo"\n("bar", "john", "created_on")\nVALUES (?, ?, datetime('now'))};
-	is join(',', @binds), 'baz,man';
+        my $builder = SQL::Maker->new(driver => 'sqlite');
+        my ($sql, @binds) = $builder->insert('foo' => ordered_hashref(bar => 'baz', john => 'man', created_on => \"datetime('now')", updated_on => \["datetime(?)", "now"]));
+        is $sql, qq{INSERT INTO "foo"\n("bar", "john", "created_on", "updated_on")\nVALUES (?, ?, datetime('now'), datetime(?))};
+        is join(',', @binds), 'baz,man,now';
     };
 
     subtest 'array column-value' => sub {
-	my $builder = SQL::Maker->new(driver => 'sqlite');
-	my ($sql, @binds) = $builder->insert('foo' => [ bar => 'baz', john => 'man', created_on => \"datetime('now')" ]);
-	is $sql, qq{INSERT INTO "foo"\n("bar", "john", "created_on")\nVALUES (?, ?, datetime('now'))};
-	is join(',', @binds), 'baz,man';
+        my $builder = SQL::Maker->new(driver => 'sqlite');
+        my ($sql, @binds) = $builder->insert('foo' => [ bar => 'baz', john => 'man', created_on => \"datetime('now')", updated_on => \["datetime(?)", "now" ] ]);
+        is $sql, qq{INSERT INTO "foo"\n("bar", "john", "created_on", "updated_on")\nVALUES (?, ?, datetime('now'), datetime(?))};
+        is join(',', @binds), 'baz,man,now';
     };
 
     subtest 'insert ignore, hash column-value' => sub {
-	my $builder = SQL::Maker->new(driver => 'sqlite');
-	my ($sql, @binds) = $builder->insert('foo' => ordered_hashref( bar => 'baz', john => 'man', created_on => \"datetime('now')" ), +{ prefix => 'INSERT IGNORE' });
-	is $sql, qq{INSERT IGNORE "foo"\n("bar", "john", "created_on")\nVALUES (?, ?, datetime('now'))};
-	is join(',', @binds), 'baz,man';
+        my $builder = SQL::Maker->new(driver => 'sqlite');
+        my ($sql, @binds) = $builder->insert('foo' => ordered_hashref( bar => 'baz', john => 'man', created_on => \"datetime('now')", updated_on => \["datetime(?)", "now"] ), +{ prefix => 'INSERT IGNORE' });
+        is $sql, qq{INSERT IGNORE "foo"\n("bar", "john", "created_on", "updated_on")\nVALUES (?, ?, datetime('now'), datetime(?))};
+        is join(',', @binds), 'baz,man,now';
     };
 
     subtest 'insert ignore, array column-value' => sub {
-	my $builder = SQL::Maker->new(driver => 'sqlite');
-	my ($sql, @binds) = $builder->insert('foo' => [ bar => 'baz', john => 'man', created_on => \"datetime('now')" ], +{ prefix => 'INSERT IGNORE' });
-	is $sql, qq{INSERT IGNORE "foo"\n("bar", "john", "created_on")\nVALUES (?, ?, datetime('now'))};
-	is join(',', @binds), 'baz,man';
+        my $builder = SQL::Maker->new(driver => 'sqlite');
+        my ($sql, @binds) = $builder->insert('foo' => [ bar => 'baz', john => 'man', created_on => \"datetime('now')", updated_on => \["datetime(?)", "now" ] ], +{ prefix => 'INSERT IGNORE' });
+        is $sql, qq{INSERT IGNORE "foo"\n("bar", "john", "created_on", "updated_on")\nVALUES (?, ?, datetime('now'), datetime(?))};
+        is join(',', @binds), 'baz,man,now';
     };
 };
 
-#subtest 'driver mysql' => sub {
-#};
+subtest 'driver mysql' => sub {
+    subtest 'hash column-value' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my ($sql, @binds) = $builder->insert('foo' => ordered_hashref(bar => 'baz', john => 'man', created_on => \"NOW()", updated_on => \["FROM_UNIXTIME(?)", 1302536204 ] ));
+        is $sql, qq{INSERT INTO `foo`\n(`bar`, `john`, `created_on`, `updated_on`)\nVALUES (?, ?, NOW(), FROM_UNIXTIME(?))};
+        is join(',', @binds), 'baz,man,1302536204';
+    };
+
+    subtest 'array column-value' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my ($sql, @binds) = $builder->insert('foo' => [ bar => 'baz', john => 'man', created_on => \"NOW()", updated_on => \["FROM_UNIXTIME(?)", 1302536204 ] ]);
+        is $sql, qq{INSERT INTO `foo`\n(`bar`, `john`, `created_on`, `updated_on`)\nVALUES (?, ?, NOW(), FROM_UNIXTIME(?))};
+        is join(',', @binds), 'baz,man,1302536204';
+    };
+
+    subtest 'insert ignore, hash column-value' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my ($sql, @binds) = $builder->insert('foo' => ordered_hashref( bar => 'baz', john => 'man', created_on => \"NOW()", updated_on => \["FROM_UNIXTIME(?)", 1302536204 ] ), +{ prefix => 'INSERT IGNORE' });
+        is $sql, qq{INSERT IGNORE `foo`\n(`bar`, `john`, `created_on`, `updated_on`)\nVALUES (?, ?, NOW(), FROM_UNIXTIME(?))};
+        is join(',', @binds), 'baz,man,1302536204';
+    };
+
+    subtest 'insert ignore, array column-value' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my ($sql, @binds) = $builder->insert('foo' => [ bar => 'baz', john => 'man', created_on => \"NOW()", updated_on => \["FROM_UNIXTIME(?)", 1302536204 ] ], +{ prefix => 'INSERT IGNORE' });
+        is $sql, qq{INSERT IGNORE `foo`\n(`bar`, `john`, `created_on`, `updated_on`)\nVALUES (?, ?, NOW(), FROM_UNIXTIME(?))};
+        is join(',', @binds), 'baz,man,1302536204';
+    };
+};
 
 done_testing;

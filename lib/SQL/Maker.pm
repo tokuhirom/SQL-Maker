@@ -71,7 +71,8 @@ sub new_select {
     );
 }
 
-# $builder->insert($table, \%values);
+# $builder->insert($table, \%values, \%opt);
+# $builder->insert($table, \@values, \%opt);
 sub insert {
     my ($self, $table, $values, $opt) = @_;
     my $prefix = $opt->{prefix} || 'INSERT INTO';
@@ -85,7 +86,14 @@ sub insert {
         if (ref($val) eq 'SCALAR') {
             # $builder->insert(foo => { created_on => \"NOW()" });
             push @columns, $$val;
-        } else {
+        }
+        elsif (ref($val) eq 'REF' && ref($$val) eq 'ARRAY') {
+            # $builder->insert( foo => \[ 'UNIX_TIMESTAMP(?)', '2011-04-12 00:34:12' ] );
+            my ( $stmt, @sub_bind ) = @{$$val};
+            push @columns, $stmt;
+            push @bind_columns, @sub_bind;
+        }
+        else {
             # normal values
             push @columns, '?';
             push @bind_columns, $val;
@@ -126,13 +134,13 @@ sub update {
             # $builder->update(foo => { created_on => \"NOW()" });
             push @columns, "$quoted_col = " . $$val;
         }
-	elsif ( ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
-	    # $builder->update( foo => \[ 'VALUES(foo) + ?', 10 ] );
-	    my ( $stmt, @sub_bind ) = @{$$val};
-	    push @columns, "$quoted_col = " . $stmt;
-	    push @bind_columns, @sub_bind;
-	}
-	else {
+        elsif ( ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
+            # $builder->update( foo => \[ 'VALUES(foo) + ?', 10 ] );
+            my ( $stmt, @sub_bind ) = @{$$val};
+            push @columns, "$quoted_col = " . $stmt;
+            push @bind_columns, @sub_bind;
+        }
+        else {
             # normal values
             push @columns, "$quoted_col = ?";
             push @bind_columns, $val;

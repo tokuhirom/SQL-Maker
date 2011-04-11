@@ -1,0 +1,97 @@
+use strict;
+use warnings;
+use Test::More;
+use SQL::Maker;
+use Test::Requires 'Tie::IxHash';
+
+sub ordered_hashref {
+    tie my %params, Tie::IxHash::, @_;
+    return \%params;
+}
+
+subtest 'driver: sqlite' => sub {
+    my $builder = SQL::Maker->new(driver => 'sqlite');
+    subtest 'arrayref, where cause' => sub {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
+        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ? WHERE ("user_id" = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'ordered hashref, where cause' => sub {
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
+        is $sql, qq{UPDATE "foo" SET "bar" = ?, "john" = ? WHERE ("yo" = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref' => sub {
+        # no where
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'));
+        is $sql, qq{UPDATE "foo" SET "bar" = ?, "john" = ?};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'literal, sub query' => sub {
+        my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => \['datetime(?)', 'now'], counter => \'counter + 1' ] );
+        is $sql, qq{UPDATE "foo" SET "user_id" = ?, "updated_on" = datetime(?), "counter" = counter + 1};
+        is join(',', @binds), '100,now';
+    };
+};
+
+subtest 'driver: mysql' => sub {
+    my $builder = SQL::Maker->new(driver => 'mysql');
+    subtest 'array ref, where cause' => sub {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
+        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'ordered hashref, where cause' => sub {
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
+        is $sql, qq{UPDATE `foo` SET `bar` = ?, `john` = ? WHERE (`yo` = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref' => sub {
+        # no where
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'));
+        is $sql, qq{UPDATE `foo` SET `bar` = ?, `john` = ?};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'literal, sub query' => sub {
+        my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => \['FROM_UNIXTIME(?)', 1302241686], counter => \'counter + 1' ] );
+        is $sql, qq{UPDATE `foo` SET `user_id` = ?, `updated_on` = FROM_UNIXTIME(?), `counter` = counter + 1};
+        is join(',', @binds), '100,1302241686';
+    };
+};
+
+subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
+    my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
+    subtest 'array ref, where cause' => sub {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
+        is $sql, qq{UPDATE user SET name = ?, email = ? WHERE (user_id = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'ordered hashref, where cause' => sub {
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
+        is $sql, qq{UPDATE foo SET bar = ?, john = ? WHERE (yo = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref' => sub {
+        # no where
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'));
+        is $sql, qq{UPDATE foo SET bar = ?, john = ?};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'literal, sub query' => sub {
+        my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => \['FROM_UNIXTIME(?)', 1302241686], counter => \'counter + 1' ] );
+        is $sql, qq{UPDATE foo SET user_id = ?, updated_on = FROM_UNIXTIME(?), counter = counter + 1};
+        is join(',', @binds), '100,1302241686';
+    };
+};
+
+done_testing;
+
