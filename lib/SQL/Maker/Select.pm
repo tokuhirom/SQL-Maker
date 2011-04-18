@@ -157,11 +157,13 @@ sub as_sql {
             $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $self->_quote($join->{table});
             $sql .= ' ' . $self->_quote($join->{alias}) if $join->{alias};
 
-            if (ref $join->{condition} && ref $join->{condition} eq 'ARRAY') {
-                $sql .= ' USING ('. join(', ', map { $self->_quote($_) } @{ $join->{condition} }) . ')';
-            }
-            else {
-                $sql .= ' ON ' . $join->{condition};
+            if ( defined $join->{condition} ) {
+                if (ref $join->{condition} && ref $join->{condition} eq 'ARRAY') {
+                    $sql .= ' USING ('. join(', ', map { $self->_quote($_) } @{ $join->{condition} }) . ')';
+                }
+                else {
+                    $sql .= ' ON ' . $join->{condition};
+                }
             }
         }
         $sql .= ', ' if @{ $self->{from} };
