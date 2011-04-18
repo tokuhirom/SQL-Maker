@@ -184,7 +184,17 @@ sub select_query {
     my $stmt = $self->new_select(
         select     => $fields,
     );
-    $stmt->add_from(ref $table eq 'ARRAY' ? @$table : $table);
+
+    unless ( ref $table ) {
+        # 'foo'
+        $stmt->add_from( $table );
+    }
+    else {
+        for ( @$table ) {
+            $stmt->add_from( ref $_ ? @$_ : $_ );
+        }
+    }
+
     $stmt->prefix($opt->{prefix}) if $opt->{prefix};
 
     if ( $where ) {
