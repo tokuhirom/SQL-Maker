@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line driver select_class/],
 );
@@ -186,10 +186,11 @@ sub select_query {
     );
 
     unless ( ref $table ) {
-        # 'foo'
+        # $table = 'foo'
         $stmt->add_from( $table );
     }
     else {
+        # $table = [ 'foo', [ bar => 'b' ] ]
         for ( @$table ) {
             $stmt->add_from( ref $_ ? @$_ : $_ );
         }
@@ -230,13 +231,6 @@ sub select_query {
     if (my $terms = $opt->{having}) {
         while (my ($col, $val) = each %$terms) {
             $stmt->add_having($col => $val);
-        }
-    }
-
-    if ($opt->{joins}) {
-        my @joins = @{$opt->{joins}};
-        while (my ($table_ref, $joins) = splice(@joins, 0, 2)) {
-            $stmt->add_join($table_ref, $joins);
         }
     }
 

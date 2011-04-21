@@ -1,5 +1,20 @@
 Revision history for Perl extension SQL::Maker
 
+0.13
+
+    - In SQL::Maker
+        - Allow 'INSERT IGNORE' by $opts->{prefix} params at insert() method (zigorou)
+        - Accept key-value as array at insert() method (zigorou)
+        - Accept value using subquery at insert(), update() method (zigorou)
+        - Allow table alias at select() method (zigorou)
+    - In SQL::Maker::Plugin::InsertMulti
+        - Accept values as arrayref at insert_multi() (zigorou)
+        - Allow 'INSERT IGNORE' by $opts->{prefix} params at insert_multi() (zigorou)
+        - Allow literal and subquery in values at insert_multi() (zigorou)
+        - Supports 'ON DUPLICATE KEY UPDATE' syntax on mysql driver at insert_multi() (zigorou)
+    - In SQL::Maker::Select
+        - Allow no conditional join (zigorou)
+
 0.12
 
     SQL::Maker::Plugin::InsertMulti before 0.12 have a critical issue.

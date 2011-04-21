@@ -38,14 +38,17 @@ sub insert_multi {
         my @value_stmt;
         for my $val (@$value) {
             if (ref $val eq 'SCALAR') {
+                # $val = \'NOW()'
                 push @value_stmt, $$val;
             }
             elsif (ref $val eq 'REF' && ref $$val eq 'ARRAY') {
+                # $val = \['UNIX_TIMESTAMP(?)', '2011-04-20 00:30:00']
                 my ( $stmt, @sub_bind ) = @{$$val};
                 push @value_stmt, $stmt;
                 push @bind, @sub_bind;
             }
             else {
+                # normal values
                 push @value_stmt, '?';
                 push @bind, $val;
             }
@@ -61,10 +64,11 @@ sub insert_multi {
         while (my ($col, $val) = splice @sets, 0, 2) {
             my $quoted_col = $self->_quote($col);
             if ( ref $val eq 'SCALAR' ) {
-                # $builder->update(foo => { created_on => \"NOW()" });
+                # $val = \'NOW()'
                 push @update_sets, "$quoted_col = " . $$val;
             }
             elsif ( ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
+                # $val = \['UNIX_TIMESTAMP(?)', '2011-04-20 00:30:00']
                 my ( $stmt, @sub_bind ) = @{$$val};
                 push @update_sets, "$quoted_col = " . $stmt;
                 push @bind, @sub_bind;
@@ -108,7 +112,7 @@ SQL::Maker::Plugin::InsertMulti - insert multiple rows at once on MySQL
     ( $sql, @binds ) = $builder->insert_multi($table, [qw/bar john/], [ map { @$_{qw/bar john/} } @rows ]);
     ### INSERT IGNORE `foo` (`bar`, `john`) VALUES (?, ?), (?, ?)
     ( $sql, @binds ) = $builder->insert_multi($table, [qw/bar john/], [ map { @$_{qw/bar john/} } @rows ], +{ prefix => 'INSERT IGNORE' });
-    ### INSERT INTO `foo` (`bar`. `john`) VALUES (?, ?), (?, ?) ON DUPLICATE KEY UPDATE bar => ?
+    ### INSERT INTO `foo` (`bar`. `john`) VALUES (?, ?), (?, ?) ON DUPLICATE KEY UPDATE `bar` => ?
     ( $sql, @binds ) = $builder->insert_multi($table, \@rows, +{ update => +{ bar => 'updated' } });
     ( $sql, @binds ) = $builder->insert_multi($table, [qw/bar john/], [ map { @$_{qw/bar john/} } @rows ], +{ update => +{ bar => 'updated' } });
 
