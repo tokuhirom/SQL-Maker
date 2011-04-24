@@ -23,13 +23,13 @@ subtest 'select_subquery' => sub {
         };
 
         do {
-            $stmt2 = $builder->select_query([$stmt1,'stmt1'] => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'));
+            $stmt2 = $builder->select_query([[$stmt1,'stmt1']] => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'));
             is $stmt2->as_sql, qq{SELECT "foo", "bar"\nFROM (SELECT "hoge", "fuga"\nFROM "sakura"\nWHERE ("fuga" = ?) AND ("zun" = ?)) "stmt1"\nWHERE ("bar" = ?) AND ("john" = ?)};
             is join(',', $stmt2->bind), 'piyo,doko,baz,man';
         };
 
         do {
-            my $stmt3 = $builder->select_query([$stmt2,'stmt2'] => ['baz'], {'baz'=>'bar'}, {order_by => 'yo'});
+            my $stmt3 = $builder->select_query([[$stmt2,'stmt2']] => ['baz'], {'baz'=>'bar'}, {order_by => 'yo'});
             is $stmt3->as_sql, qq{SELECT "baz"\nFROM (SELECT "foo", "bar"\nFROM (SELECT "hoge", "fuga"\nFROM "sakura"\nWHERE ("fuga" = ?) AND ("zun" = ?)) "stmt1"\nWHERE ("bar" = ?) AND ("john" = ?)) "stmt2"\nWHERE ("baz" = ?)\nORDER BY yo};
             is join(',', $stmt3->bind), 'piyo,doko,baz,man,bar';
         };
