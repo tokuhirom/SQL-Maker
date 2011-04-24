@@ -192,7 +192,7 @@ sub select_query {
     else {
         # $table = [ 'foo', [ bar => 'b' ] ]
         for ( @$table ) {
-            $stmt->add_from( ref $_ ? @$_ : $_ );
+            $stmt->add_from( ref $_ eq 'ARRAY' ? @$_ : $_ );
         }
     }
 
@@ -295,7 +295,7 @@ Driver name is required. The driver type is needed to create SQL string.
 
 =item quote_char: Str
 
-This is the character that a table or column name will be quoted with. 
+This is the character that a table or column name will be quoted with.
 
 Default: auto detect from $driver.
 
