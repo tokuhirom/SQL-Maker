@@ -1,5 +1,10 @@
 Revision history for Perl extension SQL::Maker
 
+0.14
+
+    - Type check for clear error messages(gfx)
+    - fixed testing issue on t/10_subquery.t(reported by gfx++)
+
 0.13
 
     - In SQL::Maker
