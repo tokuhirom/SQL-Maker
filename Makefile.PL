@@ -9,6 +9,8 @@ requires 'Class::Accessor::Lite' => 0.05;
 requires 'Module::Load';
 requires 'parent';
 
+auto_set_repository;
+
 tests 't/*.t t/*/*.t t/*/*/*.t t/*/*/*/*.t';
 test_requires 'Test::More' => 0.96; # done_testing, subtest
 test_requires 'Test::Requires';
