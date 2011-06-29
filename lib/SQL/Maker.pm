@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '0.14';
+our $VERSION = '1.00';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line driver select_class/],
 );
@@ -274,8 +274,6 @@ SQL::Maker - Yet another SQL builder
 =head1 DESCRIPTION
 
 SQL::Maker is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQL generator.
-
-B<THE SOFTWARE IS IT'S IN ALPHA QUALITY. IT MAY CHANGE THE API WITHOUT NOTICE.>
 
 =head1 METHODS
 
