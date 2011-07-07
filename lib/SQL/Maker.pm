@@ -196,16 +196,20 @@ sub select_query {
         }
     }
 
+    $self->_process_where($stmt, $where);
+    $self->_process_option($stmt, $opt);
+
+    return $stmt;
+}
+
+sub _process_where {
+    my ($self, $stmt, $where) = @_;
     if ( $where ) {
         my @w = ref $where eq 'ARRAY' ? @$where : %$where;
         while (my ($col, $val) = splice @w, 0, 2) {
             $stmt->add_where($col => $val);
         }
     }
-
-    $self->_process_option($stmt, $opt);
-
-    return $stmt;
 }
 
 sub _process_option {
