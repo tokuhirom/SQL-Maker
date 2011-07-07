@@ -196,14 +196,22 @@ sub select_query {
         }
     }
 
-    $stmt->prefix($opt->{prefix}) if $opt->{prefix};
-
     if ( $where ) {
         my @w = ref $where eq 'ARRAY' ? @$where : %$where;
         while (my ($col, $val) = splice @w, 0, 2) {
             $stmt->add_where($col => $val);
         }
     }
+
+    $self->_process_option($stmt, $opt);
+
+    return $stmt;
+}
+
+sub _process_option {
+    my ($self, $stmt, $opt) = @_;
+
+    $stmt->prefix($opt->{prefix}) if $opt->{prefix};
 
     if (my $o = $opt->{order_by}) {
         if (ref $o eq 'ARRAY') {
@@ -235,7 +243,6 @@ sub select_query {
     }
 
     $stmt->for_update(1) if $opt->{for_update};
-    return $stmt;
 }
 
 1;
