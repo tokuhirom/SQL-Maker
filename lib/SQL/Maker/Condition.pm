@@ -79,8 +79,14 @@ sub _make_term {
             return ($self->_quote($col) . " BETWEEN ? AND ?", $v);
         }
         else {
-            # make_term(foo => +{ '<', 3 }) => foo < 3
-            return ($self->_quote($col) . " $op ?", [$v]);
+            if (ref($v) eq 'SCALAR') {
+                # make_term(foo => +{ '<', \"DATE_SUB(NOW(), INTERVAL 3 DAY)"}) => 'foo < DATE_SUB(NOW(), INTERVAL 3 DAY)'
+                return ($self->_quote($col) . " $op " . $$v, []);
+            }
+            else {
+                # make_term(foo => +{ '<', 3 }) => foo < 3
+                return ($self->_quote($col) . " $op ?", [$v]);
+            }
         }
     }
     elsif ( ref($val) eq 'SCALAR' ) {
@@ -252,6 +258,10 @@ Here is a cheat sheet for conditions.
     IN:        ['foo_id', sql_type(\3, SQL_INTEGER)]
     OUT QUERY: '`foo_id` = ?'
     OUT BIND:  sql_type(\3, SQL_INTEGER)
+
+    IN:        ['created_on', { '>', \'DATE_SUB(NOW(), INTERVAL 1 DAY)' }]
+    OUT QUERY: '`created_on` > DATE_SUB(NOW(), INTERVAL 1 DAY)'
+    OUT BIND:  
 
 =head1 SEE ALSO
 
