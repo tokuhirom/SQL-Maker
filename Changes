@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+1.01
+
+    - support this form: ['created_on' => { '>', \'DATE_SUB(NOW(), INTERVAL 1 DAY)' }]
+
 1.00
 
     - remove alpha tag.
