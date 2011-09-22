@@ -313,9 +313,9 @@ Default: '\n'
 
 =item my $select = $builder->new_select(%args|\%args);
 
-Create new instance of L<SQL::Builder::Select> from the settings from B<$builder>.
+Create new instance of L<SQL::Maker::Select> from the settings from B<$builder>.
 
-This method returns instance of L<SQL::Builder::Select>.
+This method returns instance of L<SQL::Maker::Select>.
 
 =item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where, \%opt);
 
