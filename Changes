@@ -1,5 +1,11 @@
 Revision history for Perl extension SQL::Maker
 
+1.03
+
+    - support INSERT statement without parameters on SQLite3.
+      https://github.com/tokuhirom/SQL-Maker/issues/11
+      (requested by forwardever++)
+
 1.02
 
     - doc fix(reported by xaicron++)

@@ -24,6 +24,7 @@ t/01_update.t
 t/09_new_line.t
 t/10_subquery.t
 t/11_set.t
+t/12_insert_empty.t
 t/condition/01_where.t
 t/condition/02_make_term.t
 t/plugins/insert_multi/01_insert_multi.t
