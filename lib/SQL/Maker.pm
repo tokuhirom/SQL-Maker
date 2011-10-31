@@ -100,6 +100,13 @@ sub insert {
         }
     }
 
+    # Insert an empty record in SQLite.
+    # ref. https://github.com/tokuhirom/SQL-Maker/issues/11
+    if ($self->driver eq 'SQLite' && @columns==0) {
+        my $sql  = "$prefix $quoted_table" . $self->new_line . 'DEFAULT VALUES';
+        return ($sql);
+    }
+
     my $sql  = "$prefix $quoted_table" . $self->new_line;
        $sql .= '(' . join(', ', @quoted_columns) .')' . $self->new_line .
                'VALUES (' . join(', ', @columns) . ')';
