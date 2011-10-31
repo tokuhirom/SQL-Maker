@@ -13,3 +13,10 @@ nytprof/
 nytprof.out
 MYMETA.yml
 META.yml
+pm_to_blib
+blib/
+MYMETA.*
+META.json
+README
+^inc/
+SQL-Maker-*/

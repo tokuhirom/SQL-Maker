@@ -25,3 +25,13 @@ cover_db
 nytprof
 perltidy.ERR$
 ^tags$
+^[^/]+\.gz$
+^README.pod$
+^README.mkdn$
+^MYMETA\.
+\b_build
+^MANIFEST\.SKIP
+\b\.gitignore
+\.bak$
+^inc/
+^SQL-Maker-

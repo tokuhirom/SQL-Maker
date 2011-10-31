@@ -1,16 +1,7 @@
 .gitignore
 benchmarks/simple.pl
+Build.PL
 Changes
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Repository.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/SQL/Maker.pm
 lib/SQL/Maker/Condition.pm
 lib/SQL/Maker/Plugin/InsertMulti.pm
@@ -19,10 +10,11 @@ lib/SQL/Maker/Select/Oracle.pm
 lib/SQL/Maker/SelectSet.pm
 lib/SQL/Maker/SQLType.pm
 lib/SQL/Maker/Util.pm
-Makefile.PL
+LICENSE
 MANIFEST			This list of files
+META.json
 META.yml
-README.pod
+README
 t/00_compile.t
 t/01_delete.t
 t/01_insert.t
@@ -44,5 +36,7 @@ util/popopod.psgi
 xt/01_podspell.t
 xt/02_perlcritic.t
 xt/03_pod.t
+xt/04_minimum_version.t
 xt/04_synopsis.t
-xt/perlcriticrc
+xt/05_cpan_meta.t
+xt/06_meta_author.t
