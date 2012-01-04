@@ -192,14 +192,16 @@ sub select_query {
         select     => $fields,
     );
 
-    unless ( ref $table ) {
-        # $table = 'foo'
-        $stmt->add_from( $table );
-    }
-    else {
-        # $table = [ 'foo', [ bar => 'b' ] ]
-        for ( @$table ) {
-            $stmt->add_from( ref $_ eq 'ARRAY' ? @$_ : $_ );
+    if ( defined $table ) {
+        unless ( ref $table ) {
+            # $table = 'foo'
+            $stmt->add_from( $table );
+        }
+        else {
+            # $table = [ 'foo', [ bar => 'b' ] ]
+            for ( @$table ) {
+                $stmt->add_from( ref $_ eq 'ARRAY' ? @$_ : $_ );
+            }
         }
     }
 
@@ -209,6 +211,12 @@ sub select_query {
         my @w = ref $where eq 'ARRAY' ? @$where : %$where;
         while (my ($col, $val) = splice @w, 0, 2) {
             $stmt->add_where($col => $val);
+        }
+    }
+
+    if ( my $joins = $opt->{joins} ) {
+        for my $join ( @$joins ) {
+            $stmt->add_join(ref $join eq 'ARRAY' ? @$join : $join);
         }
     }
 
