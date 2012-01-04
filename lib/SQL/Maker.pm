@@ -13,6 +13,7 @@ use SQL::Maker::Select::Oracle;
 use SQL::Maker::Condition;
 use SQL::Maker::Util;
 use Module::Load ();
+use Scalar::Util ();
 
 sub load_plugin {
     my ($class, $role) = @_;
@@ -166,7 +167,9 @@ sub _make_where_condition {
     my ($self, $where) = @_;
 
     return $self->new_condition unless $where;
-    return $where if ref $where eq 'SQL::Maker::Condition';
+    if ( Scalar::Util::blessed( $where ) and $where->can('as_sql') ) {
+        return $where;
+    }
 
     my $w = $self->new_condition;
     my @w = ref $where eq 'ARRAY' ? @$where : %$where;
