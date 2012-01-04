@@ -10,9 +10,26 @@ sub ordered_hashref {
 }
 
 subtest 'driver sqlite' => sub {
-    subtest 'simple' => sub {
+    subtest 'simple where_as_hashref' => sub {
         my $builder = SQL::Maker->new(driver => 'sqlite');
         my ($sql, @binds) = $builder->delete('foo' => ordered_hashref(bar => 'baz', john => 'man'));
+        is $sql, qq{DELETE FROM "foo" WHERE ("bar" = ?) AND ("john" = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'simple where_as_arrayref' => sub {
+        my $builder = SQL::Maker->new(driver => 'sqlite');
+        my ($sql, @binds) = $builder->delete('foo' => [bar => 'baz', john => 'man']);
+        is $sql, qq{DELETE FROM "foo" WHERE ("bar" = ?) AND ("john" = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'simple where_as_condition' => sub {
+        my $builder = SQL::Maker->new(driver => 'sqlite');
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->delete('foo' => $cond);
         is $sql, qq{DELETE FROM "foo" WHERE ("bar" = ?) AND ("john" = ?)};
         is join(',', @binds), 'baz,man';
     };
@@ -26,9 +43,26 @@ subtest 'driver sqlite' => sub {
 };
 
 subtest 'driver mysql' => sub {
-    subtest 'simple' => sub {
+    subtest 'simple where_as_hashref' => sub {
         my $builder = SQL::Maker->new(driver => 'mysql');
         my ($sql, @binds) = $builder->delete('foo' => ordered_hashref(bar => 'baz', john => 'man'));
+        is $sql, qq{DELETE FROM `foo` WHERE (`bar` = ?) AND (`john` = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'simple where_as_hashref' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my ($sql, @binds) = $builder->delete('foo' => [bar => 'baz', john => 'man']);
+        is $sql, qq{DELETE FROM `foo` WHERE (`bar` = ?) AND (`john` = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'simple where_as_condition' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->delete('foo' => $cond);
         is $sql, qq{DELETE FROM `foo` WHERE (`bar` = ?) AND (`john` = ?)};
         is join(',', @binds), 'baz,man';
     };
@@ -42,9 +76,26 @@ subtest 'driver mysql' => sub {
 };
 
 subtest 'driver mysql, quote_char: "", new_line: " "' => sub {
-    subtest 'simple' => sub {
+    subtest 'simple where_as_hashref' => sub {
         my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
         my ($sql, @binds) = $builder->delete('foo' => ordered_hashref(bar => 'baz', john => 'man'));
+        is $sql, qq{DELETE FROM foo WHERE (bar = ?) AND (john = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'simple where_as_arrayref' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
+        my ($sql, @binds) = $builder->delete('foo' => [bar => 'baz', john => 'man']);
+        is $sql, qq{DELETE FROM foo WHERE (bar = ?) AND (john = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'simple where_as_condition' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->delete('foo' => $cond);
         is $sql, qq{DELETE FROM foo WHERE (bar = ?) AND (john = ?)};
         is join(',', @binds), 'baz,man';
     };
