@@ -178,6 +178,9 @@ sub _make_where_condition {
 
 sub _make_where_clause {
     my ($self, $where) = @_;
+
+    return ['', []] unless $where;
+
     my $w = $self->_make_where_condition($where);
     my $sql = $w->as_sql(1);
     return [$sql ? " WHERE $sql" : '', [$w->bind]];
