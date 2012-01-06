@@ -206,14 +206,16 @@ sub select_query {
         select     => $fields,
     );
 
-    unless ( ref $table ) {
-        # $table = 'foo'
-        $stmt->add_from( $table );
-    }
-    else {
-        # $table = [ 'foo', [ bar => 'b' ] ]
-        for ( @$table ) {
-            $stmt->add_from( ref $_ eq 'ARRAY' ? @$_ : $_ );
+    if ( defined $table ) {
+        unless ( ref $table ) {
+            # $table = 'foo'
+            $stmt->add_from( $table );
+        }
+        else {
+            # $table = [ 'foo', [ bar => 'b' ] ]
+            for ( @$table ) {
+                $stmt->add_from( ref $_ eq 'ARRAY' ? @$_ : $_ );
+            }
         }
     }
 
@@ -221,6 +223,12 @@ sub select_query {
 
     if ( $where ) {
         $stmt->set_where($self->_make_where_condition($where));
+    }
+
+    if ( my $joins = $opt->{joins} ) {
+        for my $join ( @$joins ) {
+            $stmt->add_join(ref $join eq 'ARRAY' ? @$join : $join);
+        }
     }
 
     if (my $o = $opt->{order_by}) {
@@ -400,6 +408,10 @@ This option makes HAVING clause
 =item $opt->{for_update}
 
 This option makes 'FOR UPDATE" clause.
+
+=item $opt->{joins}
+
+This option makes 'JOIN' via L<SQL::Maker::Condition>.
 
 =back
 
