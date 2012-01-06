@@ -398,6 +398,10 @@ This option makes HAVING clause
 
 This option makes 'FOR UPDATE" clause.
 
+=item $opt->{joins}
+
+This option makes 'JOIN' via L<SQL::Maker::Condition>.
+
 =back
 
 =back
