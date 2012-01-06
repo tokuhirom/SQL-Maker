@@ -111,6 +111,18 @@ subtest 'driver: sqlite' => sub {
             is join(',', @binds), '';
         };
     };
+
+    subtest 'join' => sub {
+        my ($sql, @binds) = $builder->select(undef, ['*'], +{}, {joins => [
+            [foo => {
+                type      => 'LEFT OUTER',
+                table     => 'bar',
+                condition => 'foo.bar_id = bar.id',
+            }]
+        ]});
+        is $sql, qq{SELECT *\nFROM "foo" LEFT OUTER JOIN "bar" ON foo.bar_id = bar.id};
+        is join(',', @binds), '';
+    };
 };
 
 subtest 'driver: mysql' => sub {
@@ -215,6 +227,18 @@ subtest 'driver: mysql' => sub {
             is join(',', @binds), '';
         };
     };
+
+    subtest 'join' => sub {
+        my ($sql, @binds) = $builder->select(undef, ['*'], +{}, {joins => [
+            [foo => {
+                type      => 'LEFT OUTER',
+                table     => 'bar',
+                condition => 'foo.bar_id = bar.id',
+            }]
+        ]});
+        is $sql, qq{SELECT *\nFROM `foo` LEFT OUTER JOIN `bar` ON foo.bar_id = bar.id};
+        is join(',', @binds), '';
+    };
 };
 
 subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
@@ -318,6 +342,18 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
             is $sql, qq{SELECT * FROM foo f, bar b};
             is join(',', @binds), '';
         };
+    };
+
+    subtest 'join' => sub {
+        my ($sql, @binds) = $builder->select(undef, ['*'], +{}, {joins => [
+            [foo => {
+                type      => 'LEFT OUTER',
+                table     => 'bar',
+                condition => 'foo.bar_id = bar.id',
+            }]
+        ]});
+        is $sql, qq{SELECT * FROM foo LEFT OUTER JOIN bar ON foo.bar_id = bar.id};
+        is join(',', @binds), '';
     };
 };
 
