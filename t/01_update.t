@@ -11,14 +11,42 @@ sub ordered_hashref {
 
 subtest 'driver: sqlite' => sub {
     my $builder = SQL::Maker->new(driver => 'sqlite');
-    subtest 'arrayref, where cause' => sub {
+    subtest 'arrayref, where cause(hashref)' => sub {
         my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
         is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ? WHERE ("user_id" = ?)};
         is join(',', @binds), 'john,john@example.com,3';
     };
 
-    subtest 'ordered hashref, where cause' => sub {
+    subtest 'arrayref, where cause(arrayref)' => sub {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], [user_id => 3]);
+        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ? WHERE ("user_id" = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'arrayref, where cause(condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(user_id => 3);
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], $cond);
+        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ? WHERE ("user_id" = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'ordered hashref, where cause(hashref)' => sub {
         my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
+        is $sql, qq{UPDATE "foo" SET "bar" = ?, "john" = ? WHERE ("yo" = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref, where cause(arrayref)' => sub {
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), [yo => 'king']);
+        is $sql, qq{UPDATE "foo" SET "bar" = ?, "john" = ? WHERE ("yo" = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref, where cause(condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(yo => 'king');
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), $cond);
         is $sql, qq{UPDATE "foo" SET "bar" = ?, "john" = ? WHERE ("yo" = ?)};
         is join(',', @binds), 'baz,man,king';
     };
@@ -39,14 +67,42 @@ subtest 'driver: sqlite' => sub {
 
 subtest 'driver: mysql' => sub {
     my $builder = SQL::Maker->new(driver => 'mysql');
-    subtest 'array ref, where cause' => sub {
+    subtest 'array ref, where cause(hashref)' => sub {
         my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
         is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)};
         is join(',', @binds), 'john,john@example.com,3';
     };
 
-    subtest 'ordered hashref, where cause' => sub {
+    subtest 'array ref, where cause(arrayref)' => sub {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], [user_id => 3]);
+        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'array ref, where cause(condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(user_id => 3);
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], $cond);
+        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'ordered hashref, where cause(hashref)' => sub {
         my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
+        is $sql, qq{UPDATE `foo` SET `bar` = ?, `john` = ? WHERE (`yo` = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref, where cause(arrayref)' => sub {
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), [yo => 'king']);
+        is $sql, qq{UPDATE `foo` SET `bar` = ?, `john` = ? WHERE (`yo` = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref, where cause(condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(yo => 'king');
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), $cond);
         is $sql, qq{UPDATE `foo` SET `bar` = ?, `john` = ? WHERE (`yo` = ?)};
         is join(',', @binds), 'baz,man,king';
     };
@@ -67,14 +123,42 @@ subtest 'driver: mysql' => sub {
 
 subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
     my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
-    subtest 'array ref, where cause' => sub {
+    subtest 'array ref, where cause(hashref)' => sub {
         my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
         is $sql, qq{UPDATE user SET name = ?, email = ? WHERE (user_id = ?)};
         is join(',', @binds), 'john,john@example.com,3';
     };
 
-    subtest 'ordered hashref, where cause' => sub {
+    subtest 'array ref, where cause(arrayref)' => sub {
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], [user_id => 3]);
+        is $sql, qq{UPDATE user SET name = ?, email = ? WHERE (user_id = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'array ref, where cause(condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(user_id => 3);
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], $cond);
+        is $sql, qq{UPDATE user SET name = ?, email = ? WHERE (user_id = ?)};
+        is join(',', @binds), 'john,john@example.com,3';
+    };
+
+    subtest 'ordered hashref, where cause(hashref)' => sub {
         my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), ordered_hashref(yo => 'king'));
+        is $sql, qq{UPDATE foo SET bar = ?, john = ? WHERE (yo = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref, where cause(arrayref)' => sub {
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), [yo => 'king']);
+        is $sql, qq{UPDATE foo SET bar = ?, john = ? WHERE (yo = ?)};
+        is join(',', @binds), 'baz,man,king';
+    };
+
+    subtest 'ordered hashref, where cause(condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(yo => 'king');
+        my ($sql, @binds) = $builder->update('foo' => ordered_hashref(bar => 'baz', john => 'man'), $cond);
         is $sql, qq{UPDATE foo SET bar = ?, john = ? WHERE (yo = ?)};
         is join(',', @binds), 'baz,man,king';
     };

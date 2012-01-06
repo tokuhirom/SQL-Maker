@@ -30,6 +30,15 @@ subtest 'driver: sqlite' => sub {
         is join(',', @binds), 'baz,man';
     };
 
+    subtest 'columns and tables, where cause (condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->select( 'foo', [ 'foo', 'bar' ], $cond );
+        is $sql, qq{SELECT "foo", "bar"\nFROM "foo"\nWHERE ("bar" = ?) AND ("john" = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
     subtest 'columns and tables, where cause (hash ref), order by' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
         is $sql, qq{SELECT "foo", "bar"\nFROM "foo"\nWHERE ("bar" = ?) AND ("john" = ?)\nORDER BY yo};
@@ -38,6 +47,15 @@ subtest 'driver: sqlite' => sub {
 
     subtest 'columns and table, where cause (array ref), order by' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [bar => 'baz', john => 'man'], {order_by => 'yo'});
+        is $sql, qq{SELECT "foo", "bar"\nFROM "foo"\nWHERE ("bar" = ?) AND ("john" = ?)\nORDER BY yo};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'columns and table, where cause (condition), order by' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], $cond, {order_by => 'yo'});
         is $sql, qq{SELECT "foo", "bar"\nFROM "foo"\nWHERE ("bar" = ?) AND ("john" = ?)\nORDER BY yo};
         is join(',', @binds), 'baz,man';
     };
@@ -116,6 +134,15 @@ subtest 'driver: mysql' => sub {
         is join(',', @binds), 'baz,man';
     };
 
+    subtest 'columns and tables, where cause (condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->select( 'foo', [ 'foo', 'bar' ], $cond );
+        is $sql, qq{SELECT `foo`, `bar`\nFROM `foo`\nWHERE (`bar` = ?) AND (`john` = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
     subtest 'columns and tables, where cause (hash ref), order by' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
         is $sql, qq{SELECT `foo`, `bar`\nFROM `foo`\nWHERE (`bar` = ?) AND (`john` = ?)\nORDER BY yo};
@@ -124,6 +151,15 @@ subtest 'driver: mysql' => sub {
 
     subtest 'columns and table, where cause (array ref), order by' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [bar => 'baz', john => 'man'], {order_by => 'yo'});
+        is $sql, qq{SELECT `foo`, `bar`\nFROM `foo`\nWHERE (`bar` = ?) AND (`john` = ?)\nORDER BY yo};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'columns and table, where cause (condition), order by' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], $cond, {order_by => 'yo'});
         is $sql, qq{SELECT `foo`, `bar`\nFROM `foo`\nWHERE (`bar` = ?) AND (`john` = ?)\nORDER BY yo};
         is join(',', @binds), 'baz,man';
     };
@@ -202,6 +238,15 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
         is join(',', @binds), 'baz,man';
     };
 
+    subtest 'columns and tables, where cause (condition)' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->select( 'foo', [ 'foo', 'bar' ], $cond );
+        is $sql, qq{SELECT foo, bar FROM foo WHERE (bar = ?) AND (john = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
     subtest 'columns and tables, where cause (hash ref), order by' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], ordered_hashref(bar => 'baz', john => 'man'), {order_by => 'yo'});
         is $sql, qq{SELECT foo, bar FROM foo WHERE (bar = ?) AND (john = ?) ORDER BY yo};
@@ -210,6 +255,15 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
 
     subtest 'columns and table, where cause (array ref), order by' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [bar => 'baz', john => 'man'], {order_by => 'yo'});
+        is $sql, qq{SELECT foo, bar FROM foo WHERE (bar = ?) AND (john = ?) ORDER BY yo};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'columns and table, where cause (condition), order by' => sub {
+        my $cond = $builder->new_condition;
+        $cond->add(bar => 'baz');
+        $cond->add(john => 'man');
+        my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], $cond, {order_by => 'yo'});
         is $sql, qq{SELECT foo, bar FROM foo WHERE (bar = ?) AND (john = ?) ORDER BY yo};
         is join(',', @binds), 'baz,man';
     };

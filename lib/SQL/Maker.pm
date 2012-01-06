@@ -13,6 +13,7 @@ use SQL::Maker::Select::Oracle;
 use SQL::Maker::Condition;
 use SQL::Maker::Util;
 use Module::Load ();
+use Scalar::Util ();
 
 sub load_plugin {
     my ($class, $role) = @_;
@@ -162,15 +163,28 @@ sub update {
     return ($sql, @bind_columns);
 }
 
-sub _make_where_clause {
+sub _make_where_condition {
     my ($self, $where) = @_;
-    my $w = SQL::Maker::Condition->new(
-        quote_char => $self->quote_char,
-        name_sep   => $self->name_sep,
-    );
-    while (my ($col, $val) = each %$where) {
+
+    return $self->new_condition unless $where;
+    if ( Scalar::Util::blessed( $where ) and $where->can('as_sql') ) {
+        return $where;
+    }
+
+    my $w = $self->new_condition;
+    my @w = ref $where eq 'ARRAY' ? @$where : %$where;
+    while (my ($col, $val) = splice @w, 0, 2) {
         $w->add($col => $val);
     }
+    return $w;
+}
+
+sub _make_where_clause {
+    my ($self, $where) = @_;
+
+    return ['', []] unless $where;
+
+    my $w = $self->_make_where_condition($where);
     my $sql = $w->as_sql(1);
     return [$sql ? " WHERE $sql" : '', [$w->bind]];
 }
@@ -206,10 +220,7 @@ sub select_query {
     $stmt->prefix($opt->{prefix}) if $opt->{prefix};
 
     if ( $where ) {
-        my @w = ref $where eq 'ARRAY' ? @$where : %$where;
-        while (my ($col, $val) = splice @w, 0, 2) {
-            $stmt->add_where($col => $val);
-        }
+        $stmt->set_where($self->_make_where_condition($where));
     }
 
     if (my $o = $opt->{order_by}) {
