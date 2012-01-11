@@ -1,5 +1,10 @@
 Revision history for Perl extension SQL::Maker
 
+1.04
+
+    - support $where as SQL::Maker::Condition at select, update and delete(nihen)
+    - support joins at select
+
 1.03
 
     - support INSERT statement without parameters on SQLite3.
