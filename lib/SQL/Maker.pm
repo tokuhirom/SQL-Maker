@@ -343,7 +343,7 @@ Create new instance of L<SQL::Maker::Select> from the settings from B<$builder>.
 
 This method returns instance of L<SQL::Maker::Select>.
 
-=item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where, \%opt);
+=item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where|\@where|$where, \%opt);
 
     my ($sql, @binds) = $builder->select('user', ['*'], {name => 'john'}, {order_by => 'user_id DESC'});
     # =>
@@ -366,7 +366,11 @@ This is a list for retrieving fields from database.
 
 =item \%where
 
-SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
+=item \@where
+
+=item $where
+
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
 =item \%opt
 
@@ -417,7 +421,7 @@ This option makes 'JOIN' via L<SQL::Maker::Condition>.
 
 =back
 
-=item my ($sql, @binds) = $builder->insert($table, \%values);
+=item my ($sql, @binds) = $builder->insert($table, \%values|\@values);
 
     my ($sql, @binds) = $builder->insert(user => {name => 'john'});
     # =>
@@ -438,7 +442,7 @@ This is a values for INSERT statement.
 
 =back
 
-=item my ($sql, @binds) = $builder->delete($table, \%where);
+=item my ($sql, @binds) = $builder->delete($table, \%where|\@where|$where);
 
     my ($sql, @binds) = $builder->delete($table, \%where);
     # =>
@@ -455,13 +459,15 @@ Table name in scalar.
 
 =item \%where
 
-SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
+=item \@where
+
+=item $where
+
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
 =back
 
-=item my ($sql, @binds) = $builder->update($table, \%set, \%where);
-
-=item my ($sql, @binds) = $builder->update($table, \@set, \%where);
+=item my ($sql, @binds) = $builder->update($table, \%set|@set, \%where|\@where|$where);
 
 Generate UPDATE query.
 
@@ -482,7 +488,11 @@ Setting values.
 
 =item \%where
 
-SQL::Maker creates where clause from this hashref via L<SQL::Maker::Condition>.
+=item \@where
+
+=item $where
+
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
 =back
 
