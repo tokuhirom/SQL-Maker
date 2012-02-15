@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::Maker
 
+1.xx
+
+    - support group_by at SQL::Maker->select
+
 1.04
 
     - support $where as SQL::Maker::Condition at select, update and delete(nihen)

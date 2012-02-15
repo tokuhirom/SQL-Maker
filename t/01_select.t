@@ -98,6 +98,32 @@ subtest 'driver: sqlite' => sub {
         };
     };
 
+    subtest 'group_by' => sub {
+        subtest 'scalar' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => 'yo'});
+            is $sql, qq{SELECT *\nFROM "foo"\nGROUP BY yo};
+            is join(',', @binds), '';
+        };
+
+        subtest 'hash ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => {'yo' => 'DESC'}});
+            is $sql, qq{SELECT *\nFROM "foo"\nGROUP BY "yo" DESC};
+            is join(',', @binds), '';
+        };
+
+        subtest 'array ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => ['yo', 'ya']});
+            is $sql, qq{SELECT *\nFROM "foo"\nGROUP BY yo, ya};
+            is join(',', @binds), '';
+        };
+
+        subtest 'mixed' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => [{'yo' => 'DESC'}, 'ya']});
+            is $sql, qq{SELECT *\nFROM "foo"\nGROUP BY "yo" DESC, ya};
+            is join(',', @binds), '';
+        };
+    };
+
     subtest 'from' => sub {
         subtest 'multi from' => sub {
             my ($sql, @binds) = $builder->select( [ qw/foo bar/ ], ['*'], +{}, );
@@ -214,6 +240,32 @@ subtest 'driver: mysql' => sub {
         };
     };
 
+    subtest 'group_by' => sub {
+        subtest 'scalar' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => 'yo'});
+            is $sql, qq{SELECT *\nFROM `foo`\nGROUP BY yo};
+            is join(',', @binds), '';
+        };
+
+        subtest 'hash ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => {'yo' => 'DESC'}});
+            is $sql, qq{SELECT *\nFROM `foo`\nGROUP BY `yo` DESC};
+            is join(',', @binds), '';
+        };
+
+        subtest 'array ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => ['yo', 'ya']});
+            is $sql, qq{SELECT *\nFROM `foo`\nGROUP BY yo, ya};
+            is join(',', @binds), '';
+        };
+
+        subtest 'mixed' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => [{'yo' => 'DESC'}, 'ya']});
+            is $sql, qq{SELECT *\nFROM `foo`\nGROUP BY `yo` DESC, ya};
+            is join(',', @binds), '';
+        };
+    };
+
     subtest 'from' => sub {
         subtest 'multi from' => sub {
             my ($sql, @binds) = $builder->select( [ qw/foo bar/ ], ['*'], +{}, );
@@ -326,6 +378,32 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
         subtest 'mixed' => sub {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => [{'yo' => 'DESC'}, 'ya']});
             is $sql, qq{SELECT * FROM foo ORDER BY yo DESC, ya};
+            is join(',', @binds), '';
+        };
+    };
+
+    subtest 'group_by' => sub {
+        subtest 'scalar' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => 'yo'});
+            is $sql, qq{SELECT * FROM foo GROUP BY yo};
+            is join(',', @binds), '';
+        };
+
+        subtest 'hash ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => {'yo' => 'DESC'}});
+            is $sql, qq{SELECT * FROM foo GROUP BY yo DESC};
+            is join(',', @binds), '';
+        };
+
+        subtest 'array ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => ['yo', 'ya']});
+            is $sql, qq{SELECT * FROM foo GROUP BY yo, ya};
+            is join(',', @binds), '';
+        };
+
+        subtest 'mixed' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {group_by => [{'yo' => 'DESC'}, 'ya']});
+            is $sql, qq{SELECT * FROM foo GROUP BY yo DESC, ya};
             is join(',', @binds), '';
         };
     };
