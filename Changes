@@ -1,6 +1,6 @@
 Revision history for Perl extension SQL::Maker
 
-1.xx
+1.05
 
     - support group_by at SQL::Maker->select
 
