@@ -725,6 +725,40 @@ subtest join_with_using => sub {
     };
 };
 
+subtest 'add_where_raw' => sub {
+    subtest 'quote_char: "`", name_sep: "."' => sub {
+        my $sql = ns( quote_char => q{`}, name_sep => q{.}, );
+        $sql->add_select( foo => 'foo' );
+        $sql->add_from( 'baz' );
+        $sql->add_where_raw( 'MATCH(foo) AGAINST (?)' => 'hoge' );
+
+        is $sql->as_sql, "SELECT `foo`\nFROM `baz`\nWHERE (MATCH(foo) AGAINST (?))";
+        is $sql->bind->[0], 'hoge';
+    };
+
+    subtest 'quote_char: "", name_sep: ".", new_line: " "' => sub {
+        my $sql = ns( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+        $sql->add_select( foo => 'foo' );
+        $sql->add_from( 'baz' );
+        $sql->add_where_raw( 'MATCH(foo) AGAINST (?)' => 'hoge' );
+
+        is $sql->as_sql, "SELECT foo FROM baz WHERE (MATCH(foo) AGAINST (?))";
+        is $sql->bind->[0], 'hoge';
+    };
+
+    subtest 'multi values' => sub {
+        my $sql = ns( quote_char => q{}, name_sep => q{.} );
+        $sql->add_select( foo => 'foo' );
+        $sql->add_from( 'baz' );
+        $sql->add_where_raw( 'foo = IF(bar = ?, ?, ?)' => ['hoge', 'fuga', 'piyo'] );
+
+        is $sql->as_sql, "SELECT foo\nFROM baz\nWHERE (foo = IF(bar = ?, ?, ?))";
+        is $sql->bind->[0], 'hoge';
+        is $sql->bind->[1], 'fuga';
+        is $sql->bind->[2], 'piyo';
+    };
+};
+
 sub ns { SQL::Maker::Select->new(@_) }
 
 done_testing;
