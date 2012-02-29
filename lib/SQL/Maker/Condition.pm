@@ -122,7 +122,9 @@ sub add_raw {
     my ($self, $term, $bind) = @_;
 
     push @{ $self->{sql} }, "($term)";
-    push @{ $self->{bind} }, ( ref($bind) eq 'ARRAY' ? @$bind : $bind );
+    if ( defined $bind ) {
+        push @{ $self->{bind} }, (ref($bind) eq 'ARRAY' ? @$bind : $bind);
+    }
 
     return $self;
 }

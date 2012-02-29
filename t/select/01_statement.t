@@ -757,6 +757,16 @@ subtest 'add_where_raw' => sub {
         is $sql->bind->[1], 'fuga';
         is $sql->bind->[2], 'piyo';
     };
+
+    subtest 'without value' => sub {
+        my $sql = ns( quote_char => q{}, name_sep => q{.} );
+        $sql->add_select( foo => 'foo' );
+        $sql->add_from( 'baz' );
+        $sql->add_where_raw( 'foo IS NOT NULL' );
+
+        is $sql->as_sql, "SELECT foo\nFROM baz\nWHERE (foo IS NOT NULL)";
+        is scalar(@{$sql->bind}), 0;
+    };
 };
 
 sub ns { SQL::Maker::Select->new(@_) }
