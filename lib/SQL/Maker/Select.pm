@@ -255,6 +255,14 @@ sub add_where {
     return $self;
 }
 
+sub add_where_raw {
+    my ($self, $term, $bind) = @_;
+
+    $self->{where} ||= $self->new_condition();
+    $self->{where}->add_raw($term, $bind);
+    return $self;
+}
+
 sub as_sql_where {
     my $self = shift;
 

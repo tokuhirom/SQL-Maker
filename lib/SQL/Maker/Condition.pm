@@ -118,6 +118,17 @@ sub add {
     return $self; # for influent interface
 }
 
+sub add_raw {
+    my ($self, $term, $bind) = @_;
+
+    push @{ $self->{sql} }, "($term)";
+    if ( defined $bind ) {
+        push @{ $self->{bind} }, (ref($bind) eq 'ARRAY' ? @$bind : $bind);
+    }
+
+    return $self;
+}
+
 sub compose_and {
     my ($self, $other) = @_;
 
