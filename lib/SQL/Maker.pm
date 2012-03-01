@@ -310,7 +310,7 @@ SQL::Maker - Yet another SQL builder
     ($sql, @binds) = $builder->insert($table, \%values);
 
     # DELETE
-    ($sql, @binds) = $builder->delete($table, \%values);
+    ($sql, @binds) = $builder->delete($table, \%where);
 
     # UPDATE
     ($sql, @binds) = $builder->update($table, \%set, \%where);
