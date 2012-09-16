@@ -422,6 +422,19 @@ Add new where clause.
                                    ->as_sql();
     # => "SELECT c FROM foo WHERE (name = ?) AND (type IN (?, ?, ?))"
 
+=item $stmt->add_where_raw('id = ?', [1])
+
+Add new where clause from raw placeholder string and bind variables.
+
+    my $stmt = SQL::Maker::Select->new()
+                                   ->add_select('c')
+                                   ->add_from('foo')
+                                   ->add_where_raw('EXISTS(SELECT * FROM bar WHERE name = ?)' => ['john'])
+                                   ->add_where_raw('type IS NOT NULL')
+                                   ->as_sql();
+    # => "SELECT c FROM foo WHERE (EXISTS(SELECT * FROM bar WHERE name = ?)) AND (type IS NOT NULL)"
+
+
 =item $stmt->set_where($condition)
 
 Set the where clause.

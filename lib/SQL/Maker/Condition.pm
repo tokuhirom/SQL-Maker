@@ -178,6 +178,16 @@ SQL::Maker::Condition - condition object for SQL::Maker
     $sql = $condition->as_sql(); # (`foo_id`=?) AND (`bar_id`=?)
     @bind = $condition->bind();  # (3, 4)
 
+    # add_raw
+    my $condition = SQL::Maker::Condition->new(
+        name_sep   => '.',
+        quote_char => '`',
+    );
+    $condition->add_raw('EXISTS(SELECT * FROM bar WHERE name = ?)' => ['john']);
+    $condition->add_raw('type IS NOT NULL');
+    $sql = $condition->as_sql(); # (EXISTS(SELECT * FROM bar WHERE name = ?)) AND (type IS NOT NULL)
+    @bind = $condition->bind();  # ('john')
+
     # composite and
     my $other = SQL::Maker::Condition->new(
         name_sep => '.',
