@@ -1,5 +1,12 @@
 Revision history for Perl extension SQL::Maker
 
+1.06    Sun Sep 16 04:30:50 UTC 2012
+
+    - In SQL::Maker::Select
+        - Add "add_where_raw" method. (issm)
+    - In SQL::Maker::Condition
+        - Add "add_raw" method. (issm)
+
 1.05
 
     - support group_by at SQL::Maker->select
