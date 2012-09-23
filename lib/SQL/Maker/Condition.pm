@@ -132,6 +132,22 @@ sub add_raw {
 sub compose_and {
     my ($self, $other) = @_;
 
+    if ( !@{$self->{sql}} ) {
+        if ( !@{$other->{sql}} ) {
+            return SQL::Maker::Condition->new;
+        }
+        return SQL::Maker::Condition->new(
+            sql => ['(' . $other->as_sql() . ')'],
+            bind => [@{$other->{bind}}],
+        );
+    }
+    if ( !@{$other->{sql}} ) {
+        return SQL::Maker::Condition->new(
+            sql => ['(' . $self->as_sql() . ')'],
+            bind => [@{$self->{bind}}],
+        );
+    }
+
     return SQL::Maker::Condition->new(
         sql => ['(' . $self->as_sql() . ') AND (' . $other->as_sql() . ')'],
         bind => [@{$self->{bind}}, @{$other->{bind}}],
@@ -140,6 +156,22 @@ sub compose_and {
 
 sub compose_or {
     my ($self, $other) = @_;
+
+    if ( !@{$self->{sql}} ) {
+        if ( !@{$other->{sql}} ) {
+            return SQL::Maker::Condition->new;
+        }
+        return SQL::Maker::Condition->new(
+            sql => ['(' . $other->as_sql() . ')'],
+            bind => [@{$other->{bind}}],
+        );
+    }
+    if ( !@{$other->{sql}} ) {
+        return SQL::Maker::Condition->new(
+            sql => ['(' . $self->as_sql() . ')'],
+            bind => [@{$self->{bind}}],
+        );
+    }
 
     return SQL::Maker::Condition->new(
         sql => ['(' . $self->as_sql() . ') OR (' . $other->as_sql() . ')'],
