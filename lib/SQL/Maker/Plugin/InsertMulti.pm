@@ -59,27 +59,9 @@ sub insert_multi {
     $sql =~ s/,$self->{new_line}$/$self->{new_line}/;
 
     if ( $self->{driver} eq 'mysql' && exists $opts->{update} ) {
-        my @sets = ref $opts->{update} eq 'HASH' ? %{$opts->{update}} : @{$opts->{update}};
-        my @update_sets;
-        while (my ($col, $val) = splice @sets, 0, 2) {
-            my $quoted_col = $self->_quote($col);
-            if ( ref $val eq 'SCALAR' ) {
-                # $val = \'NOW()'
-                push @update_sets, "$quoted_col = " . $$val;
-            }
-            elsif ( ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
-                # $val = \['UNIX_TIMESTAMP(?)', '2011-04-20 00:30:00']
-                my ( $stmt, @sub_bind ) = @{$$val};
-                push @update_sets, "$quoted_col = " . $stmt;
-                push @bind, @sub_bind;
-            }
-            else {
-                # normal values
-                push @update_sets, "$quoted_col = ?";
-                push @bind, $val;
-            }
-        }
-        $sql .= "ON DUPLICATE KEY UPDATE " . join(', ', @update_sets) . $self->{new_line};
+        my ($update_cols, $update_vals) = $self->make_set_clause($opts->{update});
+        $sql .= "ON DUPLICATE KEY UPDATE " . join(', ', @$update_cols) . $self->{new_line};
+        push @bind, @$update_vals;
     }
 
     $sql =~ s/$self->{new_line}+$//;
