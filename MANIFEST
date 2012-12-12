@@ -5,6 +5,7 @@ Changes
 lib/SQL/Maker.pm
 lib/SQL/Maker/Condition.pm
 lib/SQL/Maker/Plugin/InsertMulti.pm
+lib/SQL/Maker/Plugin/InsertOnDuplicate.pm
 lib/SQL/Maker/Select.pm
 lib/SQL/Maker/Select/Oracle.pm
 lib/SQL/Maker/SelectSet.pm
@@ -30,6 +31,7 @@ t/condition/02_make_term.t
 t/condition/03_add_raw.t
 t/condition/04_compose_empty.t
 t/plugins/insert_multi/01_insert_multi.t
+t/plugins/insert_on_duplicate/01_insert_on_duplicate.t
 t/select/01_statement.t
 t/select/02_pod_select.t
 t/select/oracle/01_oracle.t

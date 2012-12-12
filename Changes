@@ -1,8 +1,14 @@
 Revision history for Perl extension SQL::Maker
 
+1.09
+
+    - added SQL::Maker::Plugin::InsertOnDuplicate
+      (tokuhirom)
+
 1.08
 
     - added 'make_set_clause' method to core, and SQL::Maker::Plugin::InsertMulti use it.
+      (tokuhirom)
 
 1.07    Mon Sep 24 03:51:15 UTC 2012
 
