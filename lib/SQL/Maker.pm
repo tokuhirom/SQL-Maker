@@ -533,6 +533,10 @@ where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Ma
 
 =back
 
+=item $builder->new_condition()
+
+Create new L<SQL::Maker::Condition> object from C< $builder > settings.
+
 =back
 
 =head1 PLUGINS
