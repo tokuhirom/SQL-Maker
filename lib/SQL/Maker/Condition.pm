@@ -173,8 +173,10 @@ sub compose_or {
         );
     }
 
+    # return value is enclosed with '()'.
+    # because 'OR' operator priority less than 'AND'.
     return SQL::Maker::Condition->new(
-        sql => ['(' . $self->as_sql() . ') OR (' . $other->as_sql() . ')'],
+        sql => ['((' . $self->as_sql() . ') OR (' . $other->as_sql() . '))'],
         bind => [@{$self->{bind}}, @{$other->{bind}}],
     );
 }
