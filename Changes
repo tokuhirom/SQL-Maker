@@ -1,5 +1,10 @@
 Revision history for Perl extension SQL::Maker
 
+1.10
+
+    - [IMPOTANT] SQL::Maker::Condition::compose_or now returns the SQL bracketed.
+      (chiba)
+
 1.09
 
     - added SQL::Maker::Plugin::InsertOnDuplicate
