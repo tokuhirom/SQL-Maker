@@ -23,11 +23,11 @@ subtest 'and' => sub {
 
 subtest 'or' => sub {
     my $or = ($w1 | $w2);
-    is $or->as_sql, '((x = ?) AND (y = ?)) OR ((a = ?) AND (b = ?))';
+    is $or->as_sql, '(((x = ?) AND (y = ?)) OR ((a = ?) AND (b = ?)))';
     is join(', ', $or->bind), '1, 2, 3, 4';
 
     $or->add(z => 99);
-    is $or->as_sql, '((x = ?) AND (y = ?)) OR ((a = ?) AND (b = ?)) AND (z = ?)';
+    is $or->as_sql, '(((x = ?) AND (y = ?)) OR ((a = ?) AND (b = ?))) AND (z = ?)';
     is join(', ', $or->bind), '1, 2, 3, 4, 99';
 };
 
