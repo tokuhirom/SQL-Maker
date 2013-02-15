@@ -170,6 +170,12 @@ sub make_set_clause {
     return (\@columns, \@bind_columns);
 }
 
+sub where {
+    my ($self, $where) = @_;
+    my $cond = $self->_make_where_condition($where);
+    return ($cond->as_sql(), $cond->bind());
+}
+
 sub _make_where_condition {
     my ($self, $where) = @_;
 
@@ -536,6 +542,14 @@ where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Ma
 =item $builder->new_condition()
 
 Create new L<SQL::Maker::Condition> object from C< $builder > settings.
+
+=item my ($sql, @binds) = $builder->where(\%where)
+
+=item my ($sql, @binds) = $builder->where(\@where)
+
+=item my ($sql, @binds) = $builder->where(\@where)
+
+Where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
 =back
 
