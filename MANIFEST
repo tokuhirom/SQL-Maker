@@ -22,6 +22,7 @@ t/01_insert.t
 t/01_select.t
 t/01_simple.t
 t/01_update.t
+t/02_where.t
 t/09_new_line.t
 t/10_subquery.t
 t/11_set.t
