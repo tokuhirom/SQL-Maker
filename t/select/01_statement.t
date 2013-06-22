@@ -4,6 +4,13 @@ use warnings;
 use SQL::Maker::Select;
 use Test::More;
 
+use Test::Requires 'Tie::IxHash';
+
+sub ordered_hashref {
+    tie my %params, Tie::IxHash::, @_;
+    return \%params;
+}
+
 subtest 'PREFIX' => sub {
     subtest 'quote_char: "`", name_sep: "."' => sub {
         subtest 'simple' => sub {
@@ -122,6 +129,33 @@ subtest 'JOIN' => sub {
                 }
             );
             is($stmt->as_sql, "FROM `foo` INNER JOIN `baz` ON foo.baz_id = baz.baz_id, `bar`");
+        };
+
+        subtest 'inner join with hash condition' => sub {
+            my $stmt = ns( quote_char => q{`}, name_sep => q{.}, );
+            $stmt->add_join(
+                foo => {
+                    type      => 'inner',
+                    table     => 'baz',
+                    condition => {'foo.baz_id' => 'baz.baz_id'},
+                }
+            );
+            is($stmt->as_sql, "FROM `foo` INNER JOIN `baz` ON `foo`.`baz_id` = `baz`.`baz_id`");
+        };
+
+        subtest 'inner join with hash condition with multi keys' => sub {
+            my $stmt = ns( quote_char => q{`}, name_sep => q{.}, );
+            $stmt->add_join(
+                foo => {
+                    type      => 'inner',
+                    table     => 'baz',
+                    condition => ordered_hashref(
+                        'foo.baz_id' => 'baz.baz_id',
+                        'foo.status' => 'baz.status',
+                    ),
+                }
+            );
+            is($stmt->as_sql, "FROM `foo` INNER JOIN `baz` ON `foo`.`baz_id` = `baz`.`baz_id` AND `foo`.`status` = `baz`.`status`");
         };
 
         subtest 'test case for bug found where add_join is called twice' => sub {

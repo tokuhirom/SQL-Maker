@@ -161,6 +161,13 @@ sub as_sql {
                 if (ref $join->{condition} && ref $join->{condition} eq 'ARRAY') {
                     $sql .= ' USING ('. join(', ', map { $self->_quote($_) } @{ $join->{condition} }) . ')';
                 }
+                elsif (ref $join->{condition} && ref $join->{condition} eq 'HASH') {
+                    my @conds;
+                    for my $key (keys %{ $join->{condition} }) {
+                        push @conds, $self->_quote($key) . ' = ' . $self->_quote($join->{condition}{$key});
+                    }
+                    $sql .= ' ON ' . join(' AND ', @conds);
+                }
                 else {
                     $sql .= ' ON ' . $join->{condition};
                 }
