@@ -215,9 +215,10 @@ sub select_query {
         Carp::croak("SQL::Maker::select_query: \$fields should be ArrayRef[Str]");
     }
 
-    my $stmt = $self->new_select(
-        select     => $fields,
-    );
+    my $stmt = $self->new_select;
+    for my $field (@$fields) {
+        $stmt->add_select(ref $field ? @$field : $field);
+    }
 
     if ( defined $table ) {
         unless ( ref $table ) {
