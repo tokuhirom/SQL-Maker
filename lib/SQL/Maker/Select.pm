@@ -364,6 +364,8 @@ I<Return:> $stmt itself.
 
 =item $stmt->add_join(user => {type => 'inner', table => 'config', condition => 'user.user_id = config.user_id'});
 
+=item $stmt->add_join(user => {type => 'inner', table => 'config', condition => {'user.user_id' => 'config.user_id'});
+
 =item $stmt->add_join(user => {type => 'inner', table => 'config', condition => ['user_id']});
 
 Add new JOIN clause. If you pass arrayref for 'condition' then it uses 'USING'.
@@ -379,6 +381,16 @@ Add new JOIN clause. If you pass arrayref for 'condition' then it uses 'USING'.
     $stmt->as_sql();
     # => 'FROM user INNER JOIN config ON user.user_id = config.user_id'
 
+    my $stmt = SQL::Maker::Select->new(quote_char => '`', name_sep => '.');
+    $stmt->add_join(
+        user => {
+            type      => 'inner',
+            table     => 'config',
+            condition => {'user.user_id' => 'config.user_id'},
+        }
+    );
+    $stmt->as_sql();
+    # => 'FROM `user` INNER JOIN `config` ON `user`.`user_id` = `config`.`user_id`'
 
     my $stmt = SQL::Maker::Select->new();
     $stmt->add_select('name');
