@@ -16,7 +16,13 @@ META.yml
 pm_to_blib
 blib/
 MYMETA.*
-META.json
 README
 ^inc/
 SQL-Maker-*/
+/SQL-Maker-*
+/.build
+/_build_params
+/Build
+!Build/
+!META.json
+!LICENSE

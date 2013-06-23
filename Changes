@@ -1,5 +1,7 @@
 Revision history for Perl extension SQL::Maker
 
+{{$NEXT}}
+
 1.11 2013-02-15T16:13:52
 
     - Added SQL::Maker#where

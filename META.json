@@ -1,0 +1,84 @@
+{
+   "abstract" : "Yet another SQL builder",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SQL-Maker",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.05",
+            "DBI" : "0",
+            "Module::Load" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0",
+            "Tie::IxHash" : "0"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/SQL-Maker/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/SQL-Maker",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tokuhirom/SQL-Maker.git",
+         "web" : "https://github.com/tokuhirom/SQL-Maker"
+      }
+   },
+   "version" : "1.11",
+   "x_contributors" : [
+      "lestrrat <lestrrat+github@gmail.com>",
+      "makamaka <makamaka.donzoko@gmail.com>",
+      "Atsushi Kobayashi <nekokak@gmail.com>",
+      "yamaguchi.toru <zigorou@cpan.org>",
+      "Fuji, Goro <gfuji@cpan.org>",
+      "issm <issmxx@gmail.com>",
+      "Masahiro Chiba <nihen@megabbs.com>",
+      "Masahiro Chiba <chiba@everqueue.com>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}
