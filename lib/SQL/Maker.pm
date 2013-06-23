@@ -320,7 +320,7 @@ SQL::Maker - Yet another SQL builder
     ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
 
     # INSERT
-    ($sql, @binds) = $builder->insert($table, \%values);
+    ($sql, @binds) = $builder->insert($table, \%values, \%opt);
 
     # DELETE
     ($sql, @binds) = $builder->delete($table, \%where);
@@ -464,7 +464,7 @@ This option makes 'JOIN' via L<SQL::Maker::Condition>.
 
 =back
 
-=item my ($sql, @binds) = $builder->insert($table, \%values|\@values);
+=item my ($sql, @binds) = $builder->insert($table, \%values|\@values, \%opt);
 
     my ($sql, @binds) = $builder->insert(user => {name => 'john'});
     # =>
@@ -482,6 +482,22 @@ Table name in scalar.
 =item \%values
 
 This is a values for INSERT statement.
+
+=item \%opt
+
+This is a options for INSERT statement
+
+=over 4
+
+=item $opt->{prefix}
+
+This is a prefix for INSERT statement.
+
+For example, you can provide 'INSERT IGNORE INTO' for MySQL.
+
+Default Value: 'INSERT INTO'
+
+=back
 
 =back
 
