@@ -397,6 +397,9 @@ Table name for B<FROM> clause in scalar or arrayref. You can specify the instanc
 
 This is a list for retrieving fields from database.
 
+Each element of the C<@field> is a String of the column name normally. If you want to specify alias of the field,
+you can use ArrayRef containing the pair of column and alias name (eg. C<< ['foo.id' => 'foo_id'] >>).
+
 =item \%where
 
 =item \@where
