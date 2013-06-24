@@ -18,6 +18,12 @@ subtest 'driver: sqlite' => sub {
         is join(',', @binds), '';
     };
 
+    subtest 'scalar ref columns and tables' => sub {
+        my ($sql, @binds) = $builder->select( 'foo', [ \'bar', \'baz' ] );
+        is $sql, qq{SELECT bar, baz\nFROM "foo"};
+        is join(',', @binds), '';
+    };
+
     subtest 'columns with alias column and tables' => sub {
         my ($sql, @binds) = $builder->select( 'foo', [ 'foo', [bar => 'barbar'] ] );
         is $sql, qq{SELECT "foo", "bar" AS "barbar"\nFROM "foo"};
@@ -169,6 +175,12 @@ subtest 'driver: mysql' => sub {
     subtest 'columns with alias column and tables' => sub {
         my ($sql, @binds) = $builder->select( 'foo', [ 'foo', [bar => 'barbar'] ] );
         is $sql, qq{SELECT `foo`, `bar` AS `barbar`\nFROM `foo`};
+        is join(',', @binds), '';
+    };
+
+    subtest 'scalar ref columns and tables' => sub {
+        my ($sql, @binds) = $builder->select( 'foo', [ \'bar', \'baz' ] );
+        is $sql, qq{SELECT bar, baz\nFROM `foo`};
         is join(',', @binds), '';
     };
 

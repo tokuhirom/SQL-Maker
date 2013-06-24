@@ -217,7 +217,7 @@ sub select_query {
 
     my $stmt = $self->new_select;
     for my $field (@$fields) {
-        $stmt->add_select(ref $field ? @$field : $field);
+        $stmt->add_select(ref $field eq 'ARRAY' ? @$field : $field);
     }
 
     if ( defined $table ) {
@@ -397,8 +397,9 @@ Table name for B<FROM> clause in scalar or arrayref. You can specify the instanc
 
 This is a list for retrieving fields from database.
 
-Each element of the C<@field> is a String of the column name normally. If you want to specify alias of the field,
-you can use ArrayRef containing the pair of column and alias name (eg. C<< ['foo.id' => 'foo_id'] >>).
+Each element of the C<@field> is a scalar or a scalar ref of the column name normally.
+If you want to specify alias of the field, you can use ArrayRef containing the pair of column
+and alias name (eg. C<< ['foo.id' => 'foo_id'] >>).
 
 =item \%where
 
