@@ -215,9 +215,10 @@ sub select_query {
         Carp::croak("SQL::Maker::select_query: \$fields should be ArrayRef[Str]");
     }
 
-    my $stmt = $self->new_select(
-        select     => $fields,
-    );
+    my $stmt = $self->new_select;
+    for my $field (@$fields) {
+        $stmt->add_select(ref $field ? @$field : $field);
+    }
 
     if ( defined $table ) {
         unless ( ref $table ) {
@@ -395,6 +396,9 @@ Table name for B<FROM> clause in scalar or arrayref. You can specify the instanc
 =item \@fields
 
 This is a list for retrieving fields from database.
+
+Each element of the C<@field> is a String of the column name normally. If you want to specify alias of the field,
+you can use ArrayRef containing the pair of column and alias name (eg. C<< ['foo.id' => 'foo_id'] >>).
 
 =item \%where
 

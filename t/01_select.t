@@ -18,6 +18,12 @@ subtest 'driver: sqlite' => sub {
         is join(',', @binds), '';
     };
 
+    subtest 'columns with alias column and tables' => sub {
+        my ($sql, @binds) = $builder->select( 'foo', [ 'foo', [bar => 'barbar'] ] );
+        is $sql, qq{SELECT "foo", "bar" AS "barbar"\nFROM "foo"};
+        is join(',', @binds), '';
+    };
+
     subtest 'columns and tables, where cause (hash ref)' => sub {
         my ($sql, @binds) = $builder->select( 'foo', [ 'foo', 'bar' ], ordered_hashref( bar => 'baz', john => 'man' ) );
         is $sql, qq{SELECT "foo", "bar"\nFROM "foo"\nWHERE ("bar" = ?) AND ("john" = ?)};
@@ -157,6 +163,12 @@ subtest 'driver: mysql' => sub {
     subtest 'columns and tables' => sub {
         my ($sql, @binds) = $builder->select( 'foo', [ '*' ] );
         is $sql, qq{SELECT *\nFROM `foo`};
+        is join(',', @binds), '';
+    };
+
+    subtest 'columns with alias column and tables' => sub {
+        my ($sql, @binds) = $builder->select( 'foo', [ 'foo', [bar => 'barbar'] ] );
+        is $sql, qq{SELECT `foo`, `bar` AS `barbar`\nFROM `foo`};
         is join(',', @binds), '';
     };
 
