@@ -4,7 +4,6 @@ use warnings;
 use utf8;
 use SQL::Maker::Condition;
 use SQL::Maker::Util;
-use SQL::Maker::Condition;
 use Class::Accessor::Lite (
     new => 0,
     wo => [qw/distinct for_update/],
