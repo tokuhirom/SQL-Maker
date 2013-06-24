@@ -8,7 +8,7 @@ sub quote_identifier {
 
     return $label if $label eq '*';
     return $label unless $name_sep;
-    return join $name_sep, map { $quote_char . $_ . $quote_char } split /\Q$name_sep\E/, $label;
+    return join $name_sep, map { $_ eq '*' ? $_ : $quote_char . $_ . $quote_char } split /\Q$name_sep\E/, $label;
 }
 
 1;
