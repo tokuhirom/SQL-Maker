@@ -16,6 +16,9 @@ sub insert_on_duplicate {
 1;
 __END__
 
+=for test_synopsis
+my ($name);
+
 =head1 NAME
 
 SQL::Maker::Plugin::InsertOnDuplicate - INSERT ... ON DUPLICATE KEY UPDATE
