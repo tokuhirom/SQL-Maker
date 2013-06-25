@@ -14,7 +14,7 @@ SQL::Maker - Yet another SQL builder
     ($sql, @binds) = $builder->select($table, \@fields, \%where, \%opt);
 
     # INSERT
-    ($sql, @binds) = $builder->insert($table, \%values);
+    ($sql, @binds) = $builder->insert($table, \%values, \%opt);
 
     # DELETE
     ($sql, @binds) = $builder->delete($table, \%where);
@@ -81,6 +81,10 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
         This is a list for retrieving fields from database.
 
+        Each element of the `@field` is a scalar or a scalar ref of the column name normally.
+        If you want to specify alias of the field, you can use ArrayRef containing the pair of column
+        and alias name (e.g. `['foo.id' => 'foo_id']`).
+
     - \\%where
     - \\@where
     - $where
@@ -141,7 +145,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
             This option makes 'JOIN' via [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition).
 
-- my ($sql, @binds) = $builder->insert($table, \\%values|\\@values);
+- my ($sql, @binds) = $builder->insert($table, \\%values|\\@values, \\%opt);
 
         my ($sql, @binds) = $builder->insert(user => {name => 'john'});
         # =>
@@ -157,6 +161,18 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
     - \\%values
 
         This is a values for INSERT statement.
+
+    - \\%opt
+
+        This is a options for INSERT statement
+
+        - $opt->{prefix}
+
+            This is a prefix for INSERT statement.
+
+            For example, you can provide 'INSERT IGNORE INTO' for MySQL.
+
+            Default Value: 'INSERT INTO'
 
 - my ($sql, @binds) = $builder->delete($table, \\%where|\\@where|$where);
 

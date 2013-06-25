@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line driver select_class/],
 );
@@ -399,7 +399,7 @@ This is a list for retrieving fields from database.
 
 Each element of the C<@field> is a scalar or a scalar ref of the column name normally.
 If you want to specify alias of the field, you can use ArrayRef containing the pair of column
-and alias name (eg. C<< ['foo.id' => 'foo_id'] >>).
+and alias name (e.g. C<< ['foo.id' => 'foo_id'] >>).
 
 =item \%where
 

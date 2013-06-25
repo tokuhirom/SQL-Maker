@@ -45,6 +45,7 @@
             "Class::Accessor::Lite" : "0.05",
             "DBI" : "0",
             "Module::Load" : "0",
+            "Scalar::Util" : "0",
             "parent" : "0",
             "perl" : "5.008001"
          }
@@ -69,7 +70,7 @@
          "web" : "https://github.com/tokuhirom/SQL-Maker"
       }
    },
-   "version" : "1.11",
+   "version" : "1.12",
    "x_contributors" : [
       "lestrrat <lestrrat+github@gmail.com>",
       "makamaka <makamaka.donzoko@gmail.com>",
@@ -79,6 +80,8 @@
       "issm <issmxx@gmail.com>",
       "Masahiro Chiba <nihen@megabbs.com>",
       "Masahiro Chiba <chiba@everqueue.com>",
+      "Toshio Ito <debug.ito@gmail.com>",
+      "Masayuki Matsuki <y.songmu@gmail.com>",
       "tokuhirom <tokuhirom@gmail.com>"
    ]
 }

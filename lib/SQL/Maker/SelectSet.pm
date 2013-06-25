@@ -150,27 +150,27 @@ inherited from L<SQL::Maker::Select>.
 
 =over 4
 
-=item union($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+=item C<< union($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet >>
 
 Tow statements are combined by C<UNION>.
 
-=item union_all($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+=item C<< union_all($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet >>
 
 Tow statements are combined by C<UNION ALL>.
 
-=item intersect($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+=item C<< intersect($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet >>
 
 Tow statements are combined by C<INTERSECT>.
 
-=item intersect_all($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+=item C<< intersect_all($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet >>
 
 Tow statements are combined by C<INTERSECT ALL>.
 
-=item except($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+=item C<< except($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet >>
 
 Tow statements are combined by C<EXCEPT>.
 
-=item except($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet
+=item C<< except($select :SQL::Maker::Select | $set :SQL::Maker::SelectSet) : SQL::Maker::SelectSet >>
 
 Tow statements are combined by C<EXCEPT ALL>.
 
@@ -206,15 +206,15 @@ The operator. This parameter is required.
 
 =over 4
 
-=item my $sql = $set->as_sql() : Str
+=item C<< my $sql = $set->as_sql() : Str >>
 
 Returns a new select statement.
 
-=item my @binds = $set->bind() : Array[Str]
+=item C<< my @binds = $set->bind() : Array[Str] >>
 
 Returns bind variables.
 
-=item $set->add_statement($stmt : $stmt->can('as_sql')) : SQL::Maker::SelectSet
+=item C<< $set->add_statement($stmt : $stmt->can('as_sql')) : SQL::Maker::SelectSet >>
 
 This method adds new statement object. C<< $stmt >> must provides 'as_sql' method.
 
