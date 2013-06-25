@@ -2,6 +2,12 @@ Revision history for Perl extension SQL::Maker
 
 {{$NEXT}}
 
+    - column alias can be specified by ArrayRef in SQL::Maker#select
+    - join condition accepts HashRef. eg. {'user.id' => 'user_item.user_id'}
+    - switch to Minilla
+    - add document about \%opt for insert() method
+    - cares skip quoting asterisk after table. eg. 'foo.*' => '"foo".*'
+
 1.11 2013-02-15T16:13:52
 
     - Added SQL::Maker#where
