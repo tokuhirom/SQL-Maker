@@ -32,7 +32,7 @@ sub new {
     unless ($args{driver}) {
         Carp::croak("'driver' is required for creating new instance of $class");
     }
-    my $driver = $args{driver};
+    my $driver = $class->_find_database_type($args{driver});
     unless ( defined $args{quote_char} ) {
     $args{quote_char} = do{
         if ($driver eq  'mysql') {
@@ -42,7 +42,7 @@ sub new {
         }
     };
     }
-    $args{select_class} = $driver eq 'Oracle' ? 'SQL::Maker::Select::Oracle' : 'SQL::Maker::Select';
+    $args{select_class} = $driver eq 'oracle' ? 'SQL::Maker::Select::Oracle' : 'SQL::Maker::Select';
 
     return bless {
         name_sep => '.',
@@ -297,6 +297,44 @@ sub select_query {
     return $stmt;
 }
 
+sub _find_database_type {
+    my ($class, $driver) = @_;
+    my $db;
+
+    if (ref $driver) {
+        if (eval { $driver->{Driver}->{Name} }) {
+            # dbh of DBI
+            return $class->_find_database_from_dbh($driver);
+        }
+        else {
+            Carp::croak("unsupported ORM object: " . ref $driver);
+        }
+    }
+    else {
+        return lc $driver;
+    }
+}
+
+sub _find_database_from_dbh {
+    my ($class, $dbh) = @_;
+
+    my $driver = $dbh->{Driver}->{Name}
+        or Carp::croak("no driver in $dbh");
+
+    if (lc $driver eq 'proxy') {
+        ( $driver ) = $dbh->{proxy_client}->{application} =~ /^DBI:(.+?):/;
+    }
+
+    $driver = lc $driver;
+
+    my ( $odbc, $ado ) = ( $driver eq 'odbc', $driver eq 'ado' );
+    if ($odbc || $ado) {
+        Carp::croak("ODBC nor ADO are not supported.");
+    }
+
+    return $driver;
+}
+
 1;
 __END__
 
@@ -346,9 +384,9 @@ Attributes are following:
 
 =over 4
 
-=item driver: Str
+=item driver: Str or DBI handle
 
-Driver name is required. The driver type is needed to create SQL string.
+Driver name or DBI handle is required. The driver type is needed to create SQL string.
 
 =item quote_char: Str
 
@@ -607,6 +645,8 @@ Whole code was taken from L<DBIx::Skinny> by nekokak++.
 =head1 LICENSE
 
 Copyright (C) Tokuhiro Matsuno
+
+Copyright (C) 2004 David Baird (for dbh driver handling)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

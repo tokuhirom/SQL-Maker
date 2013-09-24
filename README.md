@@ -35,9 +35,9 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
     Attributes are following:
 
-    - driver: Str
+    - driver: Str or DBI handle
 
-        Driver name is required. The driver type is needed to create SQL string.
+        Driver name or DBI handle is required. The driver type is needed to create SQL string.
 
     - quote\_char: Str
 
@@ -255,6 +255,8 @@ Whole code was taken from [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Sk
 # LICENSE
 
 Copyright (C) Tokuhiro Matsuno
+
+Copyright (C) 2004 David Baird (for dbh driver handling)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
