@@ -1,4 +1,4 @@
-Revision history for Perl extension SQL::Maker
+Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
@@ -20,130 +20,146 @@ Revision history for Perl extension SQL::Maker
     - Added SQL::Maker#where
       (tokuhirom)
 
-1.10
+1.10 2012-12-23
 
-    - [IMPOTANT] SQL::Maker::Condition::compose_or now returns the SQL bracketed.
+    [IMPORTANT]
+    - SQL::Maker::Condition::compose_or now returns the SQL bracketed.
       (chiba)
 
-1.09
+1.09 2012-12-11
 
     - added SQL::Maker::Plugin::InsertOnDuplicate
       (tokuhirom)
 
-1.08
+1.08 2012-12-09
 
-    - added 'make_set_clause' method to core, and SQL::Maker::Plugin::InsertMulti use it.
+    - added 'make_set_clause' method to core,
+      and SQL::Maker::Plugin::InsertMulti use it.
       (tokuhirom)
 
-1.07    Mon Sep 24 03:51:15 UTC 2012
+1.07 2012-09-24 03:51:15 UTC
 
     - fix behavior for empty condition compose
 
-1.06    Sun Sep 16 04:30:50 UTC 2012
+1.06 2012-09-16 04:30:50 UTC
 
     - In SQL::Maker::Select
         - Add "add_where_raw" method. (issm)
     - In SQL::Maker::Condition
         - Add "add_raw" method. (issm)
 
-1.05
+1.05 not released
 
     - support group_by at SQL::Maker->select
 
-1.04
+1.04 not released
 
-    - support $where as SQL::Maker::Condition at select, update and delete(nihen)
+    - support $where as SQL::Maker::Condition at select,
+      update and delete(nihen)
     - support joins at select
 
-1.03
+1.03 2011-10-31
 
     - support INSERT statement without parameters on SQLite3.
       https://github.com/tokuhirom/SQL-Maker/issues/11
       (requested by forwardever++)
 
-1.02
+1.02 2011-09-22
 
     - doc fix(reported by xaicron++)
 
-1.01
+1.01 2011-09-04
 
-    - support this form: ['created_on' => { '>', \'DATE_SUB(NOW(), INTERVAL 1 DAY)' }]
+    - support this form:
+      ['created_on' => { '>', \'DATE_SUB(NOW(), INTERVAL 1 DAY)' }]
 
-1.00
+1.00 2011-06-29
 
     - remove alpha tag.
 
-0.14
+0.14 2011-04-23
 
     - Type check for clear error messages(gfx)
     - fixed testing issue on t/10_subquery.t(reported by gfx++)
 
-0.13
+0.13 2011-04-23
 
-    - In SQL::Maker
-        - Allow 'INSERT IGNORE' by $opts->{prefix} params at insert() method (zigorou)
-        - Accept key-value as array at insert() method (zigorou)
-        - Accept value using subquery at insert(), update() method (zigorou)
-        - Allow table alias at select() method (zigorou)
-    - In SQL::Maker::Plugin::InsertMulti
-        - Accept values as arrayref at insert_multi() (zigorou)
-        - Allow 'INSERT IGNORE' by $opts->{prefix} params at insert_multi() (zigorou)
-        - Allow literal and subquery in values at insert_multi() (zigorou)
-        - Supports 'ON DUPLICATE KEY UPDATE' syntax on mysql driver at insert_multi() (zigorou)
-    - In SQL::Maker::Select
-        - Allow no conditional join (zigorou)
+    [In SQL::Maker]
+    - Allow 'INSERT IGNORE' by $opts->{prefix} params at insert() method
+      (zigorou)
+    - Accept key-value as array at insert() method (zigorou)
+    - Accept value using subquery at insert(), update() method (zigorou)
+    - Allow table alias at select() method (zigorou)
 
-0.12
+    [In SQL::Maker::Plugin::InsertMulti]
+    - Accept values as arrayref at insert_multi() (zigorou)
+    - Allow 'INSERT IGNORE' by $opts->{prefix} params at insert_multi()
+      (zigorou)
+    - Allow literal and subquery in values at insert_multi() (zigorou)
+    - Supports 'ON DUPLICATE KEY UPDATE' syntax on mysql driver
+      at insert_multi() (zigorou)
 
-    SQL::Maker::Plugin::InsertMulti before 0.12 have a critical issue.
-    I highly recomment version up to 0.12+, if you are using SQL::Maker::Plugin::InsertMulti.
+    [In SQL::Maker::Select]
+    - Allow no conditional join (zigorou)
+
+0.12 2011-02-17
+
+    - SQL::Maker::Plugin::InsertMulti before 0.12 have a critical issue.
+      I highly recommend version up to 0.12+,
+      if you are using SQL::Maker::Plugin::InsertMulti.
 
     - FIX: SQL::Maker::Plugin::InsertMulti doesn't works correctly.
     - doc fix on SQL::Maker::Plugin::InsertMulti
 
-0.11
+0.11 2011-02-15
 
     - added SQL::Maker#new_condition method(nekokak)
 
-0.10
+0.10 2011-01-14
 
     - support union, intersect, except(makamaka)
 
-0.09
+0.09 2011-01-10
 
     - allow SELECT object and alias to add_join(makamaka)
 
-0.08
+0.08 2011-01-09
 
     - doc enhancements(tokuhirom)
     - support $builder->select(order_by => {foo => 'DESC'}) form for skinny
 
-0.07
+0.07 2011-01-09
 
     - allow subquery in from clause(makamaka)
 
-0.06
+0.06 2011-01-07
 
     - allow hashref in new_select() method
 
-0.05
+0.05 2011-01-06
 
     - doc fix(lestrrat)
 
-0.04
+0.04 2011-01-03
 
     - add space each comma on using IN statement(zigorou)
 
-0.03
+0.03 2010-12-28
 
-    - 60ded52 (HEAD, zigorou/master, origin/master, master) remove last new_line on as_sql(), add tests for different new args(zigorou++)
-    - 1d54a09 add new_line opts to SQL::Maker, SQL::Maker::Select(zigorou++)
-    - 0b84cd7 change the quote_char detection logic. see http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
+    - 60ded52 (HEAD, zigorou/master, origin/master, master)
+      remove last new_line on as_sql(), add tests for different new args
+      (zigorou++)
+    - 1d54a09 add new_line opts to SQL::Maker, SQL::Maker::Select
+      (zigorou++)
+    - 0b84cd7 change the quote_char detection logic.
+      see http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
 
-0.02
+0.02 2010-12-12
 
-        - added new method 'new_select'.
-        - pod fix
+    - added new method 'new_select'.
+    - pod fix
 
-0.01    Sat Nov 27 11:37:12 2010
-        - original version
+0.01 2010-12-08
+
+    - original version
+
