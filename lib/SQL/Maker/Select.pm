@@ -502,9 +502,23 @@ Add new GROUP BY clause.
                                    ->as_sql();
     # => "SELECT c FROM foo GROUP BY id DESC"
 
+=item C<< $stmt->limit(30) >>
+
+=item C<< $stmt->offset(5) >>
+
+Add limit and offset.
+
+    my $stmt = SQL::Maker::Select->new()
+                                   ->add_select('c')
+                                   ->add_from('foo')
+                                   ->limit(30)
+                                   ->offset(5)
+                                   ->as_sql();
+    # => "SELECT c FROM foo LIMIT 30 OFFSET 5"
+
 =item C<< $stmt->add_having(cnt => 2) >>
 
-Add having clause
+Add having clause.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_from('foo')
