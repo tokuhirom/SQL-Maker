@@ -342,7 +342,7 @@ SQL::Maker is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQ
 
 Create new instance of SQL::Maker.
 
-Attributes are following:
+Attributes are the following:
 
 =over 4
 
@@ -393,6 +393,8 @@ This method returns SQL string and bind variables for SELECT statement.
 
 Table name for B<FROM> clause in scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for sub-query.
 
+If you are using C<< $opt->{joins} >> this should be I<< undef >> since it's passed via the first join.
+
 =item \@fields
 
 This is a list for retrieving fields from database.
@@ -435,23 +437,23 @@ This option makes 'OFFSET $n' clause.
 
 This option makes B<ORDER BY> clause
 
-You can write it as following forms:
+You can write it as the following forms:
 
-    $builder->select(..., order_by => 'foo DESC, bar ASC');
-    $builder->select(..., order_by => ['foo DESC', 'bar ASC']);
-    $builder->select(..., order_by => {foo => 'DESC'});
-    $builder->select(..., order_by => [{foo => 'DESC'}, {bar => 'ASC'}]);
+    $builder->select(..., {order_by => 'foo DESC, bar ASC'});
+    $builder->select(..., {order_by => ['foo DESC', 'bar ASC']});
+    $builder->select(..., {order_by => {foo => 'DESC'}});
+    $builder->select(..., {order_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
 =item $opt->{group_by}
 
 This option makes B<GROUP BY> clause
 
-You can write it as following forms:
+You can write it as the following forms:
 
-    $builder->select(..., group_by => 'foo DESC, bar ASC');
-    $builder->select(..., group_by => ['foo DESC', 'bar ASC']);
-    $builder->select(..., group_by => {foo => 'DESC'});
-    $builder->select(..., group_by => [{foo => 'DESC'}, {bar => 'ASC'}]);
+    $builder->select(..., {group_by => 'foo DESC, bar ASC'});
+    $builder->select(..., {group_by => ['foo DESC', 'bar ASC']});
+    $builder->select(..., {group_by => {foo => 'DESC'}});
+    $builder->select(..., {group_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
 =item $opt->{having}
 
@@ -463,7 +465,11 @@ This option makes 'FOR UPDATE" clause.
 
 =item $opt->{joins}
 
-This option makes 'JOIN' via L<SQL::Maker::Condition>.
+This option makes 'JOIN' via L<SQL::Maker::Select>.
+
+You can write it as the following:
+
+    $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
 
 =back
 
@@ -486,17 +492,17 @@ Table name in scalar.
 
 =item \%values
 
-This is a values for INSERT statement.
+These are the values for the INSERT statement.
 
 =item \%opt
 
-This is a options for INSERT statement
+These are the options for the INSERT statement
 
 =over 4
 
 =item $opt->{prefix}
 
-This is a prefix for INSERT statement.
+This is a prefix for the INSERT statement.
 
 For example, you can provide 'INSERT IGNORE INTO' for MySQL.
 
@@ -588,7 +594,7 @@ SQL::Maker supports plugin system. Write the code like following.
 
 =item Why don't you use  SQL::Abstract?
 
-I need more extensible one.
+I need a more extensible one.
 
 So, this module contains L<SQL::Maker::Select>, the extensible B<SELECT> clause object.
 
@@ -602,7 +608,7 @@ Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>
 
 L<SQL::Abstract>
 
-Whole code was taken from L<DBIx::Skinny> by nekokak++.
+The whole code was taken from L<DBIx::Skinny> by nekokak++.
 
 =head1 LICENSE
 

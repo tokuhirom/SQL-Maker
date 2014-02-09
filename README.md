@@ -25,7 +25,7 @@ SQL::Maker - Yet another SQL builder
 
 # DESCRIPTION
 
-SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Skinny)'s SQL generator.
+SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https://metacpan.org/pod/DBIx::Skinny)'s SQL generator.
 
 # METHODS
 
@@ -33,7 +33,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
     Create new instance of SQL::Maker.
 
-    Attributes are following:
+    Attributes are the following:
 
     - driver: Str
 
@@ -59,9 +59,9 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
 - my $select = $builder->new\_select(%args|\\%args);
 
-    Create new instance of [SQL::Maker::Select](http://search.cpan.org/perldoc?SQL::Maker::Select) from the settings from __$builder__.
+    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) from the settings from __$builder__.
 
-    This method returns instance of [SQL::Maker::Select](http://search.cpan.org/perldoc?SQL::Maker::Select).
+    This method returns instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
 
 - my ($sql, @binds) = $builder->select($table|\\@tables, \\@fields, \\%where|\\@where|$where, \\%opt);
 
@@ -77,6 +77,8 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
         Table name for __FROM__ clause in scalar or arrayref. You can specify the instance of __SQL::Maker::Select__ for sub-query.
 
+        If you are using `$opt->{joins}` this should be _undef_ since it's passed via the first join.
+
     - \\@fields
 
         This is a list for retrieving fields from database.
@@ -89,7 +91,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
     - \\@where
     - $where
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition), or [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
     - \\%opt
 
@@ -115,23 +117,23 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
             This option makes __ORDER BY__ clause
 
-            You can write it as following forms:
+            You can write it as the following forms:
 
-                $builder->select(..., order_by => 'foo DESC, bar ASC');
-                $builder->select(..., order_by => ['foo DESC', 'bar ASC']);
-                $builder->select(..., order_by => {foo => 'DESC'});
-                $builder->select(..., order_by => [{foo => 'DESC'}, {bar => 'ASC'}]);
+                $builder->select(..., {order_by => 'foo DESC, bar ASC'});
+                $builder->select(..., {order_by => ['foo DESC', 'bar ASC']});
+                $builder->select(..., {order_by => {foo => 'DESC'}});
+                $builder->select(..., {order_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
         - $opt->{group\_by}
 
             This option makes __GROUP BY__ clause
 
-            You can write it as following forms:
+            You can write it as the following forms:
 
-                $builder->select(..., group_by => 'foo DESC, bar ASC');
-                $builder->select(..., group_by => ['foo DESC', 'bar ASC']);
-                $builder->select(..., group_by => {foo => 'DESC'});
-                $builder->select(..., group_by => [{foo => 'DESC'}, {bar => 'ASC'}]);
+                $builder->select(..., {group_by => 'foo DESC, bar ASC'});
+                $builder->select(..., {group_by => ['foo DESC', 'bar ASC']});
+                $builder->select(..., {group_by => {foo => 'DESC'}});
+                $builder->select(..., {group_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
         - $opt->{having}
 
@@ -143,7 +145,11 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
         - $opt->{joins}
 
-            This option makes 'JOIN' via [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition).
+            This option makes 'JOIN' via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+
+            You can write it as the following:
+
+                $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
 
 - my ($sql, @binds) = $builder->insert($table, \\%values|\\@values, \\%opt);
 
@@ -160,15 +166,15 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
 
     - \\%values
 
-        This is a values for INSERT statement.
+        These are the values for the INSERT statement.
 
     - \\%opt
 
-        This is a options for INSERT statement
+        These are the options for the INSERT statement
 
         - $opt->{prefix}
 
-            This is a prefix for INSERT statement.
+            This is a prefix for the INSERT statement.
 
             For example, you can provide 'INSERT IGNORE INTO' for MySQL.
 
@@ -191,7 +197,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
     - \\@where
     - $where
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition), or [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
 - my ($sql, @binds) = $builder->update($table, \\%set|@set, \\%where|\\@where|$where);
 
@@ -214,17 +220,17 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](http:
     - \\@where
     - $where
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition), or [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
 - $builder->new\_condition()
 
-    Create new [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition) object from ` $builder ` settings.
+    Create new [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object from ` $builder ` settings.
 
 - my ($sql, @binds) = $builder->where(\\%where)
 - my ($sql, @binds) = $builder->where(\\@where)
 - my ($sql, @binds) = $builder->where(\\@where)
 
-    Where clause from hashref or arrayref via [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition), or [SQL::Maker::Condition](http://search.cpan.org/perldoc?SQL::Maker::Condition) object.
+    Where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
 # PLUGINS
 
@@ -238,9 +244,9 @@ SQL::Maker supports plugin system. Write the code like following.
 
 - Why don't you use  SQL::Abstract?
 
-    I need more extensible one.
+    I need a more extensible one.
 
-    So, this module contains [SQL::Maker::Select](http://search.cpan.org/perldoc?SQL::Maker::Select), the extensible __SELECT__ clause object.
+    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select), the extensible __SELECT__ clause object.
 
 # AUTHOR
 
@@ -248,9 +254,9 @@ Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
 
 # SEE ALSO
 
-[SQL::Abstract](http://search.cpan.org/perldoc?SQL::Abstract)
+[SQL::Abstract](https://metacpan.org/pod/SQL::Abstract)
 
-Whole code was taken from [DBIx::Skinny](http://search.cpan.org/perldoc?DBIx::Skinny) by nekokak++.
+The whole code was taken from [DBIx::Skinny](https://metacpan.org/pod/DBIx::Skinny) by nekokak++.
 
 # LICENSE
 
