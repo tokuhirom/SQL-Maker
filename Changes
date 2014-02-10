@@ -2,6 +2,10 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.13 2014-02-10T04:29:18Z
+
+    - Documentation update(Gelu Lupas)
+
 1.12 2013-06-25T04:25:24Z
 
     - column alias can be specified by ArrayRef in SQL::Maker#select
