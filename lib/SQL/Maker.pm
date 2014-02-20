@@ -372,9 +372,9 @@ Default: '\n'
 
 =item my $select = $builder->new_select(%args|\%args);
 
-Create new instance of L<SQL::Maker::Select> from the settings from B<$builder>.
+Create new instance of L<SQL::Maker::Select> using the settings from B<$builder>.
 
-This method returns instance of L<SQL::Maker::Select>.
+This method returns an instance of L<SQL::Maker::Select>.
 
 =item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where|\@where|$where, \%opt);
 
@@ -383,7 +383,7 @@ This method returns instance of L<SQL::Maker::Select>.
     #   SELECT * FROM `user` WHERE (`name` = ?) ORDER BY user_id DESC
     #   ['john']
 
-This method returns SQL string and bind variables for SELECT statement.
+This method returns the SQL string and bind variables for a SELECT statement.
 
 =over 4
 
@@ -391,7 +391,7 @@ This method returns SQL string and bind variables for SELECT statement.
 
 =item \@tables
 
-Table name for B<FROM> clause in scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for sub-query.
+Table name for the B<FROM> clause as scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for a sub-query.
 
 If you are using C<< $opt->{joins} >> this should be I<< undef >> since it's passed via the first join.
 
@@ -399,9 +399,9 @@ If you are using C<< $opt->{joins} >> this should be I<< undef >> since it's pas
 
 This is a list for retrieving fields from database.
 
-Each element of the C<@field> is a scalar or a scalar ref of the column name normally.
-If you want to specify alias of the field, you can use ArrayRef containing the pair of column
-and alias name (e.g. C<< ['foo.id' => 'foo_id'] >>).
+Each element of the C<@fields> is normally a scalar or a scalar ref containing the column name.
+If you want to specify an alias of the field, you can use an arrayref containing a pair
+of column and alias names (e.g. C<< ['foo.id' => 'foo_id'] >>).
 
 =item \%where
 
@@ -413,13 +413,13 @@ where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Ma
 
 =item \%opt
 
-This is a options for SELECT statement
+These are the options for the SELECT statement
 
 =over 4
 
 =item $opt->{prefix}
 
-This is a prefix for SELECT statement.
+This is a prefix for the SELECT statement.
 
 For example, you can provide the 'SELECT SQL_CALC_FOUND_ROWS '. It's useful for MySQL.
 
@@ -427,17 +427,17 @@ Default Value: 'SELECT '
 
 =item $opt->{limit}
 
-This option makes 'LIMIT $n' clause.
+This option adds a 'LIMIT $n' clause.
 
 =item $opt->{offset}
 
-This option makes 'OFFSET $n' clause.
+This option adds an 'OFFSET $n' clause.
 
 =item $opt->{order_by}
 
-This option makes B<ORDER BY> clause
+This option adds an B<ORDER BY> clause
 
-You can write it as the following forms:
+You can write it in any of the following forms:
 
     $builder->select(..., {order_by => 'foo DESC, bar ASC'});
     $builder->select(..., {order_by => ['foo DESC', 'bar ASC']});
@@ -446,9 +446,9 @@ You can write it as the following forms:
 
 =item $opt->{group_by}
 
-This option makes B<GROUP BY> clause
+This option adds a B<GROUP BY> clause
 
-You can write it as the following forms:
+You can write it in any of the following forms:
 
     $builder->select(..., {group_by => 'foo DESC, bar ASC'});
     $builder->select(..., {group_by => ['foo DESC', 'bar ASC']});
@@ -457,17 +457,17 @@ You can write it as the following forms:
 
 =item $opt->{having}
 
-This option makes HAVING clause
+This option adds a HAVING clause
 
 =item $opt->{for_update}
 
-This option makes 'FOR UPDATE" clause.
+This option adds a 'FOR UPDATE" clause.
 
 =item $opt->{joins}
 
-This option makes 'JOIN' via L<SQL::Maker::Select>.
+This option adds a 'JOIN' via L<SQL::Maker::Select>.
 
-You can write it as the following:
+You can write it as follows:
 
     $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
 
@@ -482,7 +482,7 @@ You can write it as the following:
     #    INSERT INTO `user` (`name`) VALUES (?)
     #    ['john']
 
-Generate INSERT query.
+Generate an INSERT query.
 
 =over 4
 
@@ -519,7 +519,7 @@ Default Value: 'INSERT INTO'
     #    DELETE FROM `user` WHERE (`name` = ?)
     #    ['john']
 
-Generate DELETE query.
+Generate a DELETE query.
 
 =over 4
 
@@ -562,7 +562,7 @@ Setting values.
 
 =item $where
 
-where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
 =back
 
@@ -576,13 +576,13 @@ Create new L<SQL::Maker::Condition> object from C< $builder > settings.
 
 =item my ($sql, @binds) = $builder->where(\@where)
 
-Where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+Where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
 =back
 
 =head1 PLUGINS
 
-SQL::Maker supports plugin system. Write the code like following.
+SQL::Maker features a plugin system. Write the code as follows:
 
     package My::SQL::Maker;
     use parent qw/SQL::Maker/;
@@ -592,7 +592,7 @@ SQL::Maker supports plugin system. Write the code like following.
 
 =over 4
 
-=item Why don't you use  SQL::Abstract?
+=item Why don't you use SQL::Abstract?
 
 I need a more extensible one.
 
