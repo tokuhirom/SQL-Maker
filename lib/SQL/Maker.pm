@@ -122,11 +122,19 @@ sub _quote {
 }
 
 sub delete {
-    my ($self, $table, $where) = @_;
+    my ($self, $table, $where, $opt) = @_;
 
     my $w = $self->_make_where_clause($where);
     my $quoted_table = $self->_quote($table);
-    my $sql = "DELETE FROM $quoted_table" . $w->[0];
+    my $sql = "DELETE FROM $quoted_table";
+    if ($opt->{using}) {
+        # $bulder->delete('foo', \%where, { using => 'bar' });
+        # $bulder->delete('foo', \%where, { using => ['bar', 'qux'] });
+        my $tables = ref($opt->{using}) eq 'ARRAY' ? $opt->{using} : [$opt->{using}];
+        my $using = join(', ', map { $self->_quote($_) } @$tables);
+        $sql .= " USING " . $using;
+    }
+    $sql .= $w->[0];
     return ($sql, @{$w->[1]});
 }
 
@@ -324,7 +332,7 @@ SQL::Maker - Yet another SQL builder
     ($sql, @binds) = $builder->insert($table, \%values, \%opt);
 
     # DELETE
-    ($sql, @binds) = $builder->delete($table, \%where);
+    ($sql, @binds) = $builder->delete($table, \%where, \%opt);
 
     # UPDATE
     ($sql, @binds) = $builder->update($table, \%set, \%where);
@@ -512,7 +520,7 @@ Default Value: 'INSERT INTO'
 
 =back
 
-=item my ($sql, @binds) = $builder->delete($table, \%where|\@where|$where);
+=item my ($sql, @binds) = $builder->delete($table, \%where|\@where|$where, \%opt);
 
     my ($sql, @binds) = $builder->delete($table, \%where);
     # =>
@@ -535,11 +543,26 @@ Table name in scalar.
 
 where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
+=item \%opt
+
+These are the options for the DELETE statement
+
+=over 4
+
+=item $opt->{using}
+
+This option adds a USING clause. It takes a scalar or an arrayref of table names as argument:
+
+    $bulder->delete(..., { using => 'bar' });
+    $bulder->delete(..., { using => ['bar', 'qux'] });
+
+=back
+
 =back
 
 =item my ($sql, @binds) = $builder->update($table, \%set|@set, \%where|\@where|$where);
 
-Generate UPDATE query.
+Generate a UPDATE query.
 
     my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
     # =>
