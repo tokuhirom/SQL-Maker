@@ -553,7 +553,10 @@ These are the options for the DELETE statement
 
 This option adds a USING clause. It takes a scalar or an arrayref of table names as argument:
 
-    $bulder->delete(..., { using => 'bar' });
+    my ($sql, $binds) = $bulder->delete($table, \%where, { using => 'group' });
+    # =>
+    #    DELETE FROM `user` USING `group` WHERE (`group`.`name` = ?)
+    #    ['doe']
     $bulder->delete(..., { using => ['bar', 'qux'] });
 
 =back

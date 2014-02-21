@@ -80,6 +80,13 @@ subtest 'driver mysql' => sub {
         is $sql, qq{DELETE FROM `foo` USING `bar` WHERE (`bar` = ?) AND (`john` = ?)};
         is join(',', @binds), 'baz,man';
     };
+
+    subtest 'delete using array where_as_hashref' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql');
+        my ($sql, @binds) = $builder->delete('foo', [bar => 'baz', john => 'man'], {using => ['bar', 'qux']});
+        is $sql, qq{DELETE FROM `foo` USING `bar`, `qux` WHERE (`bar` = ?) AND (`john` = ?)};
+        is join(',', @binds), 'baz,man';
+    };
 };
 
 subtest 'driver mysql, quote_char: "", new_line: " "' => sub {
@@ -118,6 +125,13 @@ subtest 'driver mysql, quote_char: "", new_line: " "' => sub {
         my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
         my ($sql, @binds) = $builder->delete('foo', [bar => 'baz', john => 'man'], {using => 'bar'});
         is $sql, qq{DELETE FROM foo USING bar WHERE (bar = ?) AND (john = ?)};
+        is join(',', @binds), 'baz,man';
+    };
+
+    subtest 'delete using array where_as_hashref' => sub {
+        my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
+        my ($sql, @binds) = $builder->delete('foo', [bar => 'baz', john => 'man'], {using => ['bar', 'qux']});
+        is $sql, qq{DELETE FROM foo USING bar, qux WHERE (bar = ?) AND (john = ?)};
         is join(',', @binds), 'baz,man';
     };
 };
