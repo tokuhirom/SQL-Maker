@@ -153,7 +153,8 @@ sub as_sql {
             my ($table, $join) = map { $j->{$_} } qw( table joins );
             $table = $self->_add_index_hint(@$table); ## index hint handling
             $sql .= $table unless $initial_table_written++;
-            $sql .= ' ' . uc($join->{type}) . ' JOIN ' . $self->_quote($join->{table});
+            $sql .= ' ' . uc($join->{type}) if $join->{type};
+            $sql .= ' JOIN ' . $self->_quote($join->{table});
             $sql .= ' ' . $self->_quote($join->{alias}) if $join->{alias};
 
             if ( defined $join->{condition} ) {
@@ -345,7 +346,7 @@ Render the SQL string.
 
 =item C<< my @bind = $stmt->bind(); >>
 
-Get bind variables.
+Get the bind variables.
 
 =item C<< $stmt->add_select('*') >>
 
@@ -353,11 +354,11 @@ Get bind variables.
 
 =item C<< $stmt->add_select(\'COUNT(*)' => 'cnt') >>
 
-Add new select term. It's quote automatically.
+Add a new select term. It's automatically quoted.
 
 =item C<< $stmt->add_from($table :Str | $select :SQL::Maker::Select) : SQL::Maker::Select >>
 
-Add new from clause. You can specify the table name or instance of L<SQL::Maker::Select> for sub-query.
+Add a new FROM clause. You can specify the table name or an instance of L<SQL::Maker::Select> for a sub-query.
 
 I<Return:> $stmt itself.
 
@@ -367,7 +368,8 @@ I<Return:> $stmt itself.
 
 =item C<< $stmt->add_join(user => {type => 'inner', table => 'config', condition => ['user_id']}); >>
 
-Add new JOIN clause. If you pass arrayref for 'condition' then it uses 'USING'.
+Add a new JOIN clause. If you pass an arrayref for 'condition' then it uses 'USING'. If 'type' is omitted
+it falls back to plain JOIN.
 
     my $stmt = SQL::Maker::Select->new();
     $stmt->add_join(
@@ -430,7 +432,7 @@ Add new JOIN clause. If you pass arrayref for 'condition' then it uses 'USING'.
 
 =item C<< $stmt->add_where('foo_id' => 'bar'); >>
 
-Add new where clause.
+Add a new WHERE clause.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_select('c')
@@ -442,7 +444,7 @@ Add new where clause.
 
 =item C<< $stmt->add_where_raw('id = ?', [1]) >>
 
-Add new where clause from raw placeholder string and bind variables.
+Add a new WHERE clause from raw placeholder string and bind variables.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_select('c')
@@ -455,7 +457,7 @@ Add new where clause from raw placeholder string and bind variables.
 
 =item C<< $stmt->set_where($condition) >>
 
-Set the where clause.
+Set the WHERE clause.
 
 $condition should be instance of L<SQL::Maker::Condition>.
 
@@ -474,7 +476,7 @@ $condition should be instance of L<SQL::Maker::Condition>.
 
 =item C<< $stmt->add_order_by({'foo' => 'DESC'}); >>
 
-Add new order by clause.
+Add a new ORDER BY clause.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_select('c')
@@ -486,7 +488,7 @@ Add new order by clause.
 
 =item C<< $stmt->add_group_by('foo'); >>
 
-Add new GROUP BY clause.
+Add a new GROUP BY clause.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_select('c')
@@ -506,7 +508,7 @@ Add new GROUP BY clause.
 
 =item C<< $stmt->offset(5) >>
 
-Add limit and offset.
+Add LIMIT and OFFSET.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_select('c')
@@ -518,7 +520,7 @@ Add limit and offset.
 
 =item C<< $stmt->add_having(cnt => 2) >>
 
-Add having clause.
+Add a HAVING clause.
 
     my $stmt = SQL::Maker::Select->new()
                                    ->add_from('foo')
