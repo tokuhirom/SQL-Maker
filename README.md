@@ -17,7 +17,7 @@ SQL::Maker - Yet another SQL builder
     ($sql, @binds) = $builder->insert($table, \%values, \%opt);
 
     # DELETE
-    ($sql, @binds) = $builder->delete($table, \%where);
+    ($sql, @binds) = $builder->delete($table, \%where, \%opt);
 
     # UPDATE
     ($sql, @binds) = $builder->update($table, \%set, \%where);
@@ -29,7 +29,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
 # METHODS
 
-- my $builder = SQL::Maker->new(%args);
+- `my $builder = SQL::Maker->new(%args);`
 
     Create new instance of SQL::Maker.
 
@@ -57,122 +57,122 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         Default: '\\n'
 
-- my $select = $builder->new\_select(%args|\\%args);
+- `my $select = $builder->new_select(%args|\%args);`
 
-    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) from the settings from __$builder__.
+    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from __$builder__.
 
-    This method returns instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+    This method returns an instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
 
-- my ($sql, @binds) = $builder->select($table|\\@tables, \\@fields, \\%where|\\@where|$where, \\%opt);
+- `my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where|\@where|$where, \%opt);`
 
         my ($sql, @binds) = $builder->select('user', ['*'], {name => 'john'}, {order_by => 'user_id DESC'});
         # =>
         #   SELECT * FROM `user` WHERE (`name` = ?) ORDER BY user_id DESC
         #   ['john']
 
-    This method returns SQL string and bind variables for SELECT statement.
+    This method returns the SQL string and bind variables for a SELECT statement.
 
-    - $table
-    - \\@tables
+    - `$table`
+    - `\@tables`
 
-        Table name for __FROM__ clause in scalar or arrayref. You can specify the instance of __SQL::Maker::Select__ for sub-query.
+        Table name for the __FROM__ clause as scalar or arrayref. You can specify the instance of __SQL::Maker::Select__ for a sub-query.
 
         If you are using `$opt->{joins}` this should be _undef_ since it's passed via the first join.
 
-    - \\@fields
+    - `\@fields`
 
         This is a list for retrieving fields from database.
 
-        Each element of the `@field` is a scalar or a scalar ref of the column name normally.
-        If you want to specify alias of the field, you can use ArrayRef containing the pair of column
-        and alias name (e.g. `['foo.id' => 'foo_id']`).
+        Each element of the `@fields` is normally a scalar or a scalar ref containing the column name.
+        If you want to specify an alias of the field, you can use an arrayref containing a pair
+        of column and alias names (e.g. `['foo.id' => 'foo_id']`).
 
-    - \\%where
-    - \\@where
-    - $where
+    - `\%where`
+    - `\@where`
+    - `$where`
 
         where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
-    - \\%opt
+    - `\%opt`
 
-        This is a options for SELECT statement
+        These are the options for the SELECT statement
 
-        - $opt->{prefix}
+        - `$opt->{prefix}`
 
-            This is a prefix for SELECT statement.
+            This is a prefix for the SELECT statement.
 
             For example, you can provide the 'SELECT SQL\_CALC\_FOUND\_ROWS '. It's useful for MySQL.
 
             Default Value: 'SELECT '
 
-        - $opt->{limit}
+        - `$opt->{limit}`
 
-            This option makes 'LIMIT $n' clause.
+            This option adds a 'LIMIT $n' clause.
 
-        - $opt->{offset}
+        - `$opt->{offset}`
 
-            This option makes 'OFFSET $n' clause.
+            This option adds an 'OFFSET $n' clause.
 
-        - $opt->{order\_by}
+        - `$opt->{order_by}`
 
-            This option makes __ORDER BY__ clause
+            This option adds an __ORDER BY__ clause
 
-            You can write it as the following forms:
+            You can write it in any of the following forms:
 
                 $builder->select(..., {order_by => 'foo DESC, bar ASC'});
                 $builder->select(..., {order_by => ['foo DESC', 'bar ASC']});
                 $builder->select(..., {order_by => {foo => 'DESC'}});
                 $builder->select(..., {order_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
-        - $opt->{group\_by}
+        - `$opt->{group_by}`
 
-            This option makes __GROUP BY__ clause
+            This option adds a __GROUP BY__ clause
 
-            You can write it as the following forms:
+            You can write it in any of the following forms:
 
                 $builder->select(..., {group_by => 'foo DESC, bar ASC'});
                 $builder->select(..., {group_by => ['foo DESC', 'bar ASC']});
                 $builder->select(..., {group_by => {foo => 'DESC'}});
                 $builder->select(..., {group_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
-        - $opt->{having}
+        - `$opt->{having}`
 
-            This option makes HAVING clause
+            This option adds a HAVING clause
 
-        - $opt->{for\_update}
+        - `$opt->{for_update}`
 
-            This option makes 'FOR UPDATE" clause.
+            This option adds a 'FOR UPDATE" clause.
 
-        - $opt->{joins}
+        - `$opt->{joins}`
 
-            This option makes 'JOIN' via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+            This option adds a 'JOIN' via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
 
-            You can write it as the following:
+            You can write it as follows:
 
                 $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
 
-- my ($sql, @binds) = $builder->insert($table, \\%values|\\@values, \\%opt);
+- `my ($sql, @binds) = $builder->insert($table, \%values|\@values, \%opt);`
 
         my ($sql, @binds) = $builder->insert(user => {name => 'john'});
         # =>
         #    INSERT INTO `user` (`name`) VALUES (?)
         #    ['john']
 
-    Generate INSERT query.
+    Generate an INSERT query.
 
-    - $table
+    - `$table`
 
         Table name in scalar.
 
-    - \\%values
+    - `\%values`
 
         These are the values for the INSERT statement.
 
-    - \\%opt
+    - `\%opt`
 
         These are the options for the INSERT statement
 
-        - $opt->{prefix}
+        - `$opt->{prefix}`
 
             This is a prefix for the INSERT statement.
 
@@ -180,28 +180,42 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
             Default Value: 'INSERT INTO'
 
-- my ($sql, @binds) = $builder->delete($table, \\%where|\\@where|$where);
+- `my ($sql, @binds) = $builder->delete($table, \%where|\@where|$where, \%opt);`
 
         my ($sql, @binds) = $builder->delete($table, \%where);
         # =>
         #    DELETE FROM `user` WHERE (`name` = ?)
         #    ['john']
 
-    Generate DELETE query.
+    Generate a DELETE query.
 
-    - $table
+    - `$table`
 
         Table name in scalar.
 
-    - \\%where
-    - \\@where
-    - $where
+    - `\%where`
+    - `\@where`
+    - `$where`
 
         where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
-- my ($sql, @binds) = $builder->update($table, \\%set|@set, \\%where|\\@where|$where);
+    - `\%opt`
 
-    Generate UPDATE query.
+        These are the options for the DELETE statement
+
+        - `$opt->{using}`
+
+            This option adds a USING clause. It takes a scalar or an arrayref of table names as argument:
+
+                my ($sql, $binds) = $bulder->delete($table, \%where, { using => 'group' });
+                # =>
+                #    DELETE FROM `user` USING `group` WHERE (`group`.`name` = ?)
+                #    ['doe']
+                $bulder->delete(..., { using => ['bar', 'qux'] });
+
+- `my ($sql, @binds) = $builder->update($table, \%set|@set, \%where|\@where|$where);`
+
+    Generate a UPDATE query.
 
         my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
         # =>
@@ -220,21 +234,21 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - \\@where
     - $where
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
+        where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
-- $builder->new\_condition()
+- `$builder->new_condition()`
 
     Create new [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object from ` $builder ` settings.
 
-- my ($sql, @binds) = $builder->where(\\%where)
-- my ($sql, @binds) = $builder->where(\\@where)
-- my ($sql, @binds) = $builder->where(\\@where)
+- `my ($sql, @binds) = $builder->where(\%where)`
+- `my ($sql, @binds) = $builder->where(\@where)`
+- `my ($sql, @binds) = $builder->where(\@where)`
 
-    Where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
+    Where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
 
 # PLUGINS
 
-SQL::Maker supports plugin system. Write the code like following.
+SQL::Maker features a plugin system. Write the code as follows:
 
     package My::SQL::Maker;
     use parent qw/SQL::Maker/;
@@ -242,7 +256,7 @@ SQL::Maker supports plugin system. Write the code like following.
 
 # FAQ
 
-- Why don't you use  SQL::Abstract?
+- Why don't you use SQL::Abstract?
 
     I need a more extensible one.
 

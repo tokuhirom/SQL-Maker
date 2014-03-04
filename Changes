@@ -2,6 +2,13 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.14 2014-03-04T23:39:17Z
+
+    - `{x => []}` generates `1=0`
+      (karupanerura)
+    - Add options for the DELETE ... USING statement.
+      (Gelu Lupas)
+
 1.13 2014-02-10T04:29:18Z
 
     - Documentation update(Gelu Lupas)

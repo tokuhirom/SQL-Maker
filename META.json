@@ -71,7 +71,7 @@
          "web" : "https://github.com/tokuhirom/SQL-Maker"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_contributors" : [
       "lestrrat <lestrrat+github@gmail.com>",
       "makamaka <makamaka.donzoko@gmail.com>",
@@ -85,6 +85,7 @@
       "Masayuki Matsuki <y.songmu@gmail.com>",
       "Neil Bowers <neil@bowers.com>",
       "Gelu Lupas <gvl@cpan.org>",
+      "karupanerura <karupa@cpan.org>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ]
 }

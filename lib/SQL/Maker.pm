@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line driver select_class/],
 );
@@ -346,7 +346,7 @@ SQL::Maker is yet another SQL builder class. It is based on L<DBIx::Skinny>'s SQ
 
 =over 4
 
-=item my $builder = SQL::Maker->new(%args);
+=item C<< my $builder = SQL::Maker->new(%args); >>
 
 Create new instance of SQL::Maker.
 
@@ -378,13 +378,13 @@ Default: '\n'
 
 =back
 
-=item my $select = $builder->new_select(%args|\%args);
+=item C<< my $select = $builder->new_select(%args|\%args); >>
 
 Create new instance of L<SQL::Maker::Select> using the settings from B<$builder>.
 
 This method returns an instance of L<SQL::Maker::Select>.
 
-=item my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where|\@where|$where, \%opt);
+=item C<< my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where|\@where|$where, \%opt); >>
 
     my ($sql, @binds) = $builder->select('user', ['*'], {name => 'john'}, {order_by => 'user_id DESC'});
     # =>
@@ -395,15 +395,15 @@ This method returns the SQL string and bind variables for a SELECT statement.
 
 =over 4
 
-=item $table
+=item C<< $table >>
 
-=item \@tables
+=item C<< \@tables >>
 
 Table name for the B<FROM> clause as scalar or arrayref. You can specify the instance of B<SQL::Maker::Select> for a sub-query.
 
 If you are using C<< $opt->{joins} >> this should be I<< undef >> since it's passed via the first join.
 
-=item \@fields
+=item C<< \@fields >>
 
 This is a list for retrieving fields from database.
 
@@ -411,21 +411,21 @@ Each element of the C<@fields> is normally a scalar or a scalar ref containing t
 If you want to specify an alias of the field, you can use an arrayref containing a pair
 of column and alias names (e.g. C<< ['foo.id' => 'foo_id'] >>).
 
-=item \%where
+=item C<< \%where >>
 
-=item \@where
+=item C<< \@where >>
 
-=item $where
+=item C<< $where >>
 
 where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
-=item \%opt
+=item C<< \%opt >>
 
 These are the options for the SELECT statement
 
 =over 4
 
-=item $opt->{prefix}
+=item C<< $opt->{prefix} >>
 
 This is a prefix for the SELECT statement.
 
@@ -433,15 +433,15 @@ For example, you can provide the 'SELECT SQL_CALC_FOUND_ROWS '. It's useful for 
 
 Default Value: 'SELECT '
 
-=item $opt->{limit}
+=item C<< $opt->{limit} >>
 
 This option adds a 'LIMIT $n' clause.
 
-=item $opt->{offset}
+=item C<< $opt->{offset} >>
 
 This option adds an 'OFFSET $n' clause.
 
-=item $opt->{order_by}
+=item C<< $opt->{order_by} >>
 
 This option adds an B<ORDER BY> clause
 
@@ -452,7 +452,7 @@ You can write it in any of the following forms:
     $builder->select(..., {order_by => {foo => 'DESC'}});
     $builder->select(..., {order_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
-=item $opt->{group_by}
+=item C<< $opt->{group_by} >>
 
 This option adds a B<GROUP BY> clause
 
@@ -463,15 +463,15 @@ You can write it in any of the following forms:
     $builder->select(..., {group_by => {foo => 'DESC'}});
     $builder->select(..., {group_by => [{foo => 'DESC'}, {bar => 'ASC'}]});
 
-=item $opt->{having}
+=item C<< $opt->{having} >>
 
 This option adds a HAVING clause
 
-=item $opt->{for_update}
+=item C<< $opt->{for_update} >>
 
 This option adds a 'FOR UPDATE" clause.
 
-=item $opt->{joins}
+=item C<< $opt->{joins} >>
 
 This option adds a 'JOIN' via L<SQL::Maker::Select>.
 
@@ -483,7 +483,7 @@ You can write it as follows:
 
 =back
 
-=item my ($sql, @binds) = $builder->insert($table, \%values|\@values, \%opt);
+=item C<< my ($sql, @binds) = $builder->insert($table, \%values|\@values, \%opt); >>
 
     my ($sql, @binds) = $builder->insert(user => {name => 'john'});
     # =>
@@ -494,21 +494,21 @@ Generate an INSERT query.
 
 =over 4
 
-=item $table
+=item C<< $table >>
 
 Table name in scalar.
 
-=item \%values
+=item C<< \%values >>
 
 These are the values for the INSERT statement.
 
-=item \%opt
+=item C<< \%opt >>
 
 These are the options for the INSERT statement
 
 =over 4
 
-=item $opt->{prefix}
+=item C<< $opt->{prefix} >>
 
 This is a prefix for the INSERT statement.
 
@@ -520,7 +520,7 @@ Default Value: 'INSERT INTO'
 
 =back
 
-=item my ($sql, @binds) = $builder->delete($table, \%where|\@where|$where, \%opt);
+=item C<< my ($sql, @binds) = $builder->delete($table, \%where|\@where|$where, \%opt); >>
 
     my ($sql, @binds) = $builder->delete($table, \%where);
     # =>
@@ -531,25 +531,25 @@ Generate a DELETE query.
 
 =over 4
 
-=item $table
+=item C<< $table >>
 
 Table name in scalar.
 
-=item \%where
+=item C<< \%where >>
 
-=item \@where
+=item C<< \@where >>
 
-=item $where
+=item C<< $where >>
 
 where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
-=item \%opt
+=item C<< \%opt >>
 
 These are the options for the DELETE statement
 
 =over 4
 
-=item $opt->{using}
+=item C<< $opt->{using} >>
 
 This option adds a USING clause. It takes a scalar or an arrayref of table names as argument:
 
@@ -563,7 +563,7 @@ This option adds a USING clause. It takes a scalar or an arrayref of table names
 
 =back
 
-=item my ($sql, @binds) = $builder->update($table, \%set|@set, \%where|\@where|$where);
+=item C<< my ($sql, @binds) = $builder->update($table, \%set|@set, \%where|\@where|$where); >>
 
 Generate a UPDATE query.
 
@@ -592,15 +592,15 @@ where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::
 
 =back
 
-=item $builder->new_condition()
+=item C<< $builder->new_condition() >>
 
 Create new L<SQL::Maker::Condition> object from C< $builder > settings.
 
-=item my ($sql, @binds) = $builder->where(\%where)
+=item C<< my ($sql, @binds) = $builder->where(\%where) >>
 
-=item my ($sql, @binds) = $builder->where(\@where)
+=item C<< my ($sql, @binds) = $builder->where(\@where) >>
 
-=item my ($sql, @binds) = $builder->where(\@where)
+=item C<< my ($sql, @binds) = $builder->where(\@where) >>
 
 Where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
 
