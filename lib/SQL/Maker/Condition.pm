@@ -46,27 +46,14 @@ sub _make_term {
         }
         else {
             # make_term(foo => [1,2,3]) => foo IN (1,2,3)
-            my $term = $self->_quote($col) . " IN (" . substr('?, ' x scalar(@$val), 0, -2) . ')';
-            return ($term, $val);
+            return $self->_make_term_by_arrayref($col, 'IN', $val);
         }
     }
     elsif ( ref($val) eq 'HASH' ) {
         my ( $op, $v ) = ( %{$val} );
         $op = uc($op);
         if ( ( $op eq 'IN' || $op eq 'NOT IN' ) && ref($v) eq 'ARRAY' ) {
-            if (@$v == 0) {
-                if ($op eq 'IN') {
-                    # make_term(foo => +{'IN' => []}) => 0=1
-                    return ('0=1', []);
-                } else {
-                    # make_term(foo => +{'NOT IN' => []}) => 1=1
-                    return ('1=1', []);
-                }
-            } else {
-                # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
-                my $term = $self->_quote($col) . " $op (" . join( ', ', ('?') x scalar @$v ) . ')';
-                return ($term, $v);
-            }
+            return $self->_make_term_by_arrayref($col, $op, $v);
         }
         elsif ( ( $op eq 'IN' || $op eq 'NOT IN' ) && ref($v) eq 'REF' ) {
             # make_term(foo => +{ 'IN', \['SELECT foo FROM bar'] }) => foo IN (SELECT foo FROM bar)
@@ -105,6 +92,23 @@ sub _make_term {
             # make_term(foo => undef) => foo IS NULL
             return ($self->_quote($col) . " IS NULL", []);
         }
+    }
+}
+
+sub _make_term_by_arrayref {
+    my ($self, $col, $op, $v) = @_;
+    if (@$v == 0) {
+        if ($op eq 'IN') {
+            # make_term(foo => +{'IN' => []}) => 0=1
+            return ('0=1', []);
+        } else {
+            # make_term(foo => +{'NOT IN' => []}) => 1=1
+            return ('1=1', []);
+        }
+    } else {
+        # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
+        my $term = $self->_quote($col) . " $op (" . join( ', ', ('?') x scalar @$v ) . ')';
+        return ($term, $v);
     }
 }
 
