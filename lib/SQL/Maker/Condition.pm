@@ -211,8 +211,8 @@ SQL::Maker::Condition - condition object for SQL::Maker
         name_sep   => '.',
         quote_char => '`',
     );
-    $condition->add('foo_id' => 3);
-    $condition->add('bar_id' => 4);
+    $condition->add('foo_id', 3);
+    $condition->add('bar_id', 4);
     $sql = $condition->as_sql(); # (`foo_id`=?) AND (`bar_id`=?)
     @bind = $condition->bind();  # (3, 4)
 
@@ -231,7 +231,7 @@ SQL::Maker::Condition - condition object for SQL::Maker
         name_sep => '.',
         quote_char => '`',
     );
-    $other->add('name' => 'john');
+    $other->add('name', 'john');
     my $comp_and = $condition & $other;
     $sql = $comp_and->as_sql(); # ((`foo_id`=?) AND (`bar_id`=?)) AND (`name`=?)
     @bind = $comp_and->bind();  # (3, 4, 'john')
