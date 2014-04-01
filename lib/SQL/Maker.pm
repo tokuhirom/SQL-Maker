@@ -291,6 +291,18 @@ sub select_query {
             $stmt->add_group_by(\$o);
         }
     }
+    if (my $o = $opt->{index_hint}) {
+        if (ref $o eq 'ARRAY') {
+            # ['foo', 'bar']
+            $stmt->add_index_hint($table, { list => $o });
+        } elsif (ref $o eq 'HASH') {
+            # { type => '...', list => ['foo'] }
+            $stmt->add_index_hint($table, $o);
+        } else {
+            # just 'foo'
+            $stmt->add_index_hint($table, { list => [$o] });
+        }
+    }
 
     $stmt->limit( $opt->{limit} )    if $opt->{limit};
     $stmt->offset( $opt->{offset} )  if $opt->{offset};
@@ -478,6 +490,17 @@ This option adds a 'JOIN' via L<SQL::Maker::Select>.
 You can write it as follows:
 
     $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
+
+=item C<< $opt->{index_hint} >>
+
+This option adds an INDEX HINT like as 'USE INDEX' clause via L<SQL::Maker::Select>.
+
+You can write it as follows:
+
+    $builder->select(..., { index_hint => 'foo' });
+    $builder->select(..., { index_hint => ['foo', 'bar'] });
+    $builder->select(..., { index_hint => { list => 'foo' });
+    $builder->select(..., { index_hint => { type => 'FORCE', list => ['foo', 'bar'] });
 
 =back
 
