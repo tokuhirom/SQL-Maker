@@ -151,6 +151,17 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
                 $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
 
+        - `$opt->{index_hint}`
+
+            This option adds an INDEX HINT like as 'USE INDEX' clause for MySQL via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+
+            You can write it as follows:
+
+                $builder->select(..., { index_hint => 'foo' });
+                $builder->select(..., { index_hint => ['foo', 'bar'] });
+                $builder->select(..., { index_hint => { list => 'foo' });
+                $builder->select(..., { index_hint => { type => 'FORCE', list => ['foo', 'bar'] });
+
 - `my ($sql, @binds) = $builder->insert($table, \%values|\@values, \%opt);`
 
         my ($sql, @binds) = $builder->insert(user => {name => 'john'});
