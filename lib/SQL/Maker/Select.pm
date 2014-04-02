@@ -110,10 +110,23 @@ sub add_join {
 sub add_index_hint {
     my ($self, $table, $hint) = @_;
 
+    my ($type, $list);
+
+    if (ref $hint eq 'HASH') {
+        # { type => '...', list => ['foo'] }
+        $type = $hint->{type} || 'USE';
+        $list = ref($hint->{list}) eq 'ARRAY' ? $hint->{list} : [ $hint->{list} ];
+    } else {
+        # ['foo, 'bar'] or just 'foo'
+        $type = 'USE';
+        $list = ref($hint) eq 'ARRAY' ? $hint : [ $hint ];
+    }
+
     $self->{index_hint}->{$table} = {
-        type => $hint->{type} || 'USE',
-        list => ref($hint->{list}) eq 'ARRAY' ? $hint->{list} : [ $hint->{list} ],
+        type => $type,
+        list => $list,
     };
+
     return $self;
 }
 
@@ -422,6 +435,10 @@ it falls back to plain JOIN.
     # => "FROM (SELECT * FROM foo WHERE (hoge = ?)) bar INNER JOIN baz b1 ON bar.baz_id = b1.baz_id";
 
 =item C<< $stmt->add_index_hint(foo => {type => 'USE', list => ['index_hint']}); >>
+
+=item C<< $stmt->add_index_hint(foo => 'index_hint'); >>
+
+=item C<< $stmt->add_index_hint(foo => ['index_hint']); >>
 
     my $stmt = SQL::Maker::Select->new();
     $stmt->add_select('name');

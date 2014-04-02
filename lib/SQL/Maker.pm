@@ -292,16 +292,7 @@ sub select_query {
         }
     }
     if (my $o = $opt->{index_hint}) {
-        if (ref $o eq 'ARRAY') {
-            # ['foo', 'bar']
-            $stmt->add_index_hint($table, { list => $o });
-        } elsif (ref $o eq 'HASH') {
-            # { type => '...', list => ['foo'] }
-            $stmt->add_index_hint($table, $o);
-        } else {
-            # just 'foo'
-            $stmt->add_index_hint($table, { list => [$o] });
-        }
+        $stmt->add_index_hint($table, $o);
     }
 
     $stmt->limit( $opt->{limit} )    if $opt->{limit};
@@ -493,7 +484,7 @@ You can write it as follows:
 
 =item C<< $opt->{index_hint} >>
 
-This option adds an INDEX HINT like as 'USE INDEX' clause via L<SQL::Maker::Select>.
+This option adds an INDEX HINT like as 'USE INDEX' clause for MySQL via L<SQL::Maker::Select>.
 
 You can write it as follows:
 
