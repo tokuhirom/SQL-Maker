@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use SQL::Maker;
+use SQL::QueryMaker;
 use Test::Requires 'Tie::IxHash';
 
 sub ordered_hashref {
@@ -84,6 +85,41 @@ ON DUPLICATE KEY UPDATE `bar` = VALUES(bar), `john` = ?, `updated_on` = UNIX_TIM
 SQL
             is join( ',', @binds ), 'baz,man,2011-04-12,bee,row,2011-04-13,john,2011-04-14';
         };
+
+subtest 'on duplicate key update (term)' => sub {
+    my $builder = SQL::Maker->new( driver => 'mysql' );
+    my ( $sql, @binds ) = $builder->insert_multi(
+        'foo' => [
+            ordered_hashref(
+                bar        => 'baz',
+                john       => 'man',
+                created_on => sql_raw("UNIX_TIMESTAMP()"),
+                updated_on => sql_raw("UNIX_TIMESTAMP(?)", "2011-04-12"),
+            ),
+            ordered_hashref(
+                bar        => 'bee',
+                john       => 'row',
+                created_on => sql_raw("UNIX_TIMESTAMP()"),
+                updated_on => sql_raw("UNIX_TIMESTAMP(?)", "2011-04-13"),
+            ),
+        ],
+        +{
+            update => ordered_hashref(
+                bar        => \"VALUES(bar)",
+                john       => "john",
+                updated_on => sql_raw("UNIX_TIMESTAMP(?)", "2011-04-14"),
+            )
+        },
+    );
+    is $sql, substr(<< 'SQL', 0, -1);
+INSERT INTO `foo`
+(`bar`, `john`, `created_on`, `updated_on`)
+VALUES (?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(?)),
+(?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(?))
+ON DUPLICATE KEY UPDATE `bar` = VALUES(bar), `john` = ?, `updated_on` = UNIX_TIMESTAMP(?)
+SQL
+    is join( ',', @binds ), 'baz,man,2011-04-12,bee,row,2011-04-13,john,2011-04-14';
+};
     };
 
     subtest 'insert_multi( $table, \@cols, \@values, \%opts )' => sub {

@@ -8,7 +8,7 @@ use Class::Accessor::Lite (
     new => 0,
     wo => [qw/distinct for_update/],
     rw => [qw/prefix/],
-    ro => [qw/quote_char name_sep new_line/],
+    ro => [qw/quote_char name_sep new_line strict/],
 );
 use Scalar::Util ();
 
@@ -45,6 +45,7 @@ sub new {
         order_by           => +[],
         prefix             => 'SELECT ',
         new_line           => "\n",
+        strict             => 0,
         %args
     }, $class;
 
@@ -57,6 +58,7 @@ sub new_condition {
     SQL::Maker::Condition->new(
         quote_char => $self->{quote_char},
         name_sep   => $self->{name_sep},
+        strict     => $self->{strict},
     );
 }
 

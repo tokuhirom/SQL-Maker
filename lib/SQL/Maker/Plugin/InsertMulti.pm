@@ -2,6 +2,7 @@ package SQL::Maker::Plugin::InsertMulti;
 use strict;
 use warnings;
 use utf8;
+use Scalar::Util ();
 
 our @EXPORT = qw/insert_multi/;
 
@@ -37,20 +38,27 @@ sub insert_multi {
     for my $value ( @values ) {
         my @value_stmt;
         for my $val (@$value) {
-            if (ref $val eq 'SCALAR') {
-                # $val = \'NOW()'
-                push @value_stmt, $$val;
-            }
-            elsif (ref $val eq 'REF' && ref $$val eq 'ARRAY') {
-                # $val = \['UNIX_TIMESTAMP(?)', '2011-04-20 00:30:00']
-                my ( $stmt, @sub_bind ) = @{$$val};
-                push @value_stmt, $stmt;
-                push @bind, @sub_bind;
-            }
-            else {
-                # normal values
-                push @value_stmt, '?';
-                push @bind, $val;
+            if (Scalar::Util::blessed($val)) {
+                push @value_stmt, $val->as_sql(undef, sub { $self->_quote($_[0]) });
+                push @bind, $val->bind();
+            } else {
+                Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
+                    if ref($val) && $self->strict;
+                if (! $self->strict && ref $val eq 'SCALAR') {
+                    # $val = \'NOW()'
+                    push @value_stmt, $$val;
+                }
+                elsif (! $self->strict && ref $val eq 'REF' && ref $$val eq 'ARRAY') {
+                    # $val = \['UNIX_TIMESTAMP(?)', '2011-04-20 00:30:00']
+                    my ( $stmt, @sub_bind ) = @{$$val};
+                    push @value_stmt, $stmt;
+                    push @bind, @sub_bind;
+                }
+                else {
+                    # normal values
+                    push @value_stmt, '?';
+                    push @bind, $val;
+                }
             }
         }
         $sql .= '(' . join(', ', @value_stmt) . '),' . $self->new_line;

@@ -20,6 +20,22 @@ sub new {
 sub value_ref { $_[0]->{value_ref} }
 sub type      { $_[0]->{type} }
 
+sub as_sql {
+    my ($self, $supplied_colname, $quote_cb) = @_;
+    my $stmt;
+    if (defined $supplied_colname) {
+        $stmt = $quote_cb->($supplied_colname) . ' = ?';
+    } else {
+        $stmt = '?';
+    }
+    return $stmt;
+}
+
+sub bind {
+    my $self = shift;
+    return $self;
+}
+
 1;
 __END__
 
