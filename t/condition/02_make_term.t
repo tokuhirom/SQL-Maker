@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use SQL::Maker::SQLType qw/sql_type/;
 use SQL::Maker::Condition;
-use Data::Dumper;
+use SQL::QueryMaker;
 use DBI qw/:sql_types/;
 
 open my $fh, '<', 'lib/SQL/Maker/Condition.pm' or die "cannot open file: $!";
@@ -13,7 +13,7 @@ while (<$fh>) {
 }
 my ($in, $query, @bind);
 while (<$fh>) {
-    $in = eval $1 if /IN:(.+)/;
+    $in = $1 if /IN:\s*(.+)\s*$/;
     $query = eval $1 if /OUT QUERY:(.+)/;
     if (/OUT BIND:(.+)/) {
         @bind = eval $1;
@@ -24,11 +24,15 @@ done_testing;
 exit(0);
 
 sub test {
-    my ($source, $expected_term, $expected_bind) = @_;
-    local $Data::Dumper::Terse  = 1;
-    local $Data::Dumper::Indent = 0;
+    my ($in, $expected_term, $expected_bind) = @_;
 
-    subtest Dumper($source) => sub {
+    subtest $in => sub {
+        my $source = do {
+            local $@;
+            my $source = eval $in;
+            die $@ if $@;
+            $source;
+        };
         my $cond = SQL::Maker::Condition->new(
             quote_char => q{`},
             name_sep   => q{.},

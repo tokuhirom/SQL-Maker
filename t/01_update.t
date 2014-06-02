@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use SQL::Maker;
+use SQL::QueryMaker;
 use Test::Requires 'Tie::IxHash';
 
 sub ordered_hashref {
@@ -63,6 +64,12 @@ subtest 'driver: sqlite' => sub {
         is $sql, qq{UPDATE "foo" SET "user_id" = ?, "updated_on" = datetime(?), "counter" = counter + 1};
         is join(',', @binds), '100,now';
     };
+
+    subtest 'literal, sub query using term' => sub {
+        my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => sql_raw('datetime(?)', 'now'), counter => sql_raw('counter + 1') ] );
+        is $sql, qq{UPDATE "foo" SET "user_id" = ?, "updated_on" = datetime(?), "counter" = counter + 1};
+        is join(',', @binds), '100,now';
+    };
 };
 
 subtest 'driver: mysql' => sub {
@@ -119,6 +126,12 @@ subtest 'driver: mysql' => sub {
         is $sql, qq{UPDATE `foo` SET `user_id` = ?, `updated_on` = FROM_UNIXTIME(?), `counter` = counter + 1};
         is join(',', @binds), '100,1302241686';
     };
+
+    subtest 'literal, sub query using term' => sub {
+        my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => sql_raw('FROM_UNIXTIME(?)', 1302241686), counter => sql_raw('counter + 1') ] );
+        is $sql, qq{UPDATE `foo` SET `user_id` = ?, `updated_on` = FROM_UNIXTIME(?), `counter` = counter + 1};
+        is join(',', @binds), '100,1302241686';
+    };
 };
 
 subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
@@ -172,6 +185,12 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
 
     subtest 'literal, sub query' => sub {
         my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => \['FROM_UNIXTIME(?)', 1302241686], counter => \'counter + 1' ] );
+        is $sql, qq{UPDATE foo SET user_id = ?, updated_on = FROM_UNIXTIME(?), counter = counter + 1};
+        is join(',', @binds), '100,1302241686';
+    };
+
+    subtest 'literal, sub query using term' => sub {
+        my ($sql, @binds) = $builder->update( 'foo', [ user_id => 100, updated_on => sql_raw('FROM_UNIXTIME(?)', 1302241686), counter => sql_raw('counter + 1') ] );
         is $sql, qq{UPDATE foo SET user_id = ?, updated_on = FROM_UNIXTIME(?), counter = counter + 1};
         is join(',', @binds), '100,1302241686';
     };
