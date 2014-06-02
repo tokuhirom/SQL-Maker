@@ -5,6 +5,7 @@ requires 'DBI';
 requires 'Module::Load';
 requires 'parent';
 requires 'Scalar::Util';
+requires 'SQL::QueryMaker';
 
 on test => sub {
     requires 'Test::More', '0.98';
