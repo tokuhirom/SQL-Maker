@@ -46,6 +46,7 @@
             "Class::Accessor::Lite" : "0.05",
             "DBI" : "0",
             "Module::Load" : "0",
+            "SQL::QueryMaker" : "0",
             "Scalar::Util" : "0",
             "parent" : "0",
             "perl" : "5.008001"
@@ -71,7 +72,8 @@
          "web" : "https://github.com/tokuhirom/SQL-Maker"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
+   "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "lestrrat <lestrrat+github@gmail.com>",
       "makamaka <makamaka.donzoko@gmail.com>",
@@ -87,6 +89,7 @@
       "Gelu Lupas <gvl@cpan.org>",
       "karupanerura <karupa@cpan.org>",
       "soh335 <sugarbabe335@gmail.com>",
+      "Kazuho Oku <kazuhooku@gmail.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ]
 }

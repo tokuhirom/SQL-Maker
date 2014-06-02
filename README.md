@@ -57,6 +57,14 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         Default: '\\n'
 
+    - strict: Bool
+
+        Whether or not the use of unblessed references are prohibited for defining the SQL expressions.
+
+        In strict mode, all the expressions must be declared by using blessed references that export `as_sql` and `bind` methods like [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker).
+
+        Default: undef
+
 - `my $select = $builder->new_select(%args|\%args);`
 
     Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from __$builder__.
@@ -280,6 +288,7 @@ Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
 # SEE ALSO
 
 [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract)
+[SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker)
 
 The whole code was taken from [DBIx::Skinny](https://metacpan.org/pod/DBIx::Skinny) by nekokak++.
 
