@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use SQL::Maker;
 use SQL::QueryMaker;
+use Test::Requires 'DateTime';
 use Test::Requires 'Tie::IxHash';
 
 sub ordered_hashref {
@@ -13,15 +14,15 @@ sub ordered_hashref {
 subtest 'driver: sqlite' => sub {
     my $builder = SQL::Maker->new(driver => 'sqlite');
     subtest 'arrayref, where cause(hashref)' => sub {
-        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
-        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ? WHERE ("user_id" = ?)};
-        is join(',', @binds), 'john,john@example.com,3';
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com', expires => DateTime->new(year => 2025)], {user_id => 3});
+        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ?, "expires" = ? WHERE ("user_id" = ?)};
+        is join(',', @binds), 'john,john@example.com,2025-01-01T00:00:00,3';
     };
 
     subtest 'arrayref, where cause(arrayref)' => sub {
-        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], [user_id => 3]);
-        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ? WHERE ("user_id" = ?)};
-        is join(',', @binds), 'john,john@example.com,3';
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com', expires => DateTime->new(year => 2025)], [user_id => 3]);
+        is $sql, qq{UPDATE "user" SET "name" = ?, "email" = ?, "expires" = ? WHERE ("user_id" = ?)};
+        is join(',', @binds), 'john,john@example.com,2025-01-01T00:00:00,3';
     };
 
     subtest 'arrayref, where cause(condition)' => sub {
@@ -75,15 +76,15 @@ subtest 'driver: sqlite' => sub {
 subtest 'driver: mysql' => sub {
     my $builder = SQL::Maker->new(driver => 'mysql');
     subtest 'array ref, where cause(hashref)' => sub {
-        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
-        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)};
-        is join(',', @binds), 'john,john@example.com,3';
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com', expires => DateTime->new(year => 2025)], {user_id => 3});
+        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ?, `expires` = ? WHERE (`user_id` = ?)};
+        is join(',', @binds), 'john,john@example.com,2025-01-01T00:00:00,3';
     };
 
     subtest 'array ref, where cause(arrayref)' => sub {
-        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], [user_id => 3]);
-        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ? WHERE (`user_id` = ?)};
-        is join(',', @binds), 'john,john@example.com,3';
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com', expires => DateTime->new(year => 2025)], [user_id => 3]);
+        is $sql, qq{UPDATE `user` SET `name` = ?, `email` = ?, `expires` = ? WHERE (`user_id` = ?)};
+        is join(',', @binds), 'john,john@example.com,2025-01-01T00:00:00,3';
     };
 
     subtest 'array ref, where cause(condition)' => sub {
@@ -137,15 +138,15 @@ subtest 'driver: mysql' => sub {
 subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
     my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
     subtest 'array ref, where cause(hashref)' => sub {
-        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], {user_id => 3});
-        is $sql, qq{UPDATE user SET name = ?, email = ? WHERE (user_id = ?)};
-        is join(',', @binds), 'john,john@example.com,3';
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com', expires => DateTime->new(year => 2025)], {user_id => 3});
+        is $sql, qq{UPDATE user SET name = ?, email = ?, expires = ? WHERE (user_id = ?)};
+        is join(',', @binds), 'john,john@example.com,2025-01-01T00:00:00,3';
     };
 
     subtest 'array ref, where cause(arrayref)' => sub {
-        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com'], [user_id => 3]);
-        is $sql, qq{UPDATE user SET name = ?, email = ? WHERE (user_id = ?)};
-        is join(',', @binds), 'john,john@example.com,3';
+        my ($sql, @binds) = $builder->update('user', ['name' => 'john', email => 'john@example.com', expires => DateTime->new(year => 2025)], [user_id => 3]);
+        is $sql, qq{UPDATE user SET name = ?, email = ?, expires = ? WHERE (user_id = ?)};
+        is join(',', @binds), 'john,john@example.com,2025-01-01T00:00:00,3';
     };
 
     subtest 'array ref, where cause(condition)' => sub {
