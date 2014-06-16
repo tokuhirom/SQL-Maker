@@ -26,7 +26,11 @@ sub _make_term {
     my ($self, $col, $val) = @_;
 
     if (Scalar::Util::blessed($val)) {
-        return ($val->as_sql($col, sub { $self->_quote(@_) }), [ $val->bind() ]);
+        if ($val->can('as_sql')) {
+            return ($val->as_sql($col, sub { $self->_quote(@_) }), [ $val->bind() ]);
+        } else {
+            return ($self->_quote($col) . " = ?", [ $val ]);
+        }
     }
 
     Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
