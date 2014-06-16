@@ -88,8 +88,13 @@ sub insert {
     while (my ($col, $val) = splice(@values, 0, 2)) {
         push @quoted_columns, $self->_quote($col);
         if (Scalar::Util::blessed($val)) {
-            push @columns, $val->as_sql(undef, sub { $self->_quote($_[0]) });
-            push @bind_columns, $val->bind();
+            if ($val->can('as_sql')) {
+                push @columns, $val->as_sql(undef, sub { $self->_quote($_[0]) });
+                push @bind_columns, $val->bind();
+            } else {
+                push @columns, '?';
+                push @bind_columns, $val;
+            }
         } else {
             Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
                 if ref($val) && $self->strict;
@@ -170,8 +175,13 @@ sub make_set_clause {
     while (my ($col, $val) = splice @args, 0, 2) {
         my $quoted_col = $self->_quote($col);
         if (Scalar::Util::blessed($val)) {
-            push @columns, "$quoted_col = " . $val->as_sql(undef, sub { $self->_quote($_[0]) });
-            push @bind_columns, $val->bind();
+            if ($val->can('as_sql')) {
+                push @columns, "$quoted_col = " . $val->as_sql(undef, sub { $self->_quote($_[0]) });
+                push @bind_columns, $val->bind();
+            } else {
+                push @columns, "$quoted_col = ?";
+                push @bind_columns, $val;
+            }
         } else {
             Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
                 if ref($val) && $self->strict;

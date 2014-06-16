@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use SQL::Maker;
 use SQL::QueryMaker;
+use Test::Requires 'DateTime';
 use Test::Requires 'Tie::IxHash';
 
 sub ordered_hashref {
@@ -59,31 +60,34 @@ subtest 'mysql' => sub {
                         bar        => 'baz',
                         john       => 'man',
                         created_on => \"UNIX_TIMESTAMP()",
-                        updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-12" ]
+                        updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-12" ],
+                        expires    => DateTime->new(year => 2024),
                     ),
                     ordered_hashref(
                         bar        => 'bee',
                         john       => 'row',
                         created_on => \"UNIX_TIMESTAMP()",
-                        updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-13" ]
+                        updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-13" ],
+                        expires    => DateTime->new(year => 2025),
                     ),
                 ],
                 +{
                     update => ordered_hashref(
                         bar        => \"VALUES(bar)",
                         john       => "john",
-                        updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-14" ]
+                        updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-14" ],
+                        expires    => DateTime->new(year => 2025),
                     )
                 },
             );
             is $sql, substr(<< 'SQL', 0, -1);
 INSERT INTO `foo`
-(`bar`, `john`, `created_on`, `updated_on`)
-VALUES (?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(?)),
-(?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(?))
-ON DUPLICATE KEY UPDATE `bar` = VALUES(bar), `john` = ?, `updated_on` = UNIX_TIMESTAMP(?)
+(`bar`, `john`, `created_on`, `updated_on`, `expires`)
+VALUES (?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(?), ?),
+(?, ?, UNIX_TIMESTAMP(), UNIX_TIMESTAMP(?), ?)
+ON DUPLICATE KEY UPDATE `bar` = VALUES(bar), `john` = ?, `updated_on` = UNIX_TIMESTAMP(?), `expires` = ?
 SQL
-            is join( ',', @binds ), 'baz,man,2011-04-12,bee,row,2011-04-13,john,2011-04-14';
+            is join( ',', @binds ), 'baz,man,2011-04-12,2024-01-01T00:00:00,bee,row,2011-04-13,2025-01-01T00:00:00,john,2011-04-14,2025-01-01T00:00:00';
         };
 
 subtest 'on duplicate key update (term)' => sub {

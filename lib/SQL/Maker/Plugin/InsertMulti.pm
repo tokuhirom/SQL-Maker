@@ -39,8 +39,13 @@ sub insert_multi {
         my @value_stmt;
         for my $val (@$value) {
             if (Scalar::Util::blessed($val)) {
-                push @value_stmt, $val->as_sql(undef, sub { $self->_quote($_[0]) });
-                push @bind, $val->bind();
+                if ($val->can('as_sql')) {
+                    push @value_stmt, $val->as_sql(undef, sub { $self->_quote($_[0]) });
+                    push @bind, $val->bind();
+                } else {
+                    push @value_stmt, '?';
+                    push @bind, $val;
+                }
             } else {
                 Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
                     if ref($val) && $self->strict;
