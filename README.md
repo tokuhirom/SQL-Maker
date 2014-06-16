@@ -67,7 +67,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
 - `my $select = $builder->new_select(%args|\%args);`
 
-    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from __$builder__.
+    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from **$builder**.
 
     This method returns an instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
 
@@ -83,7 +83,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - `$table`
     - `\@tables`
 
-        Table name for the __FROM__ clause as scalar or arrayref. You can specify the instance of __SQL::Maker::Select__ for a sub-query.
+        Table name for the **FROM** clause as scalar or arrayref. You can specify the instance of **SQL::Maker::Select** for a sub-query.
 
         If you are using `$opt->{joins}` this should be _undef_ since it's passed via the first join.
 
@@ -123,7 +123,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         - `$opt->{order_by}`
 
-            This option adds an __ORDER BY__ clause
+            This option adds an **ORDER BY** clause
 
             You can write it in any of the following forms:
 
@@ -134,7 +134,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         - `$opt->{group_by}`
 
-            This option adds a __GROUP BY__ clause
+            This option adds a **GROUP BY** clause
 
             You can write it in any of the following forms:
 
@@ -279,7 +279,7 @@ SQL::Maker features a plugin system. Write the code as follows:
 
     I need a more extensible one.
 
-    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select), the extensible __SELECT__ clause object.
+    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select), the extensible **SELECT** clause object.
 
 # AUTHOR
 
