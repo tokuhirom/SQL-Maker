@@ -2,9 +2,9 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '1.14';
+our $VERSION = '1.17';
 use Class::Accessor::Lite 0.05 (
-    ro => [qw/quote_char name_sep new_line driver select_class/],
+    ro => [qw/quote_char name_sep new_line strict driver select_class/],
 );
 
 use Carp ();
@@ -47,6 +47,7 @@ sub new {
     return bless {
         name_sep => '.',
         new_line => "\n",
+        strict   => 0,
         %args
     }, $class;
 }
@@ -57,6 +58,7 @@ sub new_condition {
     SQL::Maker::Condition->new(
         quote_char => $self->{quote_char},
         name_sep   => $self->{name_sep},
+        strict     => $self->{strict},
     );
 }
 
@@ -68,6 +70,7 @@ sub new_select {
         name_sep   => $self->name_sep,
         quote_char => $self->quote_char,
         new_line   => $self->new_line,
+        strict     => $self->strict,
         %args,
     );
 }
@@ -84,20 +87,32 @@ sub insert {
     @values = ref $values eq 'HASH' ? %$values : @$values;
     while (my ($col, $val) = splice(@values, 0, 2)) {
         push @quoted_columns, $self->_quote($col);
-        if (ref($val) eq 'SCALAR') {
-            # $builder->insert(foo => { created_on => \"NOW()" });
-            push @columns, $$val;
-        }
-        elsif (ref($val) eq 'REF' && ref($$val) eq 'ARRAY') {
-            # $builder->insert( foo => \[ 'UNIX_TIMESTAMP(?)', '2011-04-12 00:34:12' ] );
-            my ( $stmt, @sub_bind ) = @{$$val};
-            push @columns, $stmt;
-            push @bind_columns, @sub_bind;
-        }
-        else {
-            # normal values
-            push @columns, '?';
-            push @bind_columns, $val;
+        if (Scalar::Util::blessed($val)) {
+            if ($val->can('as_sql')) {
+                push @columns, $val->as_sql(undef, sub { $self->_quote($_[0]) });
+                push @bind_columns, $val->bind();
+            } else {
+                push @columns, '?';
+                push @bind_columns, $val;
+            }
+        } else {
+            Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
+                if ref($val) && $self->strict;
+            if (ref($val) eq 'SCALAR') {
+                # $builder->insert(foo => { created_on => \"NOW()" });
+                push @columns, $$val;
+            }
+            elsif (ref($val) eq 'REF' && ref($$val) eq 'ARRAY') {
+                # $builder->insert( foo => \[ 'UNIX_TIMESTAMP(?)', '2011-04-12 00:34:12' ] );
+                my ( $stmt, @sub_bind ) = @{$$val};
+                push @columns, $stmt;
+                push @bind_columns, @sub_bind;
+            }
+            else {
+                # normal values
+                push @columns, '?';
+                push @bind_columns, $val;
+            }
         }
     }
 
@@ -159,20 +174,32 @@ sub make_set_clause {
     my @args = ref $args eq 'HASH' ? %$args : @$args;
     while (my ($col, $val) = splice @args, 0, 2) {
         my $quoted_col = $self->_quote($col);
-        if (ref $val eq 'SCALAR') {
-            # $builder->update(foo => { created_on => \"NOW()" });
-            push @columns, "$quoted_col = " . $$val;
-        }
-        elsif ( ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
-            # $builder->update( foo => \[ 'VALUES(foo) + ?', 10 ] );
-            my ( $stmt, @sub_bind ) = @{$$val};
-            push @columns, "$quoted_col = " . $stmt;
-            push @bind_columns, @sub_bind;
-        }
-        else {
-            # normal values
-            push @columns, "$quoted_col = ?";
-            push @bind_columns, $val;
+        if (Scalar::Util::blessed($val)) {
+            if ($val->can('as_sql')) {
+                push @columns, "$quoted_col = " . $val->as_sql(undef, sub { $self->_quote($_[0]) });
+                push @bind_columns, $val->bind();
+            } else {
+                push @columns, "$quoted_col = ?";
+                push @bind_columns, $val;
+            }
+        } else {
+            Carp::croak("cannot pass in an unblessed ref as an argument in strict mode")
+                if ref($val) && $self->strict;
+            if (ref $val eq 'SCALAR') {
+                # $builder->update(foo => { created_on => \"NOW()" });
+                push @columns, "$quoted_col = " . $$val;
+            }
+            elsif (ref $val eq 'REF' && ref $$val eq 'ARRAY' ) {
+                # $builder->update( foo => \[ 'VALUES(foo) + ?', 10 ] );
+                my ( $stmt, @sub_bind ) = @{$$val};
+                push @columns, "$quoted_col = " . $stmt;
+                push @bind_columns, @sub_bind;
+            }
+            else {
+                # normal values
+                push @columns, "$quoted_col = ?";
+                push @bind_columns, $val;
+            }
         }
     }
     return (\@columns, \@bind_columns);
@@ -291,6 +318,9 @@ sub select_query {
             $stmt->add_group_by(\$o);
         }
     }
+    if (my $o = $opt->{index_hint}) {
+        $stmt->add_index_hint($table, $o);
+    }
 
     $stmt->limit( $opt->{limit} )    if $opt->{limit};
     $stmt->offset( $opt->{offset} )  if $opt->{offset};
@@ -375,6 +405,14 @@ Default: '.'
 This is the character that separates a part of statements.
 
 Default: '\n'
+
+=item strict: Bool
+
+Whether or not the use of unblessed references are prohibited for defining the SQL expressions.
+
+In strict mode, all the expressions must be declared by using blessed references that export C<as_sql> and C<bind> methods like L<SQL::QueryMaker>.
+
+Default: undef
 
 =back
 
@@ -478,6 +516,17 @@ This option adds a 'JOIN' via L<SQL::Maker::Select>.
 You can write it as follows:
 
     $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
+
+=item C<< $opt->{index_hint} >>
+
+This option adds an INDEX HINT like as 'USE INDEX' clause for MySQL via L<SQL::Maker::Select>.
+
+You can write it as follows:
+
+    $builder->select(..., { index_hint => 'foo' });
+    $builder->select(..., { index_hint => ['foo', 'bar'] });
+    $builder->select(..., { index_hint => { list => 'foo' });
+    $builder->select(..., { index_hint => { type => 'FORCE', list => ['foo', 'bar'] });
 
 =back
 
@@ -633,6 +682,7 @@ Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>
 =head1 SEE ALSO
 
 L<SQL::Abstract>
+L<SQL::QueryMaker>
 
 The whole code was taken from L<DBIx::Skinny> by nekokak++.
 

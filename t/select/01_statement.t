@@ -632,6 +632,22 @@ subtest 'index hint' => sub {
         $stmt->add_index_hint('baz' => { type => 'USE', list => ['index_hint']});
         is($stmt->as_sql, "SELECT foo FROM baz USE INDEX (index_hint)", "we can turn on USE INDEX");
     };
+
+    subtest 'hint as scalar' => sub {
+        my $stmt = ns( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+        $stmt->add_select(foo => 'foo');
+        $stmt->add_from( qw(baz) );
+        $stmt->add_index_hint('baz' => 'index_hint');
+        is($stmt->as_sql, "SELECT foo FROM baz USE INDEX (index_hint)", "we can turn on USE INDEX");
+    };
+
+    subtest 'hint as array ref' => sub {
+        my $stmt = ns( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+        $stmt->add_select(foo => 'foo');
+        $stmt->add_from( qw(baz) );
+        $stmt->add_index_hint('baz' => ['index_hint']);
+        is($stmt->as_sql, "SELECT foo FROM baz USE INDEX (index_hint)", "we can turn on USE INDEX");
+    };
 };
 
 subtest 'index hint with joins' => sub {

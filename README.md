@@ -57,9 +57,17 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         Default: '\\n'
 
+    - strict: Bool
+
+        Whether or not the use of unblessed references are prohibited for defining the SQL expressions.
+
+        In strict mode, all the expressions must be declared by using blessed references that export `as_sql` and `bind` methods like [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker).
+
+        Default: undef
+
 - `my $select = $builder->new_select(%args|\%args);`
 
-    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from __$builder__.
+    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from **$builder**.
 
     This method returns an instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
 
@@ -75,7 +83,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - `$table`
     - `\@tables`
 
-        Table name for the __FROM__ clause as scalar or arrayref. You can specify the instance of __SQL::Maker::Select__ for a sub-query.
+        Table name for the **FROM** clause as scalar or arrayref. You can specify the instance of **SQL::Maker::Select** for a sub-query.
 
         If you are using `$opt->{joins}` this should be _undef_ since it's passed via the first join.
 
@@ -115,7 +123,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         - `$opt->{order_by}`
 
-            This option adds an __ORDER BY__ clause
+            This option adds an **ORDER BY** clause
 
             You can write it in any of the following forms:
 
@@ -126,7 +134,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         - `$opt->{group_by}`
 
-            This option adds a __GROUP BY__ clause
+            This option adds a **GROUP BY** clause
 
             You can write it in any of the following forms:
 
@@ -150,6 +158,17 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
             You can write it as follows:
 
                 $builder->select(undef, ..., {joins => [[user => {table => 'group', condition => 'user.gid = group.gid'}], ...]});
+
+        - `$opt->{index_hint}`
+
+            This option adds an INDEX HINT like as 'USE INDEX' clause for MySQL via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+
+            You can write it as follows:
+
+                $builder->select(..., { index_hint => 'foo' });
+                $builder->select(..., { index_hint => ['foo', 'bar'] });
+                $builder->select(..., { index_hint => { list => 'foo' });
+                $builder->select(..., { index_hint => { type => 'FORCE', list => ['foo', 'bar'] });
 
 - `my ($sql, @binds) = $builder->insert($table, \%values|\@values, \%opt);`
 
@@ -260,7 +279,7 @@ SQL::Maker features a plugin system. Write the code as follows:
 
     I need a more extensible one.
 
-    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select), the extensible __SELECT__ clause object.
+    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select), the extensible **SELECT** clause object.
 
 # AUTHOR
 
@@ -269,6 +288,7 @@ Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
 # SEE ALSO
 
 [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract)
+[SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker)
 
 The whole code was taken from [DBIx::Skinny](https://metacpan.org/pod/DBIx::Skinny) by nekokak++.
 

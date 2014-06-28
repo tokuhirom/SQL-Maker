@@ -432,6 +432,23 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
         };
     };
 
+    subtest 'index_hint' => sub {
+        subtest 'scalar' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {index_hint => 'bar'});
+            is $sql, qq{SELECT * FROM foo USE INDEX (bar)};
+        };
+
+        subtest 'array ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {index_hint => ['bar', 'baz']});
+            is $sql, qq{SELECT * FROM foo USE INDEX (bar,baz)};
+        };
+
+        subtest 'hash ref' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {index_hint => {type => 'FORCE', list => ['bar']}});
+            is $sql, qq{SELECT * FROM foo FORCE INDEX (bar)};
+        };
+    };
+
     subtest 'from' => sub {
         subtest 'multi from' => sub {
             my ($sql, @binds) = $builder->select( [ qw/foo bar/ ], ['*'], +{}, );

@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,8 @@
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
-            "Test::MinimumVersion" : "0.10108",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -46,6 +47,7 @@
             "Class::Accessor::Lite" : "0.05",
             "DBI" : "0",
             "Module::Load" : "0",
+            "SQL::QueryMaker" : "0",
             "Scalar::Util" : "0",
             "parent" : "0",
             "perl" : "5.008001"
@@ -53,6 +55,7 @@
       },
       "test" : {
          "requires" : {
+            "DateTime" : "0",
             "Test::More" : "0.98",
             "Test::Requires" : "0",
             "Tie::IxHash" : "0"
@@ -71,7 +74,8 @@
          "web" : "https://github.com/tokuhirom/SQL-Maker"
       }
    },
-   "version" : "1.14",
+   "version" : "1.17",
+   "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "lestrrat <lestrrat+github@gmail.com>",
       "makamaka <makamaka.donzoko@gmail.com>",
@@ -86,6 +90,8 @@
       "Neil Bowers <neil@bowers.com>",
       "Gelu Lupas <gvl@cpan.org>",
       "karupanerura <karupa@cpan.org>",
+      "soh335 <sugarbabe335@gmail.com>",
+      "Kazuho Oku <kazuhooku@gmail.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ]
 }
