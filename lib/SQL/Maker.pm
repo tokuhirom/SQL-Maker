@@ -322,7 +322,7 @@ sub select_query {
         $stmt->add_index_hint($table, $o);
     }
 
-    $stmt->limit( $opt->{limit} )    if $opt->{limit};
+    $stmt->limit( $opt->{limit} )    if defined $opt->{limit};
     $stmt->offset( $opt->{offset} )  if $opt->{offset};
 
     if (my $terms = $opt->{having}) {

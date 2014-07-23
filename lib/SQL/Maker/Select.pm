@@ -204,7 +204,7 @@ sub as_sql {
     $sql .= $self->as_sql_having    if $self->{having};
     $sql .= $self->as_sql_order_by  if $self->{order_by};
 
-    $sql .= $self->as_sql_limit     if $self->{limit};
+    $sql .= $self->as_sql_limit     if defined $self->{limit};
 
     $sql .= $self->as_sql_for_update;
     $sql =~ s/${new_line}+$//;
@@ -214,8 +214,10 @@ sub as_sql {
 
 sub as_sql_limit {
     my $self = shift;
-    my $n = $self->{limit} or
-        return '';
+
+    my $n = $self->{limit};
+    return '' unless defined $n;
+
     die "Non-numerics in limit clause ($n)" if $n =~ /\D/;
     return sprintf "LIMIT %d%s" . $self->new_line, $n,
            ($self->{offset} ? " OFFSET " . int($self->{offset}) : "");
