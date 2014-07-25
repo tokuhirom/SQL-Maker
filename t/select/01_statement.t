@@ -443,6 +443,8 @@ subtest 'LIMIT OFFSET' => sub {
         is($stmt->as_sql, "FROM `foo`\nLIMIT 5");
         $stmt->offset(10);
         is($stmt->as_sql, "FROM `foo`\nLIMIT 5 OFFSET 10");
+        $stmt->limit(0);
+        is($stmt->as_sql, "FROM `foo`\nLIMIT 0 OFFSET 10");
         $stmt->limit("  15g");  ## Non-numerics should cause an error
         {
             my $sql = eval { $stmt->as_sql };
@@ -457,6 +459,8 @@ subtest 'LIMIT OFFSET' => sub {
         is($stmt->as_sql, "FROM foo LIMIT 5");
         $stmt->offset(10);
         is($stmt->as_sql, "FROM foo LIMIT 5 OFFSET 10");
+        $stmt->limit(0);
+        is($stmt->as_sql, "FROM foo LIMIT 0 OFFSET 10");
         $stmt->limit("  15g");  ## Non-numerics should cause an error
         {
             my $sql = eval { $stmt->as_sql };

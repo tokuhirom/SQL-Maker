@@ -84,6 +84,27 @@ subtest 'driver: sqlite' => sub {
         is join(',', @binds), '';
     };
 
+    subtest 'limit' => sub {
+        subtest 'with value' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {limit => 3});
+            is $sql ,qq{SELECT *\nFROM "foo"\nLIMIT 3};
+            is join(',', @binds), '';
+        };
+
+        subtest 'with zero' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {limit => 0});
+            is $sql ,qq{SELECT *\nFROM "foo"\nLIMIT 0};
+            is join(',', @binds), '';
+        };
+
+        subtest 'with non-numeric' => sub {
+            {
+                my ($sql, @binds) = eval { $builder->select('foo' => ['*'], +{}, {limit => '  9t'}) };
+                like $@, qr/Non-numerics/;
+            }
+        }
+    };
+
     subtest 'order_by' => sub {
         subtest 'scalar' => sub {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
@@ -238,6 +259,27 @@ subtest 'driver: mysql' => sub {
         is join(',', @binds), '';
     };
 
+    subtest 'limit' => sub {
+        subtest 'with value' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {limit => 3});
+            is $sql ,qq{SELECT *\nFROM `foo`\nLIMIT 3};
+            is join(',', @binds), '';
+        };
+
+        subtest 'with zero' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {limit => 0});
+            is $sql ,qq{SELECT *\nFROM `foo`\nLIMIT 0};
+            is join(',', @binds), '';
+        };
+
+        subtest 'with non-numeric' => sub {
+            {
+                my ($sql, @binds) = eval { $builder->select('foo' => ['*'], +{}, {limit => '  9t'}) };
+                like $@, qr/Non-numerics/;
+            }
+        }
+    };
+
     subtest 'order_by' => sub {
         subtest 'scalar' => sub {
             my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {order_by => 'yo'});
@@ -378,6 +420,27 @@ subtest 'driver: mysql, quote_char: "", new_line: " "' => sub {
         my ($sql, @binds) = $builder->select('foo' => ['foo', 'bar'], [], {prefix => 'SELECT SQL_CALC_FOUND_ROWS '});
         is $sql, qq{SELECT SQL_CALC_FOUND_ROWS foo, bar FROM foo};
         is join(',', @binds), '';
+    };
+
+    subtest 'limit' => sub {
+        subtest 'with value' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {limit => 3});
+            is $sql ,qq{SELECT * FROM foo LIMIT 3};
+            is join(',', @binds), '';
+        };
+
+        subtest 'with zero' => sub {
+            my ($sql, @binds) = $builder->select('foo' => ['*'], +{}, {limit => 0});
+            is $sql ,qq{SELECT * FROM foo LIMIT 0};
+            is join(',', @binds), '';
+        };
+
+        subtest 'with non-numeric' => sub {
+            {
+                my ($sql, @binds) = eval { $builder->select('foo' => ['*'], +{}, {limit => '  9t'}) };
+                like $@, qr/Non-numerics/;
+            }
+        }
     };
 
     subtest 'order_by' => sub {
