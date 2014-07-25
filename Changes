@@ -2,6 +2,10 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.18 2014-07-25T23:52:14Z
+
+    Handle `limit 0` correctly.
+
 1.17 2014-06-16T05:24:23Z
 
     [BUG FIX]

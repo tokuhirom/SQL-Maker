@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line strict driver select_class/],
 );
