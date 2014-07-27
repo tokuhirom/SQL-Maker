@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line strict driver select_class/],
 );
@@ -322,7 +322,7 @@ sub select_query {
         $stmt->add_index_hint($table, $o);
     }
 
-    $stmt->limit( $opt->{limit} )    if $opt->{limit};
+    $stmt->limit( $opt->{limit} )    if defined $opt->{limit};
     $stmt->offset( $opt->{offset} )  if $opt->{offset};
 
     if (my $terms = $opt->{having}) {

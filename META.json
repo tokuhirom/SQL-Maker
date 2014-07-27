@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.1.0, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Minilla/v2.1.0, CPAN::Meta::Converter version 2.141520",
    "license" : [
       "perl_5"
    ],
@@ -28,8 +28,6 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
             "Module::Build" : "0.38"
          }
       },
@@ -74,7 +72,7 @@
          "web" : "https://github.com/tokuhirom/SQL-Maker"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_authority" : "cpan:TOKUHIROM",
    "x_contributors" : [
       "lestrrat <lestrrat+github@gmail.com>",
@@ -92,6 +90,7 @@
       "karupanerura <karupa@cpan.org>",
       "soh335 <sugarbabe335@gmail.com>",
       "Kazuho Oku <kazuhooku@gmail.com>",
+      "pokutuna <popopopopokutuna@gmail.com>",
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ]
 }
