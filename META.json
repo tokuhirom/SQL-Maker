@@ -56,7 +56,8 @@
             "DateTime" : "0",
             "Test::More" : "0.98",
             "Test::Requires" : "0",
-            "Tie::IxHash" : "0"
+            "Tie::IxHash" : "0",
+            "DBD::SQLite" : "0"
          }
       }
    },
