@@ -1,10 +1,12 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
 use SQL::Maker;
 use SQL::QueryMaker;
-use Test::Requires 'DateTime';
 use Test::Requires 'Tie::IxHash';
+
+require_ok('FooTime');
 
 sub ordered_hashref {
     tie my %params, Tie::IxHash::, @_;
@@ -61,14 +63,14 @@ subtest 'mysql' => sub {
                         john       => 'man',
                         created_on => \"UNIX_TIMESTAMP()",
                         updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-12" ],
-                        expires    => DateTime->new(year => 2024),
+                        expires    => FooTime->new(year => 2024),
                     ),
                     ordered_hashref(
                         bar        => 'bee',
                         john       => 'row',
                         created_on => \"UNIX_TIMESTAMP()",
                         updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-13" ],
-                        expires    => DateTime->new(year => 2025),
+                        expires    => FooTime->new(year => 2025),
                     ),
                 ],
                 +{
@@ -76,7 +78,7 @@ subtest 'mysql' => sub {
                         bar        => \"VALUES(bar)",
                         john       => "john",
                         updated_on => \[ "UNIX_TIMESTAMP(?)", "2011-04-14" ],
-                        expires    => DateTime->new(year => 2025),
+                        expires    => FooTime->new(year => 2025),
                     )
                 },
             );
