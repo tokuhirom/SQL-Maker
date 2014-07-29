@@ -1,9 +1,11 @@
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
 use SQL::Maker;
 use Test::Requires 'Tie::IxHash';
-use Test::Requires 'DateTime';
+
+require_ok("FooTime");
 
 sub ordered_hashref {
     tie my %params, Tie::IxHash::, @_;
@@ -32,13 +34,13 @@ subtest 'driver: sqlite' => sub {
     };
 
     subtest 'hash-stringify' => sub {
-        my ($sql, @binds) = $builder->where({ x => DateTime->new(year => 2025) });
+        my ($sql, @binds) = $builder->where({ x => FooTime->new(year => 2025) });
         is $sql, qq{("x" = ?)};
         is join(',', @binds), '2025-01-01T00:00:00';
     };
 
     subtest 'hash-stringify' => sub {
-        my ($sql, @binds) = $builder->where([x => DateTime->new(year => 2025)]);
+        my ($sql, @binds) = $builder->where([x => FooTime->new(year => 2025)]);
         is $sql, qq{("x" = ?)};
         is join(',', @binds), '2025-01-01T00:00:00';
     };

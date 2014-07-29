@@ -10,6 +10,5 @@ requires 'SQL::QueryMaker';
 on test => sub {
     requires 'Test::More', '0.98';
     requires 'Test::Requires';
-    requires 'DateTime';
     requires 'Tie::IxHash';
 };
