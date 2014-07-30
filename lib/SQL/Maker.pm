@@ -233,7 +233,7 @@ sub _make_where_clause {
     return ['', []] unless $where;
 
     my $w = $self->_make_where_condition($where);
-    my $sql = $w->as_sql(1);
+    my $sql = $w->as_sql();
     return [$sql ? " WHERE $sql" : '', [$w->bind]];
 }
 
