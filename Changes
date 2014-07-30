@@ -2,6 +2,11 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.19 2014-07-30T09:32:20Z
+
+    - Fix issue 38: update() and delete() cannot use SQL::QueryMaker
+      (Kazuho Oku)
+
 1.18 2014-07-25T23:52:14Z
 
     Handle `limit 0` correctly.

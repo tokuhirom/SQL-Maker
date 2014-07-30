@@ -1,1 +1,2 @@
 authority="cpan:TOKUHIROM"
+module_maker="ModuleBuildTiny"
