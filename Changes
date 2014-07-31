@@ -2,6 +2,11 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.20 2014-07-31T20:59:30Z
+
+    - DateTime is a testing deps
+      (Gelu Lupas)
+
 1.19 2014-07-30T09:32:20Z
 
     - Fix issue 38: update() and delete() cannot use SQL::QueryMaker
