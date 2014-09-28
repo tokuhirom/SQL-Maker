@@ -62,11 +62,23 @@ subtest "maker->select (err)" => checkerr(sub {
     $maker->select("user", ['*'], { name => ["John", "Tom" ]});
 });
 
+subtest "maker->select (ok)", sub {
+    $maker->select("user", ['*'], { name => sql_in(["John", "Tom"]) });
+    $maker->select("user", ['*'], $maker->new_condition->add(name => sql_in(["John", "Tom"])));
+    $maker->select("user", ['*'], sql_in(name => ["John", "Tom"]));
+    ok("run without croaking");
+};
+
 subtest "maker->insert (err)" => checkerr(sub {
     $maker->insert(
         user => [ name => "John", created_on => \"datetime(now)" ]
     );
 });
+
+subtest "maker->insert (ok)" => sub {
+    $maker->insert(user => [name => "John", created_on => sql_raw("datetime(now)")]);
+    ok("run without croaking");
+};
 
 subtest "maker->delete (err)" => checkerr(sub {
     $maker->delete(user => [ name => ["John", "Tom"]]);
