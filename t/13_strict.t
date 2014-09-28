@@ -31,7 +31,7 @@ subtest "maker->select where" => sub {
 };
 
 subtest "maker->update where" => sub {
-  my ($sql, @binds) = $maker->delete("table", sql_eq(id => 1));
+  my ($sql, @binds) = $maker->update("table", [], sql_eq(id => 1));
   like $sql, qr/WHERE\s+.*id.*\s*=/s;
   is_deeply \@binds, [ 1 ];
 };
