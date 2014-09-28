@@ -55,6 +55,12 @@ foreach my $cond_case (@condition_cases) {
         my ($sql, @binds) = $maker->delete("table", $cond);
         like $sql, qr/:foo:-:bar:/;
     };
+
+    subtest "where: $cond_case->{label}" => sub {
+        my $cond = $cond_case->{cond_maker}();
+        my ($sql, @binds) = $maker->where($cond);
+        like $sql, qr/:foo:-:bar:/;
+    };
 }
 
 done_testing;

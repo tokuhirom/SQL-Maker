@@ -208,7 +208,7 @@ sub make_set_clause {
 sub where {
     my ($self, $where) = @_;
     my $cond = $self->_make_where_condition($where);
-    return ($cond->as_sql(), $cond->bind());
+    return ($cond->as_sql(undef, sub { $self->_quote($_[0]) }), $cond->bind());
 }
 
 sub _make_where_condition {
