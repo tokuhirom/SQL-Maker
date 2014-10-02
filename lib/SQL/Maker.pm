@@ -456,7 +456,7 @@ of column and alias names (e.g. C<< ['foo.id' => 'foo_id'] >>).
 
 =item C<< $where >>
 
-where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =item C<< \%opt >>
 
@@ -591,7 +591,7 @@ Table name in scalar.
 
 =item C<< $where >>
 
-where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =item C<< \%opt >>
 
@@ -638,7 +638,7 @@ Setting values.
 
 =item $where
 
-where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =back
 
@@ -652,7 +652,7 @@ Create new L<SQL::Maker::Condition> object from C< $builder > settings.
 
 =item C<< my ($sql, @binds) = $builder->where(\@where) >>
 
-Where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+Where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =back
 
@@ -684,7 +684,7 @@ Values in C<%values> and C<%set> parameter for C<insert> and C<update> methods, 
 
 =back
 
-You can use L<SQL::Maker::Condition> or L<SQL::QueryMaker> objects for those parameters.
+You can use L<SQL::QueryMaker> objects for those parameters.
 
 Example:
 
