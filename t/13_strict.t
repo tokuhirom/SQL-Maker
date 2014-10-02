@@ -42,6 +42,12 @@ subtest "maker->delete where" => sub {
   is_deeply \@binds, [ 1 ];
 };
 
+subtest "maker->where" => sub {
+  my ($sql, @binds) = $maker->where(sql_eq(id => 1));
+  like $sql, qr/id.*\s*=/s;
+  is_deeply \@binds, [ 1 ];
+};
+
 subtest "maker->new_condition (err)" => checkerr(sub {
     $maker->new_condition->add(
         foo => [1],
