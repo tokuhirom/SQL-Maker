@@ -208,7 +208,7 @@ sub make_set_clause {
 sub where {
     my ($self, $where) = @_;
     my $cond = $self->_make_where_condition($where);
-    return ($cond->as_sql(), $cond->bind());
+    return ($cond->as_sql(undef, sub { $self->_quote($_[0]) }), $cond->bind());
 }
 
 sub _make_where_condition {
@@ -233,7 +233,7 @@ sub _make_where_clause {
     return ['', []] unless $where;
 
     my $w = $self->_make_where_condition($where);
-    my $sql = $w->as_sql();
+    my $sql = $w->as_sql(undef, sub { $self->_quote($_[0]) });
     return [$sql ? " WHERE $sql" : '', [$w->bind]];
 }
 
@@ -411,6 +411,7 @@ Default: '\n'
 Whether or not the use of unblessed references are prohibited for defining the SQL expressions.
 
 In strict mode, all the expressions must be declared by using blessed references that export C<as_sql> and C<bind> methods like L<SQL::QueryMaker>.
+See L</STRICT MODE> for detail.
 
 Default: undef
 
@@ -455,7 +456,7 @@ of column and alias names (e.g. C<< ['foo.id' => 'foo_id'] >>).
 
 =item C<< $where >>
 
-where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =item C<< \%opt >>
 
@@ -590,7 +591,7 @@ Table name in scalar.
 
 =item C<< $where >>
 
-where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =item C<< \%opt >>
 
@@ -637,7 +638,7 @@ Setting values.
 
 =item $where
 
-where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =back
 
@@ -651,7 +652,7 @@ Create new L<SQL::Maker::Condition> object from C< $builder > settings.
 
 =item C<< my ($sql, @binds) = $builder->where(\@where) >>
 
-Where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object.
+Where clause from a hashref or arrayref via L<SQL::Maker::Condition>, or L<SQL::Maker::Condition> object, or L<SQL::QueryMaker> object.
 
 =back
 
@@ -662,6 +663,50 @@ SQL::Maker features a plugin system. Write the code as follows:
     package My::SQL::Maker;
     use parent qw/SQL::Maker/;
     __PACKAGE__->load_plugin('InsertMulti');
+
+=head1 STRICT MODE
+
+See L<http://blog.kazuhooku.com/2014/07/the-json-sql-injection-vulnerability.html> for why
+do we need the strict mode in the first place.
+
+In strict mode, the following parameters must be blessed references implementing C<as_sql> and C<bind> methods
+if they are NOT simple scalars (i.e. if they are references of any kind).
+
+=over
+
+=item *
+
+Values in C<$where> parameter for C<select>, C<update>, C<delete> methods.
+
+=item *
+
+Values in C<%values> and C<%set> parameter for C<insert> and C<update> methods, respectively.
+
+=back
+
+You can use L<SQL::QueryMaker> objects for those parameters.
+
+Example:
+
+    use SQL::QueryMaker qw(sql_in sql_raw);
+    
+    ## NG: Use array-ref for values.
+    $maker->select("user", ['*'], { name => ["John", "Tom"] });
+    
+    ## OK: Use SQL::QueryMaker
+    $maker->select("user", ['*'], { name => sql_in(["John", "Tom"]) });
+    
+    ## Also OK: $where parameter itself is a blessed object.
+    $maker->select("user", ['*'], $maker->new_condition->add(name => sql_in(["John", "Tom"])));
+    $maker->select("user", ['*'], sql_in(name => ["John", "Tom"]));
+    
+    
+    ## NG: Use scalar-ref for a raw value.
+    $maker->insert(user => [ name => "John", created_on => \"datetime(now)" ]);
+    
+    ## OK: Use SQL::QueryMaker
+    $maker->insert(user => [name => "John", created_on => sql_raw("datetime(now)")]);
+
 
 =head1 FAQ
 

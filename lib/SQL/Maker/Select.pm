@@ -290,7 +290,7 @@ sub add_where_raw {
 sub as_sql_where {
     my $self = shift;
 
-    my $where = $self->{where}->as_sql();
+    my $where = $self->{where}->as_sql(undef, sub { $self->_quote($_[0]) });
     $where ? "WHERE $where" . $self->new_line : '';
 }
 

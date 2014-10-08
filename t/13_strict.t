@@ -31,7 +31,7 @@ subtest "maker->select where" => sub {
 };
 
 subtest "maker->update where" => sub {
-  my ($sql, @binds) = $maker->delete("table", sql_eq(id => 1));
+  my ($sql, @binds) = $maker->update("table", [], sql_eq(id => 1));
   like $sql, qr/WHERE\s+.*id.*\s*=/s;
   is_deeply \@binds, [ 1 ];
 };
@@ -39,6 +39,12 @@ subtest "maker->update where" => sub {
 subtest "maker->delete where" => sub {
   my ($sql, @binds) = $maker->delete("table", sql_eq(id => 1));
   like $sql, qr/WHERE\s+.*id.*\s*=/s;
+  is_deeply \@binds, [ 1 ];
+};
+
+subtest "maker->where" => sub {
+  my ($sql, @binds) = $maker->where(sql_eq(id => 1));
+  like $sql, qr/id.*\s*=/s;
   is_deeply \@binds, [ 1 ];
 };
 
@@ -62,11 +68,23 @@ subtest "maker->select (err)" => checkerr(sub {
     $maker->select("user", ['*'], { name => ["John", "Tom" ]});
 });
 
+subtest "maker->select (ok)", sub {
+    $maker->select("user", ['*'], { name => sql_in(["John", "Tom"]) });
+    $maker->select("user", ['*'], $maker->new_condition->add(name => sql_in(["John", "Tom"])));
+    $maker->select("user", ['*'], sql_in(name => ["John", "Tom"]));
+    ok("run without croaking");
+};
+
 subtest "maker->insert (err)" => checkerr(sub {
     $maker->insert(
         user => [ name => "John", created_on => \"datetime(now)" ]
     );
 });
+
+subtest "maker->insert (ok)" => sub {
+    $maker->insert(user => [name => "John", created_on => sql_raw("datetime(now)")]);
+    ok("run without croaking");
+};
 
 subtest "maker->delete (err)" => checkerr(sub {
     $maker->delete(user => [ name => ["John", "Tom"]]);
