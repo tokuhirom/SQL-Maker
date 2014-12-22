@@ -62,6 +62,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
         Whether or not the use of unblessed references are prohibited for defining the SQL expressions.
 
         In strict mode, all the expressions must be declared by using blessed references that export `as_sql` and `bind` methods like [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker).
+        See ["STRICT MODE"](#strict-mode) for detail.
 
         Default: undef
 
@@ -99,7 +100,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - `\@where`
     - `$where`
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
 
     - `\%opt`
 
@@ -216,7 +217,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - `\@where`
     - `$where`
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
 
     - `\%opt`
 
@@ -253,7 +254,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - \\@where
     - $where
 
-        where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
+        where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
 
 - `$builder->new_condition()`
 
@@ -263,7 +264,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 - `my ($sql, @binds) = $builder->where(\@where)`
 - `my ($sql, @binds) = $builder->where(\@where)`
 
-    Where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object.
+    Where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
 
 # PLUGINS
 
@@ -272,6 +273,40 @@ SQL::Maker features a plugin system. Write the code as follows:
     package My::SQL::Maker;
     use parent qw/SQL::Maker/;
     __PACKAGE__->load_plugin('InsertMulti');
+
+# STRICT MODE
+
+See [http://blog.kazuhooku.com/2014/07/the-json-sql-injection-vulnerability.html](http://blog.kazuhooku.com/2014/07/the-json-sql-injection-vulnerability.html) for why
+do we need the strict mode in the first place.
+
+In strict mode, the following parameters must be blessed references implementing `as_sql` and `bind` methods
+if they are NOT simple scalars (i.e. if they are references of any kind).
+
+- Values in `$where` parameter for `select`, `update`, `delete` methods.
+- Values in `%values` and `%set` parameter for `insert` and `update` methods, respectively.
+
+You can use [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) objects for those parameters.
+
+Example:
+
+    use SQL::QueryMaker qw(sql_in sql_raw);
+    
+    ## NG: Use array-ref for values.
+    $maker->select("user", ['*'], { name => ["John", "Tom"] });
+    
+    ## OK: Use SQL::QueryMaker
+    $maker->select("user", ['*'], { name => sql_in(["John", "Tom"]) });
+    
+    ## Also OK: $where parameter itself is a blessed object.
+    $maker->select("user", ['*'], $maker->new_condition->add(name => sql_in(["John", "Tom"])));
+    $maker->select("user", ['*'], sql_in(name => ["John", "Tom"]));
+    
+    
+    ## NG: Use scalar-ref for a raw value.
+    $maker->insert(user => [ name => "John", created_on => \"datetime(now)" ]);
+    
+    ## OK: Use SQL::QueryMaker
+    $maker->insert(user => [name => "John", created_on => sql_raw("datetime(now)")]);
 
 # FAQ
 

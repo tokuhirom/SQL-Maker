@@ -2,6 +2,11 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.21 2014-12-22T06:27:33Z
+
+    Official support for directly passing a SQL::QueryMaker object as $where parameter #42
+    (debug-ito)
+
 1.20 2014-07-31T20:59:30Z
 
     - DateTime is a testing deps
