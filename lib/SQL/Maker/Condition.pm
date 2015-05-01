@@ -119,7 +119,7 @@ sub _make_term_by_arrayref {
         }
     } else {
         # make_term(foo => +{ 'IN', [1,2,3] }) => foo IN (1,2,3)
-        my $term = $self->_quote($col) . " $op (" . join( ', ', ('?') x scalar @$v ) . ')';
+        my $term = $self->_quote($col) . " $op (" . '?, ' x (scalar @$v - 1) . '?)';
         return ($term, $v);
     }
 }
