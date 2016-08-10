@@ -4,7 +4,7 @@ use warnings;
 use parent qw(SQL::Maker::Select);
 
 ## Oracle doesn't have the LIMIT clause.
-sub as_limit {
+sub as_sql_limit {
     return '';
 }
 
