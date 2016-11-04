@@ -319,7 +319,7 @@ sub select_query {
         }
     }
     if (my $o = $opt->{index_hint}) {
-        $stmt->add_index_hint($table, $o);
+        $stmt->add_index_hint($table // $opt->{joins}[0][0], $o);
     }
 
     $stmt->limit( $opt->{limit} )    if defined $opt->{limit};
