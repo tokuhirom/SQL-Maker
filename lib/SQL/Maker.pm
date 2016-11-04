@@ -319,7 +319,13 @@ sub select_query {
         }
     }
     if (my $o = $opt->{index_hint}) {
-        $stmt->add_index_hint($table, $o);
+        if (defined $table) {
+            $stmt->add_index_hint($table, $o);
+        }
+        elsif (my $joins = $opt->{joins}) {
+            my $target_table = ref $joins->[0][0] eq 'ARRAY' ? $joins->[0][0][0] : $joins->[0][0];
+            $stmt->add_index_hint($target_table, $o);
+        }
     }
 
     $stmt->limit( $opt->{limit} )    if defined $opt->{limit};
