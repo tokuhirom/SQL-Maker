@@ -31,11 +31,22 @@ subtest 'select_query' => sub {
     };
 
     subtest 'index hint with joins' => sub {
-        my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
+        subtest 'not with alias' => sub {
+            my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
 
-        do {
-            my $stmt = $builder->select_query(undef, ['foo', 'bar'], undef, {joins => [[foo => {table => 'bar', condition => 'foo.id = bar.id'}]], index_hint => 'index_hint'});
-            is $stmt->as_sql, qq{SELECT foo, bar FROM foo USE INDEX (index_hint) JOIN bar ON foo.id = bar.id};
+            do {
+                my $stmt = $builder->select_query(undef, ['foo', 'bar'], undef, {joins => [[foo => {table => 'bar', condition => 'foo.id = bar.id'}]], index_hint => 'index_hint'});
+                is $stmt->as_sql, qq{SELECT foo, bar FROM foo USE INDEX (index_hint) JOIN bar ON foo.id = bar.id};
+            };
+        };
+
+        subtest 'with alias' => sub {
+            my $builder = SQL::Maker->new(driver => 'mysql', quote_char => '', new_line => ' ');
+
+            do {
+                my $stmt = $builder->select_query(undef, ['foo', 'bar'], undef, {joins => [[['foo' , 'alias'] => {table => 'bar', condition => 'foo.id = bar.id'}]], index_hint => 'index_hint'});
+                is $stmt->as_sql, qq{SELECT foo, bar FROM foo alias USE INDEX (index_hint) JOIN bar ON foo.id = bar.id};
+            };
         };
     };
 };
