@@ -268,8 +268,14 @@ sub select_query {
         }
     }
 
-    $stmt->prefix($opt->{prefix}) if $opt->{prefix};
+    $self->_process_where($stmt, $where);
+    $self->_process_option($stmt, $opt);
 
+    return $stmt;
+}
+
+sub _process_where {
+    my ($self, $stmt, $where) = @_;
     if ( $where ) {
         $stmt->set_where($self->_make_where_condition($where));
     }
@@ -279,6 +285,12 @@ sub select_query {
             $stmt->add_join(ref $join eq 'ARRAY' ? @$join : $join);
         }
     }
+}
+
+sub _process_option {
+    my ($self, $stmt, $opt) = @_;
+
+    $stmt->prefix($opt->{prefix}) if $opt->{prefix};
 
     if (my $o = $opt->{order_by}) {
         if (ref $o eq 'ARRAY') {
@@ -338,7 +350,6 @@ sub select_query {
     }
 
     $stmt->for_update(1) if $opt->{for_update};
-    return $stmt;
 }
 
 1;
