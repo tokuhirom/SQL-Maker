@@ -315,6 +315,14 @@ sub add_having {
     return $self;
 }
 
+sub add_having_raw {
+    my ($self, $term, $bind) = @_;
+
+    $self->{having} ||= $self->new_condition();
+    $self->{having}->add_raw($term, $bind);
+    return $self;
+}
+
 sub as_sql_for_update {
     my $self = shift;
     $self->{for_update} ? ' FOR UPDATE' : '';
