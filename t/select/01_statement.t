@@ -823,6 +823,50 @@ subtest 'add_where_raw' => sub {
     };
 };
 
+subtest 'add_having_raw' => sub {
+    subtest 'quote_char: "`", name_sep: "."' => sub {
+        my $sql = ns(quote_char => q{`}, name_sep => q{.},);
+        $sql->add_select(foo => 'foo');
+        $sql->add_from('baz');
+        $sql->add_having_raw('MAX(foo) < (?)' => '100');
+
+        is $sql->as_sql, "SELECT `foo`\nFROM `baz`\nHAVING (MAX(foo) < (?))";
+        is $sql->bind->[0], '100';
+    };
+
+    subtest 'quote_char: "", name_sep: ".", new_line: " "' => sub {
+        my $sql = ns(quote_char => q{}, name_sep => q{.}, new_line => q{ });
+        $sql->add_select(foo => 'foo');
+        $sql->add_from('baz');
+        $sql->add_having_raw('MAX(foo) < (?)' => '100');
+
+        is $sql->as_sql, "SELECT foo FROM baz HAVING (MAX(foo) < (?))";
+        is $sql->bind->[0], '100';
+    };
+
+    subtest 'multi values' => sub {
+        my $sql = ns(quote_char => q{}, name_sep => q{.});
+        $sql->add_select(foo => 'foo');
+        $sql->add_from('baz');
+        $sql->add_having_raw('foo = IF(bar = ?, ?, ?)' => ['hoge', 'fuga', 'piyo']);
+
+        is $sql->as_sql, "SELECT foo\nFROM baz\nHAVING (foo = IF(bar = ?, ?, ?))";
+        is $sql->bind->[0], 'hoge';
+        is $sql->bind->[1], 'fuga';
+        is $sql->bind->[2], 'piyo';
+    };
+
+    subtest 'without value' => sub {
+        my $sql = ns(quote_char => q{}, name_sep => q{.});
+        $sql->add_select(foo => 'foo');
+        $sql->add_from('baz');
+        $sql->add_having_raw('foo IS NOT NULL');
+
+        is $sql->as_sql, "SELECT foo\nFROM baz\nHAVING (foo IS NOT NULL)";
+        is scalar(@{$sql->bind}), 0;
+    };
+};
+
 sub ns { SQL::Maker::Select->new(@_) }
 
 done_testing;
