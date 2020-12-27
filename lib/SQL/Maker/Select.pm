@@ -102,6 +102,11 @@ sub add_join {
         $table = \do{ '(' . $table->as_sql . ')' };
     }
 
+    if ( Scalar::Util::blessed( $joins->{table} ) and $joins->{table}->can('as_sql') ) {
+        push @{ $self->{subqueries} }, $joins->{table}->bind;
+        $joins->{table} = \do{ '(' . $joins->{table}->as_sql . ')' };
+    }
+
     push @{ $self->{joins} }, {
         table => [ $table, $alias ],
         joins => $joins,
@@ -393,8 +398,12 @@ I<Return:> $stmt itself.
 
 =item C<< $stmt->add_join(user => {type => 'inner', table => 'config', condition => ['user_id']}); >>
 
+=item C<< $stmt->add_join(user => {type => 'inner', table => $select :SQL::Maker::Select, condition => 'user.user_id = config.user_id'}); >>
+
 Add a new JOIN clause. If you pass an arrayref for 'condition' then it uses 'USING'. If 'type' is omitted
 it falls back to plain JOIN.
+
+You can specify the table name or an instance of L<SQL::Maker::Select> for a sub-query in 'table' argument.
 
     my $stmt = SQL::Maker::Select->new();
     $stmt->add_join(
@@ -445,6 +454,26 @@ it falls back to plain JOIN.
     );
     $stmt->as_sql;
     # => "FROM (SELECT * FROM foo WHERE (hoge = ?)) bar INNER JOIN baz b1 ON bar.baz_id = b1.baz_id";
+
+    my $subquery1 = SQL::Maker::Select->new();
+    $subquery1->add_select('*');
+    $subquery1->add_from( 'foo' );
+    $subquery1->add_where( 'hoge' => 'fuga' );
+    my $subquery2 = SQL::Maker::Select->new();
+    $subquery2->add_select('*');
+    $subquery2->add_from( 'bar' );
+    $subquery2->add_where( 'piyo' => 'gera' );
+    my $stmt = SQL::Maker::Select->new();
+    $stmt->add_join(
+        [ $subquery1, 'f1' ] => {
+            type      => 'inner',
+            table     => $subquery2,
+            alias     => 'b1',
+            condition => 'f1.baz_id = b1.baz_id'
+        },
+    );
+    $stmt->as_sql;
+    # => "FROM (SELECT * FROM foo WHERE (hoge = ?)) f1 INNER JOIN (SELECT * FROM bar WHERE (piyo = ?)) b1 ON f1.baz_id = b1.baz_id";
 
 =item C<< $stmt->add_index_hint(foo => {type => 'USE', list => ['index_hint']}); >>
 

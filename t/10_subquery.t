@@ -66,6 +66,30 @@ subtest 'subquery_and_join' => sub {
     is join(',', $stmt->bind), 'fuga';
 };
 
+subtest 'join_subqueries' => sub {
+    my $subquery1 = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $subquery1->add_select('*');
+    $subquery1->add_from( 'foo' );
+    $subquery1->add_where( 'hoge' => 'fuga' );
+
+    my $subquery2 = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
+    $subquery2->add_select('*');
+    $subquery2->add_from( 'bar' );
+    $subquery2->add_where( 'piyo' => 'gera' );
+
+    my $stmt = SQL::Maker::Select->new();
+    $stmt->add_join(
+        [ $subquery1, 'f1' ] => {
+            type      => 'inner',
+            table     => $subquery2,
+            alias     => 'b1',
+            condition => 'f1.baz_id = b1.baz_id'
+        },
+    );
+    is $stmt->as_sql, "FROM (SELECT * FROM foo WHERE (hoge = ?)) f1 INNER JOIN (SELECT * FROM bar WHERE (piyo = ?)) b1 ON f1.baz_id = b1.baz_id";
+    is join(',', $stmt->bind), 'fuga,gera';
+};
+
 subtest 'complex' => sub {
     my $s1 = SQL::Maker::Select->new( quote_char => q{}, name_sep => q{.}, new_line => q{ } );
     $s1->add_select('*');
