@@ -12,4 +12,5 @@ on test => sub {
     requires 'Test::Requires';
     suggests 'DateTime';
     requires 'Tie::IxHash';
+    requires 'Clone';
 };
