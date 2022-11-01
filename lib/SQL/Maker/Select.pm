@@ -74,10 +74,11 @@ sub bind {
 sub add_select {
     my ($self, $term, $col) = @_;
 
-    $col ||= $term;
     push @{ $self->{select} }, $term;
-    $self->{select_map}->{$term} = $col;
-    $self->{select_map_reverse}->{$col} = $term;
+    if ($col) {
+        $col ||= $term;
+        $self->{select_map_reverse}->{$col} = $term;
+    }
     return $self;
 }
 
@@ -150,6 +151,7 @@ sub as_sql {
     my $new_line = $self->new_line;
     
     if (@{ $self->{select} }) {
+        $self->{select_map} = { reverse %{$self->{select_map_reverse}} };
         $sql .= $self->{prefix};
         $sql .= 'DISTINCT ' if $self->{distinct};
         $sql .= join(', ',  map {
@@ -345,7 +347,6 @@ sub _add_index_hint {
     }
     return $quoted;
 }
-
 
 1;
 __END__
