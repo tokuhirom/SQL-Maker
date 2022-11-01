@@ -2,6 +2,12 @@ Revision history for Perl module SQL::Maker
 
 {{$NEXT}}
 
+1.22 2022-11-01T03:02:16Z
+
+    Cloned object make different SQL from the original. #51
+    https://github.com/tokuhirom/SQL-Maker/pull/51
+    (ktat)
+
 1.21 2014-12-22T06:27:33Z
 
     Official support for directly passing a SQL::QueryMaker object as $where parameter #42

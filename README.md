@@ -25,7 +25,7 @@ SQL::Maker - Yet another SQL builder
 
 # DESCRIPTION
 
-SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https://metacpan.org/pod/DBIx::Skinny)'s SQL generator.
+SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https://metacpan.org/pod/DBIx%3A%3ASkinny)'s SQL generator.
 
 # METHODS
 
@@ -61,16 +61,16 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         Whether or not the use of unblessed references are prohibited for defining the SQL expressions.
 
-        In strict mode, all the expressions must be declared by using blessed references that export `as_sql` and `bind` methods like [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker).
+        In strict mode, all the expressions must be declared by using blessed references that export `as_sql` and `bind` methods like [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker).
         See ["STRICT MODE"](#strict-mode) for detail.
 
         Default: undef
 
 - `my $select = $builder->new_select(%args|\%args);`
 
-    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select) using the settings from **$builder**.
+    Create new instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ASelect) using the settings from **$builder**.
 
-    This method returns an instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+    This method returns an instance of [SQL::Maker::Select](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ASelect).
 
 - `my ($sql, @binds) = $builder->select($table|\@tables, \@fields, \%where|\@where|$where, \%opt);`
 
@@ -100,7 +100,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - `\@where`
     - `$where`
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker) object.
 
     - `\%opt`
 
@@ -154,7 +154,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         - `$opt->{joins}`
 
-            This option adds a 'JOIN' via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+            This option adds a 'JOIN' via [SQL::Maker::Select](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ASelect).
 
             You can write it as follows:
 
@@ -162,7 +162,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
 
         - `$opt->{index_hint}`
 
-            This option adds an INDEX HINT like as 'USE INDEX' clause for MySQL via [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select).
+            This option adds an INDEX HINT like as 'USE INDEX' clause for MySQL via [SQL::Maker::Select](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ASelect).
 
             You can write it as follows:
 
@@ -217,7 +217,7 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - `\@where`
     - `$where`
 
-        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
+        where clause from hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker) object.
 
     - `\%opt`
 
@@ -254,17 +254,17 @@ SQL::Maker is yet another SQL builder class. It is based on [DBIx::Skinny](https
     - \\@where
     - $where
 
-        where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
+        where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker) object.
 
 - `$builder->new_condition()`
 
-    Create new [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object from ` $builder ` settings.
+    Create new [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition) object from ` $builder ` settings.
 
 - `my ($sql, @binds) = $builder->where(\%where)`
 - `my ($sql, @binds) = $builder->where(\@where)`
 - `my ($sql, @binds) = $builder->where(\@where)`
 
-    Where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL::Maker::Condition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) object.
+    Where clause from a hashref or arrayref via [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition), or [SQL::Maker::Condition](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ACondition) object, or [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker) object.
 
 # PLUGINS
 
@@ -285,7 +285,7 @@ if they are NOT simple scalars (i.e. if they are references of any kind).
 - Values in `$where` parameter for `select`, `update`, `delete` methods.
 - Values in `%values` and `%set` parameter for `insert` and `update` methods, respectively.
 
-You can use [SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker) objects for those parameters.
+You can use [SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker) objects for those parameters.
 
 Example:
 
@@ -314,18 +314,18 @@ Example:
 
     I need a more extensible one.
 
-    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL::Maker::Select), the extensible **SELECT** clause object.
+    So, this module contains [SQL::Maker::Select](https://metacpan.org/pod/SQL%3A%3AMaker%3A%3ASelect), the extensible **SELECT** clause object.
 
 # AUTHOR
 
-Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF@ GMAIL COM>
 
 # SEE ALSO
 
-[SQL::Abstract](https://metacpan.org/pod/SQL::Abstract)
-[SQL::QueryMaker](https://metacpan.org/pod/SQL::QueryMaker)
+[SQL::Abstract](https://metacpan.org/pod/SQL%3A%3AAbstract)
+[SQL::QueryMaker](https://metacpan.org/pod/SQL%3A%3AQueryMaker)
 
-The whole code was taken from [DBIx::Skinny](https://metacpan.org/pod/DBIx::Skinny) by nekokak++.
+The whole code was taken from [DBIx::Skinny](https://metacpan.org/pod/DBIx%3A%3ASkinny) by nekokak++.
 
 # LICENSE
 
