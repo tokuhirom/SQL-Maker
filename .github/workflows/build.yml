@@ -1,0 +1,32 @@
+name: CI builds
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        perl: ["5.10", "5.28", "latest"]
+
+    defaults:
+      run:
+        working-directory: "XML/"
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up perl
+      uses: shogo82148/actions-setup-perl@v1
+      with:
+        perl-version: ${{ matrix.perl }}
+        install-modules-with: cpanm
+        install-modules: "Module::Build::Tiny"
+    - run: cpanm --installdeps --notest .
+    - run: perl Makefile.PL
+    - run: ./Build build
+    - run: ./Build test
+
