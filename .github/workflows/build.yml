@@ -22,7 +22,7 @@ jobs:
         install-modules-with: cpanm
         install-modules: "Module::Build::Tiny"
     - run: cpanm --installdeps --notest .
-    - run: perl Makefile.PL
+    - run: perl Build.PL
     - run: ./Build build
     - run: ./Build test
 
