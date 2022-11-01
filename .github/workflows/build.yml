@@ -13,10 +13,6 @@ jobs:
       matrix:
         perl: ["5.10", "5.28", "latest"]
 
-    defaults:
-      run:
-        working-directory: "XML/"
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up perl
