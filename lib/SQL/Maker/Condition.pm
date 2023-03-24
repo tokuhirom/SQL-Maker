@@ -73,6 +73,11 @@ sub _make_term {
             my $term = $self->_quote($col) . " $op (" . shift(@values) . ')';
             return ($term, \@values);
         }
+        elsif ( ( $op eq 'IN' || $op eq 'NOT IN' ) && Scalar::Util::blessed($v) && $v->can('as_sql') ) {
+            # make_term(foo => +{ 'IN', SQL::Maker::Select->new->add_select('foo')->add_from('bar') }) => foo IN (SELECT foo FROM bar)
+            my $term = $self->_quote($col) . " $op (" . $v->as_sql() . ')';
+            return ($term, [$v->bind]);
+        }
         elsif ( ( $op eq 'BETWEEN' ) && ref($v) eq 'ARRAY' ) {
             Carp::croak("USAGE: make_term(foo => {BETWEEN => [\$a, \$b]})") if @$v != 2;
             return ($self->_quote($col) . " BETWEEN ? AND ?", $v);
@@ -310,6 +315,10 @@ Here is a cheat sheet for conditions.
     OUT QUERY: '`foo_id` IN (SELECT foo_id FROM bar WHERE t=?)'
     OUT BIND:  ('44')
 
+    IN:        ['foo_id', {IN => SQL::Maker::Select->new->add_select('foo_id')->add_from('bar')->add_where(t => 44)}]
+    OUT QUERY: '`foo_id` IN (SELECT foo_id FROM bar WHERE (t = ?))'
+    OUT BIND:  ('44')
+
     IN:        ['foo_id',\['MATCH (col1, col2) AGAINST (?)','apples']]
     OUT QUERY: '`foo_id` MATCH (col1, col2) AGAINST (?)'
     OUT BIND:  ('apples')
@@ -336,7 +345,7 @@ Here is a cheat sheet for conditions.
 
     IN:        ['created_on', { '>', \'DATE_SUB(NOW(), INTERVAL 1 DAY)' }]
     OUT QUERY: '`created_on` > DATE_SUB(NOW(), INTERVAL 1 DAY)'
-    OUT BIND:  
+    OUT BIND:  ()
 
 It is also possible to use the functions exported by C<SQL::QueryMaker> to define the conditions.
 

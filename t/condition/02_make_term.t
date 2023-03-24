@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use SQL::Maker::SQLType qw/sql_type/;
 use SQL::Maker::Condition;
+use SQL::Maker::Select;
 use SQL::QueryMaker;
 use DBI qw/:sql_types/;
 
@@ -41,6 +42,7 @@ sub test {
         my $sql = $cond->as_sql;
         $sql =~ s/^\(//;
         $sql =~ s/\)$//;
+        $sql =~ s/\n/ /g;
         is $sql, $expected_term;
         is_deeply [$cond->bind], $expected_bind;
     };
